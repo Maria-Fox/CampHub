@@ -1,0 +1,44 @@
+{%extends "base.html"%} {%block title %} <title>Camphub User Posts</title> {%endblock%}
+<!-- page content here -->
+
+{%block content%} {% if g.user%}
+
+<div>
+  <h1> Camphub User Posts - All </h1>
+
+
+{%if serialized_posts%}
+{% for post in serialized_posts%}
+<div class = "user-post">
+  <h2>{{title}}</h2>
+  <p><small>{{author_id}}</small></p>
+  <p>{{content}}</p>
+
+
+  <!-- ON USER POST, NOT MODERATOR POST -->
+  <form action="/comment/user/{{post_id}}">Add Comment</form>
+
+</div>
+
+{%endfor%}
+<a href="/camphub/posts">Return to CampHub Posts</a>
+
+  {%else%}
+  <h2>No Posts yet!</h2>
+  <h3><a href="/create/post/{{g.user.id}}">Make a post here at CampHub</a></h3>
+  <h4><a href="https://wordpress.com/home/camphub2022">Create Post in Wordpress</a></h4>
+
+  <a href="/camphub/posts">Return to CampHub Posts</a>
+  {%endif%}
+
+
+</div>
+  <!-- not auth user -->
+  {%else%}
+  <p>Please create an account or sign in to view blogs.</p>
+  <a href="/signup">Sign Up</a>
+  {%endif%}
+
+  <!-- do not touch below -->
+  {%endblock%}
+</div>

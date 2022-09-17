@@ -1,0 +1,35 @@
+{%extends "base.html"%} {%block title %} <title></title> {%endblock%}
+<!-- page content here -->
+
+{%block content%} {% if g.user%}
+<!-- NO NEW BLOGS CAN BE CREATED DUE TO KEY RESTRAINT -->
+
+<h1>{{Title}}</h1>
+<div id="post-content">
+  <p><small>{{author}}</small></p>
+  <p>{{content}}</p>
+</div>
+
+{% if comment_content%} {% for comment in comment_content%}
+<div class="comment-section">
+  <p id="{{comment_id}}">{{comment}}</p>
+</div>
+
+<a href="/">Home</a>
+
+{%endfor%} {%else%}
+<div class="comment-section"><p>No comments yet!</p></div>
+
+<a href="/">Home</a>
+{%endif%}
+
+<!-- not g.user -->
+{%else%}
+<p>Please create an account or sign in to create a blog.</p>
+<a href="/signup">Sign Up</a>
+{%endif%}
+
+<!-- do not touch below -->
+{%endblock%} return render_template("blog_routes/wp_post_comments.html", author
+= author, title = title, content = content, comment_id = comment_id,
+comment_content = comment_content)

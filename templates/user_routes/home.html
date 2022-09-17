@@ -13,7 +13,14 @@
     </form>
   </div>
   <div>
-    <button>View User Posts</button>
+    <form action="/camphub/users/posts">
+      <button>View User Posts</button>
+    </form>
+  </div>
+  <div>
+    <form action="/create/post/{{g.user.id}}">
+      <button>Create Post</button>
+    </form>
   </div>
   <div>
     <form action=""><button>Suggest a Topic</button></form>

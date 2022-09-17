@@ -1,0 +1,35 @@
+{%extends "base.html"%} {%block title %}
+<title>Camphub Comments</title> {%endblock%}
+<!-- page content here -->
+
+{%block content%} {% if g.user%}
+
+<div>
+  <h1>Camphub Comments - All</h1>
+
+  {%if serialized_comments%} {% for comment in serialized_comments%}
+  <div class="user-comment">
+    <p><small>{{comment_user}}</small></p>
+    <p>{{render_content}}</p>
+
+    {%endfor%} {%else%}
+    <h2>No comments yet!</h2>
+    <h3><a href="/create/comment">Make a comment here at CampHub</a></h3>
+    <h4>
+      <a href="https://wordpress.com/home/camphub2022"
+        >Create Comment in Wordpress</a
+      >
+    </h4>
+
+    <a href="/camphub/posts">Return to CampHub Posts</a>
+    {%endif%}
+  </div>
+  <!-- not auth user -->
+  {%else%}
+  <p>Please create an account or sign in to view blogs.</p>
+  <a href="/signup">Sign Up</a>
+  {%endif%}
+
+  <!-- do not touch below -->
+  {%endblock%}
+</div>

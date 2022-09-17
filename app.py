@@ -1,9 +1,10 @@
-from flask import Flask, render_template, redirect, flash, redirect, session, g, abort, request
+from flask import Flask, render_template, redirect, flash, redirect, session, g, abort, request, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 import requests
 from telegraph_api import Telegraph
 from models import db, connect_db, User, User_Post, Comment, Post_Comment
 from forms import Signup_Form, Login_Form, Edit_Profile_form, Create_Post_Form, Comment_Form
+from serialize import serialize, user_post_serialize
 from sqlalchemy.exc import IntegrityError
 import os
 
@@ -175,6 +176,13 @@ def render_homepage(user_id):
   
     return render_template("user_routes/home.html")
 
+
+# 
+# 
+# Camphub post routes
+# 
+# 
+
 @app.route("/camphub/posts")
 def camphub_posts():
     '''View camphub posts made by moderator/ creator.'''
@@ -182,15 +190,12 @@ def camphub_posts():
     if not g.user:
         redirect("/")
 
-
     print("********* posts is ****************")
-    # resp = requests.get(f"{base_url}/{camphub_site}/")
-
-    # resp = resp.json()
-    # wordpress_blog_info = resp
 
     resp = requests.get(f"{base_url}/{camphub_site}/posts/")
     resp = resp.json()
+    print("***************************")
+    print(resp)
     # wordpress_posts = posts['posts']
 
     author = []
@@ -202,6 +207,7 @@ def camphub_posts():
     site = []
 
     # url = resp['posts'][0]['URL']
+    # for i in range(len(resp['posts'])): for all but it prints too many?
     print("******************************")
 
     for i in range(len(resp['posts'])-1):
@@ -219,14 +225,154 @@ def camphub_posts():
     
     print("**********************")
     return render_template("blog_routes/blog.html", author = author, url = url, date = date, title = title, content = content, post_id = post_id, site = site)
+
+
+@app.route("/create/comment", methods = ["GET", "POST"])
+def camphub_comment():
+    '''Create new camphub comment - EXCLUSIVELY ON MODERATOR POSTS.'''
+
+    if not g.user:
+      redirect("/")
+
+    form = Comment_Form()
+
+    if form.validate_on_submit():
+
+        try: 
+          comment_user_id = g.user.id
+          content = form.content.data
+
+          new_comment = Comment(comment_user_id = comment_user_id, content = content)
+
+          db.session.add(new_comment)
+          db.session.commit()
+
+
+          print("NEW COMMENT IS ************")
+          print(new_comment)
+          flash("Your comment was added to camphub comments.")
+          return redirect("/camphub/comments")
+
+        except:
+          flash("Something went wrong- please try again.")
+          return redirect("/create/comment")
+
+
+    return render_template("comment_routes/new_comment.html", form = form)
+
+
+app.route("/comment/user/<int:post_id>")
+def make_user_post_comment(post_id):
+
+  return "this ran"
     
+# this is for ALL comments. Do another for spefic / id comments
+@app.route("/camphub/comments")
+def view_camphub_comments():
+    '''View comments made here on camphub- does not include Wordpress Comments.'''
+
+    if not g.user:
+      return redirect("/")
+
+    all_comments = Comment.query.all()
+    print("*********************")
+    print(all_comments)
+    serialized_comments = [serialize(comment) for comment in all_comments]
+
+    comment_user = []
+    render_content = []
+
+    for i in range(len(serialized_comments)):
+      comment_user.append(serialized_comments[i]['comment_user_id'])
+      render_content.append(serialized_comments[i]['content'])
+
+      print("**********HERE")
+      print(comment_user, render_content)
+    
+    return render_template("comment_routes/camphub_comments.html", serialized_comments = serialized_comments, comment_user = comment_user, render_content = render_content)
+    # return render_template("comment_routes/camphub_comments.html", serialized_comments = serialized_comments)
+   
+
+@app.route("/camphub/users/posts")
+def view_user_posts():
+    '''View all camphub user posts.'''
+
+    if not g.user:
+      return redirect("/")
+
+    all_posts = User_Post.query.all()
+    print("******ALL POSTS ARE*******")
+    print(all_posts)
+
+    serialized_posts = [user_post_serialize(post) for post in all_posts]
+    print(serialized_posts)
+    author_id = serialized_posts[0]['author_id']
+    print(author_id)
+
+    author_id = []
+    title = []
+    content = []
+
+    for i in range(len(serialized_posts)):
+      author_id.append(serialized_posts[i]['author_id'])
+      title.append(serialized_posts[i]['title'])
+      content.append(serialized_posts[i]['content'])
+      print(author_id, title, content)
+      
+    return render_template("user_post_routes/all_posts.html", serialized_posts = serialized_posts, author_id = author_id, title = title, content = content)
+
+
+@app.route("/create/post/<int:user_id>", methods = ["GET", "POST"])
+def create_user_post(user_id):
+    '''Allow authorized users to create indiviudal posts on app.'''
+
+    if not g.user:
+        return redirect("/")
+
+    form = Create_Post_Form()
+
+    if form.validate_on_submit():
+        try:
+        
+            author_id = g.user.id
+            title = form.title.data
+            content = form.content.data
+
+            new_user_post = User_Post(author_id = author_id, title = title, content = content)
+
+            db.session.add(new_user_post)
+            db.session.commit()
+            print(" *************** this is the new user post:")
+            print(new_user_post)
+
+            flash("Your post was added!")
+
+            return redirect("/camphub/user/posts")
+
+        except:
+
+            flash("There was an issue submitting the form. Please try again.")
+            return redirect(f"/create/post/{user_id}")
+
+
+    return render_template("user_post_routes/create_post.html", form = form)
+
+
+
+
+
+# 
+# 
+# Wordpress Routes
+# 
+# 
 
 @app.route("/wordpress/comments")
 def wordpress_comments():
     '''View existing Wordpress Camphub comments.'''
 
     if not g.user:
-      redirect("/")
+        redirect("/")
 
     resp = requests.get(f"{base_url}/{camphub_site}/comments/")
     resp = resp.json()
@@ -246,31 +392,35 @@ def wordpress_comments():
     return render_template("comment_routes/wordpress_comments.html", wordpress_comments = wordpress_comments, wp_comment_id = wp_comment_id)
 
 
-@app.route("/wordpress/view/comment/")
-def view_wordpress_comment(id):
+@app.route("/wordpress/comment/<int:post_id>")
+def view_wordpress_comment(post_id):
     '''View replies to given post.'''
 
-    resp = requests.get(f"{base_url}/sites/{site_id}/")
-    # https://public-api.wordpress.com/rest/v1.1/sites/210640995/posts/13/replies/
-
-    return
-
-@app.route("/create/comment")
-def camphub_comment():
-    '''Create new camphub comment.'''
-
     if not g.user:
-      redirect("/")
+      return redirect("/")
 
-    form = Create_Post_Form()
+    post = requests.get(f"{base_url}/{site_id}/posts/{post_id}")
+    post = post.json()
 
-    if form.validate_on_submit():
+    author = post['author']['nice_name']
+    title =  post['title']
+    content = post['content']
 
-        comment_user_id = g.user.id
-        content = form.content.data
+    # print("PAY ATT HERE*********************")
+    # print(author, title, content)
 
-        new_comment = Comment(comment_user_id = comment_user_id, content = content)
+    comments = requests.get(f"{base_url}/{camphub_site}/posts/{post_id}/replies/")
+    comments = comments.json()
 
-        return 
+    comment_id = []
+    comment_content = []
 
-    return render_template("comment_routes/new_comment.html", form = form)
+
+    for i in range(len(comments['comments'])):
+      if comments['comments']['status'] == "approved":
+        comment_id.push(comments['comments'][i]['ID'])
+        comment_content.push(comments['comments'][i]['raw_comment'])
+
+    return render_template("blog_routes/wp_post_comments.html", author = author, title = title, content = content, comment_id = comment_id, comment_content = comment_content)
+
+

@@ -1,0 +1,75 @@
+body {
+  background-color: black;
+  color: whitesmoke;
+  /* background-image: url("https://images.pexels.com/photos/3825296/pexels-photo-3825296.jpeg?auto=compress&cs=tinysrgb&w=300");
+  background-repeat: no-repeat;
+  background-size: cover; */
+}
+
+#nav-area {
+  border: 1px solid whitesmoke;
+  font-size: 35px;
+  flex-direction: row;
+  display: flex;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: rgba(182, 231, 233, 0.767);
+}
+
+/* #welcome-banner {
+  background-image: url("https://images.pexels.com/photos/3825296/pexels-photo-3825296.jpeg?auto=compress&cs=tinysrgb&w=300");
+  background-repeat: no-repeat;
+  background-size: cover;
+} */
+
+a:link,
+a:visited,
+a:hover,
+a:active {
+  color: blanchedalmond;
+  text-decoration: none;
+}
+
+#app-icon {
+  float: right;
+  position: absolute;
+  top: -12px;
+  right: 15px;
+  /* color: blanchedalmond; */
+  font-size: 25px;
+  /* color: rgba(29, 98, 102, 0.589); */
+}
+
+#sin-button,
+#sup-button {
+  background-color: transparent;
+  color: rgba(21, 88, 92, 0.589);
+  border: none;
+  size: 6rem;
+}
+
+.page-title {
+  align-items: center;
+  font-size: 50px;
+}
+
+/* Registration Page */
+
+#signup-title {
+  font-size: 30px;
+  padding: 5px;
+}
+
+#register-form,
+#login-form {
+  border: 1px solid white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 90%;
+  height: 100%;
+  position: relative;
+  margin: auto;
+}

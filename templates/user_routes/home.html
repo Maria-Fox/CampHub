@@ -1,0 +1,89 @@
+{%extends "base.html"%} {%block title %} <title>Home</title> {%endblock%}
+<!-- page content here -->
+
+{%block content%}
+<!--  -->
+{% if g.user%}
+
+<h1>What would you like to do?</h1>
+<div id="user-options">
+  <div>
+    <form action="/camphub/posts">
+      <button>View Camphub Posts</button>
+    </form>
+  </div>
+  <div>
+    <button>View User Posts</button>
+  </div>
+  <div>
+    <form action=""><button>Suggest a Topic</button></form>
+  </div>
+  <div>
+    <form action="/edit/profile/{{g.user.id}}" method="get">
+      <button>Update Profile</button>
+    </form>
+  </div>
+</div>
+
+<div id="instructions">
+  <h2>Need some direction?</h2>
+  <p>
+    CampHub is a blog site originally hosted under WordPress. In an effort to
+    create a safe environemnt for students to ask questions or provide honest
+    feedback about a bootcamp we have seperated the users as to allow for
+    'camphub-users' and 'wordpress-users'. This means users who post here are
+    deemed camphub-users (privately for application users only) and users who
+    post under Wordpress are 'wordpress-users' (public for all WordPress users).
+    Users should use their preferred site to interact with the content.
+  </p>
+
+  <div id="differences">
+    <h3>What are the differences?</h3>
+
+    <div id="posts">
+      <h4>Posts</h4>
+
+      <p>
+        Wordpress does not allow for blog users to read and create posts. Only
+        the blog creator may do this. Wordpress users may only comment on posts.
+      </p>
+      <p>
+        Camphub-users are provided the option to create their own posts within
+        this application! This allows for more topics and further community
+        interaction. Here, you can post discussion items, questions, or topics
+        you would to receive feedback on. If you would like to discuss a topic
+        but do not feel comfortable posting about it, you may complete the
+        <a href="/suggesttopic">suggest a topic.</a> form and the CampHub
+        moderator will create the post on your behalf. No names/user details
+        will be shared.
+      </p>
+    </div>
+
+    <div id="comments">
+      <h4>Comments</h4>
+      <p>
+        All post comments will be visible here, whether they be made through
+        WordPress or Camphub. However, you may only make comments and respond to
+        comments through the website you are accessing. For example, if you are
+        using CampHub, you may read comments from CampHub and WordPress but may
+        only comment on CampHub comments made here.
+      </p>
+
+      <p>
+        If you are on WordPress you may only read and respond to comments made
+        through WordPress. Camphub-user comments are not visible.
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- {{resp}} -->
+
+<!-- if not signed in -->
+{%else%}
+<p>Please create an account or sign in to view posts.</p>
+<a href="/signup">Sign Up</a>
+{%endif%}
+
+<!-- do not touch below -->
+{%endblock%}

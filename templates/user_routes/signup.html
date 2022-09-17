@@ -1,0 +1,41 @@
+{%extends "base.html"%} {%block title %} <title>Sign Up</title> {%endblock%}
+<!-- page content here -->
+
+{%block content%}
+
+<!--  -->
+
+<div id="register-form">
+  <h1 class="page-title" id="signup-title">Join CampHub</h1>
+
+  <div id="notice-to-user">
+    <h2>Notice to User:</h2>
+    <p>
+      CampHub uses the Google Blogger API - as a result, authorization from a
+      google account is necessary to create an account with CampHub. CampHub
+      will not store any personal or private information from your Google
+      account. Access is simply authorizing an existing gmail account user to a
+      blogger/ CampHub account as required by the API to make comments, posts,
+      etc. This authorization will only need to be completed once. Upon clicking
+      "Create Account" you will be prompted to authorize a connection between a
+      google account and your new CampHub account.
+    </p>
+    <p>
+      CampHub will however store your desired CampHub username and password to
+      authenticate you for any future vists.
+    </p>
+  </div>
+
+  <br />
+  <form action="/signup" , method="post">
+    <!--come back and style the form - leaving to work on functionality for now  -->
+
+    {{form.hidden_tag()}} {%for field in form if field.widget.input_type !=
+    'hidden'%} {{field.label}} {{field}} {%for error in field.errors%}
+    {{error}}{%endfor%} {%endfor%}
+    <button type="submit">Create Account</button>
+  </form>
+</div>
+
+<!-- do not touch below -->
+{%endblock%}

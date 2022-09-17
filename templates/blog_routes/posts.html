@@ -1,0 +1,42 @@
+{%extends "base.html"%} {%block title %}
+<title>Create New Blog</title> {%endblock%}
+<!-- page content here -->
+
+{%block content%} {% if g.user%}
+
+<!-- <h1>Posts</h1>
+<div>
+  <p>Add what you would like to here.</p>
+</div>
+<div>{{resp}}</div> -->
+
+<!-- <div>
+  <h1>Published on: {{published_date}}</h1>
+</div>
+
+<div>Content: {{content}}</div> -->
+
+<div>
+  {%for date in all_dates%}
+  <h1>Published on: {{date}}</h1>
+  {% for cont in all_content%}
+  <div>
+    <p>Content: {{cont}}</p>
+    <!-- should include which post with an id - figure this out -->
+    <form action="/add/comment" , method="get">
+      <button>Add Comment</button>
+    </form>
+    <a href="">View Wordpress Comments</a>
+  </div>
+</div>
+{%endfor%} {%endfor%}
+
+<!-- Comment section -->
+
+<!-- <div>{{resp_dict}}</div> -->
+{%else%}
+<p>Please create an account or sign in to view posts.</p>
+<a href="/signup">Sign Up</a>
+{%endif%}
+<!-- do not touch below -->
+{%endblock%}

@@ -1,0 +1,36 @@
+{%extends "base.html"%} {%block title %} <title>Wordpress Comments</title> {%endblock%}
+<!-- page content here -->
+
+{%block content%} {% if g.user%}
+
+<div>
+  <h1> Wordpress Comments - All </h1>
+
+  {% if wordpress_comment %}
+  {% for comment in wordpress_comment%}
+
+  <div>
+    <p>{{comment}}</p>
+    <small><a href="https://wordpress.com/home/camphub2022">Respond to Comment in Wordpress</a></small>
+  </div>
+  {%endfor%}
+
+  {%else%}
+  <h2>No comments yet!</h2>
+  <h3><a href="/create/comment">Make a comment here at CampHub</a></h3>
+  <h4><a href="https://wordpress.com/home/camphub2022">Create Comment in Wordpress</a></h4>
+
+  <a href="/camphub/posts">Return to CampHub Posts</a>
+  {%endif%}
+
+
+</div>
+  <!-- not auth user -->
+  {%else%}
+  <p>Please create an account or sign in to view blogs.</p>
+  <a href="/signup">Sign Up</a>
+  {%endif%}
+
+  <!-- do not touch below -->
+  {%endblock%}
+</div>

@@ -1,0 +1,32 @@
+{%extends "base.html"%} {%block title %} <title>Wordpress Comments</title> {%endblock%}
+<!-- page content here -->
+
+{%block content%} {% if g.user%}
+
+<div>
+<h1>Create a New Comment</h1>
+
+<form action = "/create/comment" method="post" >
+
+  {{form.hidden_tag()}} 
+  {%for field in form if field.widget.input_type != 'hidden'%}
+  {{field.label}} 
+  {{field}} 
+  
+  {%for error in field.errors%}
+  {{error}}{%endfor%} {%endfor%}
+  <button type="submit">Post</button>
+</form>
+
+</div>
+
+</div>
+  <!-- not auth user -->
+  {%else%}
+  <p>Please create an account or sign in to view blogs.</p>
+  <a href="/signup">Sign Up</a>
+  {%endif%}
+
+  <!-- do not touch below -->
+  {%endblock%}
+</div>

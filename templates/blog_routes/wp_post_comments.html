@@ -10,6 +10,7 @@
   <p>{{content}}</p>
 </div>
 
+<h2>Comments:</h2>
 {% if comment_content%} {% for comment in comment_content%}
 <div class="comment-section">
   <p id="{{comment_id}}">{{comment}}</p>
@@ -19,8 +20,11 @@
 
 {%endfor%} {%else%}
 <div class="comment-section"><p>No comments yet!</p></div>
-
-<a href="/">Home</a>
+<a href="/create/comment">Add Comment Here</a>
+<br />
+<a href="https://wordpress.com/home/camphub2022"
+  >Add Comment through your Wordpress Account</a
+>
 {%endif%}
 
 <!-- not g.user -->

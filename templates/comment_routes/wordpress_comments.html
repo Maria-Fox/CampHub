@@ -4,13 +4,13 @@
 {%block content%} {% if g.user%}
 
 <div>
-  <h1> Wordpress Comments - All </h1>
+  <h1> Wordpress Comments - All</h1>
 
   {% if wordpress_comment %}
   {% for comment in wordpress_comment%}
 
   <div>
-    <p>{{comment}}</p>
+    <blockquote>{{comment}}</blockquote>
     <small><a href="https://wordpress.com/home/camphub2022">Respond to Comment in Wordpress</a></small>
   </div>
   {%endfor%}

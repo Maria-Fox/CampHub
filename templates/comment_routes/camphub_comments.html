@@ -7,10 +7,10 @@
 <div>
   <h1>Camphub Comments - All</h1>
 
-  {%if serialized_comments%} {% for comment in serialized_comments%}
+  {%if all_comments%} {% for comment in all_comments%}
   <div class="user-comment">
-    <p><small>{{comment_user}}</small></p>
-    <p>{{render_content}}</p>
+    <p><small>Published by: {{comment.comment_user_id}}</small></p>
+    <blockquote>{{comment.content}}</blockquote>
 
     {%endfor%} {%else%}
     <h2>No comments yet!</h2>
@@ -24,6 +24,7 @@
     <a href="/camphub/posts">Return to CampHub Posts</a>
     {%endif%}
   </div>
+
   <!-- not auth user -->
   {%else%}
   <p>Please create an account or sign in to view blogs.</p>

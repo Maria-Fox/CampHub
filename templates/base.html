@@ -88,11 +88,6 @@
     </ul>
     {% endif %} {% endwith %}
     <!--  -->
-    
-    <div class="container mt-3">
-      {% for category, message in get_flashed_messages(with_categories=True) %}
-      <div class="alert alert-{{ category }}">{{ message }}</div>
-      {% endfor %}
 
     <!-- body content -->
     {%block content%}
@@ -111,9 +106,9 @@
       we're here to uplift and support one another on our new journey's!
     </p> -->
 
-
-
-    {%endblock%}
+    {%endblock%} {% if g.user%}
+    <a href="/home/{{g.user.id}}">Home</a>
+    {%endif%}
     <!-- Scripts -->
     <script src="https://unpkg.com/jquery"></script>
     <script src="https://developer.biodigital.com/builds/api/2/human-api.min.js"></script>

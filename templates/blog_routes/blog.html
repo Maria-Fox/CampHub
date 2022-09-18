@@ -30,14 +30,20 @@
   <!-- COME BACK AND STYLE AS A BUTTON -->
   <div id = "view-options">
   <a href="/create/comment">Add Comment</a>
-  <a href="/camphub/comments">View CampHub Comments</a>
+  <br>
+  <a href="/camphub/comments">CampHub Comments</a>
+  <br>
   {%for post in post_id%}
-  <a href="/wordpress/comment/{{post}}">View Wordpress Comments on this Post</a>
+  <a href="/wordpress/comment/{{post}}">Wordpress Comments on this Post</a>
   {%endfor%}
-  <a href="/wordpress/comments">View ALL WordPress Comments</a>
+  <br>
+  <a href="/wordpress/comments">ALL WordPress Comments</a>
   </div>
   {%endfor%} {%endfor%} {%endfor%} {%endfor%}
 </div>
+
+
+
   <!-- not auth user -->
   {%else%}
   <p>Please create an account or sign in to view blogs.</p>

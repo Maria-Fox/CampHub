@@ -37,10 +37,10 @@ class User(db.Model):
         return user
 
     @classmethod
-    def authenticate(cls, short_name, given_password):
+    def authenticate(cls, username, given_password):
         '''Validate given form data comapred to db.'''
 
-        user = User.query.filter_by(short_name = short_name).first()
+        user = User.query.filter_by(username = username).first()
       
         if user and bcrypt.check_password_hash(user.password, given_password):
             return user

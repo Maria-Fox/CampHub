@@ -156,7 +156,7 @@ def edit_profile(user_id):
 
     if form.validate_on_submit():
 
-      user.short_name = form.short_name.data 
+      user.username = form.username.data 
       user.school_name = form.school_name.data
       user.field_of_study = form.field_of_study.data
 
@@ -194,6 +194,9 @@ def camphub_posts():
 
     resp = requests.get(f"{base_url}/{camphub_site}/posts/")
     resp = resp.json()
+
+    # need post ID - link to then another route
+
     print("***************************")
     print(resp)
     # wordpress_posts = posts['posts']
@@ -205,6 +208,7 @@ def camphub_posts():
     date = []
     post_id = []
     site = []
+
 
     # url = resp['posts'][0]['URL']
     # for i in range(len(resp['posts'])): for all but it prints too many?
@@ -218,6 +222,10 @@ def camphub_posts():
       content.append(resp['posts'][i]['content'])
       post_id.append(resp['posts'][i]['ID'])
       site.append(resp['posts'][i]['meta']['links']['site'])
+      print("*************")
+      print(post_id)
+
+    
       # print(i, resp['posts'][i])
 
       print("****************************")
@@ -261,9 +269,10 @@ def camphub_comment():
     return render_template("comment_routes/new_comment.html", form = form)
 
 
-app.route("/comment/user/<int:post_id>")
-def make_user_post_comment(post_id):
+app.route("/comment/<int:user_id>/<int:post_id>")
+def make_post_comment(user_id, post_id):
 
+  # FOR SOME REASON THIS ROUTE IS NOT BEING FOUND ON THE SERVER
   return "this ran"
     
 # this is for ALL comments. Do another for spefic / id comments
@@ -277,22 +286,10 @@ def view_camphub_comments():
     all_comments = Comment.query.all()
     print("*********************")
     print(all_comments)
-    serialized_comments = [serialize(comment) for comment in all_comments]
-
-    comment_user = []
-    render_content = []
-
-    for i in range(len(serialized_comments)):
-      comment_user.append(serialized_comments[i]['comment_user_id'])
-      render_content.append(serialized_comments[i]['content'])
-
-      print("**********HERE")
-      print(comment_user, render_content)
     
-    return render_template("comment_routes/camphub_comments.html", serialized_comments = serialized_comments, comment_user = comment_user, render_content = render_content)
-    # return render_template("comment_routes/camphub_comments.html", serialized_comments = serialized_comments)
-   
+    return render_template("comment_routes/camphub_comments.html", all_comments = all_comments)
 
+  
 @app.route("/camphub/users/posts")
 def view_user_posts():
     '''View all camphub user posts.'''
@@ -304,22 +301,13 @@ def view_user_posts():
     print("******ALL POSTS ARE*******")
     print(all_posts)
 
-    serialized_posts = [user_post_serialize(post) for post in all_posts]
-    print(serialized_posts)
-    author_id = serialized_posts[0]['author_id']
-    print(author_id)
-
-    author_id = []
-    title = []
-    content = []
-
-    for i in range(len(serialized_posts)):
-      author_id.append(serialized_posts[i]['author_id'])
-      title.append(serialized_posts[i]['title'])
-      content.append(serialized_posts[i]['content'])
-      print(author_id, title, content)
+    if len(all_posts) >= 1 :
       
-    return render_template("user_post_routes/all_posts.html", serialized_posts = serialized_posts, author_id = author_id, title = title, content = content)
+        return render_template("user_post_routes/all_posts.html", all_posts=all_posts)
+
+    else:
+        return render_template("user_post_routes/all_posts.html")
+
 
 
 @app.route("/create/post/<int:user_id>", methods = ["GET", "POST"])
@@ -347,7 +335,7 @@ def create_user_post(user_id):
 
             flash("Your post was added!")
 
-            return redirect("/camphub/user/posts")
+            return redirect("/camphub/users/posts")
 
         except:
 
@@ -379,6 +367,9 @@ def wordpress_comments():
 
     wordpress_comments = []
     wp_comment_id = []
+
+    # NEED TO INCLUDE POST ID
+    post_id = []
 
     for i in range(len(resp['comments'])):
       wordpress_comments.append(resp['comments'][i]['raw_content'])

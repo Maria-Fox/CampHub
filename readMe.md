@@ -1,6 +1,6 @@
 CampHub
 
-Link to API: Telegraph: https://telegra.ph/api#createPage
+Link to API: Wordpress: https://developer.wordpress.org/rest-api/
 
 1. What goal will your website be designed to achieve?
 

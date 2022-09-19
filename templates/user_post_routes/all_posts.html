@@ -11,7 +11,7 @@
 {% for post in all_posts%}
 <div class = "user-post">
   <h2>{{post.title}}</h2>
-  <p><small>Published by: {{post.author_id}}</small></p>
+  <p><small>Published by: {{post.users.username}}</small></p>
   <blockquote>{{post.content}}</blockquote>
 
   <!-- ON USER POST, NOT MODERATOR POST -->
@@ -21,6 +21,7 @@
 
 {%endfor%}
 
+{{author_name}}
 
 
 <a href="/camphub/posts">Return to CampHub Posts</a>

@@ -255,7 +255,6 @@ def camphub_comment():
           db.session.add(new_comment)
           db.session.commit()
 
-
           print("NEW COMMENT IS ************")
           print(new_comment)
           flash("Your comment was added to camphub comments.")
@@ -269,13 +268,14 @@ def camphub_comment():
     return render_template("comment_routes/new_comment.html", form = form)
 
 
-app.route("/comment/<int:user_id>/<int:post_id>")
+@app.route("/comment/<int:user_id>/<int:post_id>")
 def make_post_comment(user_id, post_id):
 
   # FOR SOME REASON THIS ROUTE IS NOT BEING FOUND ON THE SERVER
-  return "this ran"
+  return redirect("/")
+
     
-# this is for ALL comments. Do another for spefic / id comments
+# this is for ALL comments. 
 @app.route("/camphub/comments")
 def view_camphub_comments():
     '''View comments made here on camphub- does not include Wordpress Comments.'''
@@ -301,13 +301,7 @@ def view_user_posts():
     print("******ALL POSTS ARE*******")
     print(all_posts)
 
-    if len(all_posts) >= 1 :
-      
-        return render_template("user_post_routes/all_posts.html", all_posts=all_posts)
-
-    else:
-        return render_template("user_post_routes/all_posts.html")
-
+    return render_template("user_post_routes/all_posts.html", all_posts = all_posts)
 
 
 @app.route("/create/post/<int:user_id>", methods = ["GET", "POST"])

@@ -5,7 +5,7 @@
 
 CREATE TABLE "users" (
     "id" int   NOT NULL,
-    "user_name" text   NOT NULL,
+    "username" text   NOT NULL,
     "password" text   NOT NULL,
     "school_name" text   NOT NULL,
     "field_of_study" text   NOT NULL,
@@ -14,37 +14,37 @@ CREATE TABLE "users" (
      )
 );
 
-CREATE TABLE "user_posts" (
+CREATE TABLE "camphub_user_posts" (
     "id" int   NOT NULL,
     "author_id" int   NOT NULL,
     "title" text   NOT NULL,
     "content" text   NOT NULL
 );
 
-CREATE TABLE "comments" (
+CREATE TABLE "camphub_comments" (
     "id" int   NOT NULL,
     "comment_user_id" int   NOT NULL,
     "content" text   NOT NULL,
-    CONSTRAINT "pk_comments" PRIMARY KEY (
+    CONSTRAINT "pk_camphub_comments" PRIMARY KEY (
         "id"
      )
 );
 
-CREATE TABLE "post_comments" (
+CREATE TABLE "camphub_post_comments" (
     "id" int   NOT NULL,
-    "post_id" int   NOT NULL,
+    "camphub_post_id" int   NOT NULL,
     "comment_id" int   NOT NULL
 );
 
-ALTER TABLE "user_posts" ADD CONSTRAINT "fk_user_posts_author_id" FOREIGN KEY("author_id")
+ALTER TABLE "camphub_user_posts" ADD CONSTRAINT "fk_camphub_user_posts_author_id" FOREIGN KEY("author_id")
 REFERENCES "users" ("id");
 
-ALTER TABLE "comments" ADD CONSTRAINT "fk_comments_comment_user_id" FOREIGN KEY("comment_user_id")
+ALTER TABLE "camphub_comments" ADD CONSTRAINT "fk_camphub_comments_comment_user_id" FOREIGN KEY("comment_user_id")
 REFERENCES "users" ("id");
 
-ALTER TABLE "post_comments" ADD CONSTRAINT "fk_post_comments_post_id" FOREIGN KEY("post_id")
-REFERENCES "user_posts" ("id");
+ALTER TABLE "camphub_post_comments" ADD CONSTRAINT "fk_camphub_post_comments_camphub_post_id" FOREIGN KEY("camphub_post_id")
+REFERENCES "camphub_user_posts" ("id");
 
-ALTER TABLE "post_comments" ADD CONSTRAINT "fk_post_comments_comment_id" FOREIGN KEY("comment_id")
-REFERENCES "comments" ("id");
+ALTER TABLE "camphub_post_comments" ADD CONSTRAINT "fk_camphub_post_comments_comment_id" FOREIGN KEY("comment_id")
+REFERENCES "camphub_comments" ("id");
 

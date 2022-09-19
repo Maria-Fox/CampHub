@@ -15,7 +15,7 @@
   <blockquote>{{post.content}}</blockquote>
 
   <!-- ON USER POST, NOT MODERATOR POST -->
-  <a href="/comment/{{g.user.id}}/{{post.id}}">Add Comment</a>
+  <a href="/comment/{{post.id}}/{{g.user.id}}">Add Comment</a>
 
 </div>
 
@@ -24,14 +24,14 @@
 {{author_name}}
 
 
-<a href="/camphub/posts">Return to CampHub Posts</a>
+<a href="/wordpress/posts/all">Return to Wordpress Posts</a>
 
   {%else%}
   <h2>No Posts yet!</h2>
   <h3><a href="/create/post/{{g.user.id}}">Make a post here at CampHub</a></h3>
   <h4><a href="https://wordpress.com/home/camphub2022">Create Post in Wordpress</a></h4>
 
-  <a href="/camphub/posts">Return to CampHub Posts</a>
+  <a href="/new/wordpress/posts/all">Return to CampHub Posts</a>
   {%endif%}
 
 

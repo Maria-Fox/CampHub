@@ -25,13 +25,13 @@ class Edit_Profile_form(FlaskForm):
     field_of_study = StringField("Field of Study", validators = [InputRequired()])
     
 
-class Create_Post_Form(FlaskForm):
+class Camphub_User_Post_Form(FlaskForm):
     '''Form for user to create a new page/article.'''
 
     title = StringField("Title", validators=[InputRequired()])
     content = TextAreaField("Content", validators=[InputRequired()])
 
-class Comment_Form(FlaskForm):
+class Camphub_Comment_Form(FlaskForm):
     '''Create a comment for an article/page.'''
 
     content = TextAreaField("Comment", validators = [InputRequired()])

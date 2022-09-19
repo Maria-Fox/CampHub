@@ -55,11 +55,11 @@ class User(db.Model):
     school_name = db.Column(db.String, nullable = False)
     field_of_study = db.Column(db.String, nullable = False)
 
-    posts = db.relationship("User_Post")
-    comments = db.relationship("Comment")
+    posts = db.relationship("Camphub_User_Post")
+    comments = db.relationship("Camphub_Comment")
 
 
-class User_Post(db.Model):
+class Camphub_User_Post(db.Model):
   
     def __repr__(self):
         '''Holds user post information.'''
@@ -67,7 +67,7 @@ class User_Post(db.Model):
         p = self
         return f"{p.id} Title: {p.title}, written by user w/ id: {p.author_id}. The blog is about {p.content}."
 
-    __tablename__ = "user_posts"
+    __tablename__ = "camphub_user_posts"
 
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable = False)
@@ -75,16 +75,35 @@ class User_Post(db.Model):
     content = db.Column(db.Text, nullable = False)
 
     users = db.relationship("User")
-    post_comments = db.relationship("Post_Comment")
+    post_comments = db.relationship("Camphub_Post_Comment")
 
 
 
-class Comment(db.Model):
+# class Wordpress_Comment(db.Model):
 
-    __tablename__ = "comments"
+#     __tablename__ = "comments"
+
+#     def __repr__(self):
+#         '''Holds comment id, user_id, and content.'''
+
+#         c = self
+#         return f"id: {c.id}, written by {c.comment_user_id}, content: {c.content} "    
+
+#     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
+#     comment_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable = False)
+#     content = db.Column(db.Text, nullable = False) 
+
+#     users = db.relationship("User")
+#     post_comments = db.relationship("Post_Comment")
+
+
+
+class Camphub_Comment(db.Model):
+
+    __tablename__ = "camphub_comments"
 
     def __repr__(self):
-        '''Holds comment id, user_id, and content.'''
+        '''Holds camphub(in-app) comment id, user_id, and content.'''
 
         c = self
         return f"id: {c.id}, written by {c.comment_user_id}, content: {c.content} "    
@@ -94,26 +113,26 @@ class Comment(db.Model):
     content = db.Column(db.Text, nullable = False) 
 
     users = db.relationship("User")
-    post_comments = db.relationship("Post_Comment")
+    post_comments = db.relationship("Camphub_Post_Comment")
 
 
 
-class Post_Comment(db.Model):
+class Camphub_Post_Comment(db.Model):
     '''Maps an id to each comment made on a post.'''
 
-    __tablename__ = "post_comments"
+    __tablename__ = "camphub_post_comments"
 
     def __repr__(self):
         '''Holds comment id, user_id, and content.'''
 
         pc = self
-        return f"id: {pc.blog_id}, post {pc.post_id}, comment: {pc.comment_id}  "    
+        return f"id: {pc.blog_id}, post {pc.camphub_post_id}, comment: {pc.comment_id}  "    
 
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
-    post_id = db.Column(db.Integer, db.ForeignKey("user_posts.id"), nullable = False)
-    comment_id = db.Column(db.Integer, db.ForeignKey("comments.id"), nullable = False)
+    camphub_post_id = db.Column(db.Integer, db.ForeignKey("camphub_user_posts.id"), nullable = False)
+    comment_id = db.Column(db.Integer, db.ForeignKey("camphub_comments.id"), nullable = False)
 
-    posts = db.relationship("User_Post")
-    comments = db.relationship("Comment")
+    posts = db.relationship("Camphub_User_Post")
+    comments = db.relationship("Camphub_Comment")
     
 

@@ -2,9 +2,8 @@ from flask import Flask, render_template, redirect, flash, redirect, session, g,
 from flask_debugtoolbar import DebugToolbarExtension
 import requests
 from telegraph_api import Telegraph
-from models import db, connect_db, User, User_Post, Comment, Post_Comment
-from forms import Signup_Form, Login_Form, Edit_Profile_form, Create_Post_Form, Comment_Form
-from serialize import serialize, user_post_serialize
+from models import db, connect_db, User, Camphub_User_Post, Camphub_Comment, Camphub_Post_Comment
+from forms import Signup_Form, Login_Form, Edit_Profile_form, Camphub_Comment_Form, Camphub_User_Post_Form
 from sqlalchemy.exc import IntegrityError
 import os
 
@@ -179,11 +178,104 @@ def render_homepage(user_id):
 
 # 
 # 
-# Camphub post routes
+# Camphub blog routes
+# 
+# 
+# IN -APP POSTS AND COMMENTS
+
+@app.route("/new/comment/<int:post_id>/<int:user_id>")
+def make_post_comment(post_id, user_id):
+      '''Allow authorized user to create a camphub (in-app) comment to an existing in-app post.'''
+
+      if not g.user:
+          return redirect("/")
+
+      # come back and add 404 page
+      post = Camphub_User_Post.query.filter_by(id = post_id).first().or404()
+      user = User.query.filter_by(id = user_id).first().or404()
+
+      if not post or user: 
+          flash("Post does not exist.")
+          return redirect("/camphub/users/posts")
+
+          return redirect("/")
+
+    
+# this is for ALL IN comments. 
+@app.route("/camphub/comments")
+def view_camphub_comments():
+    '''View comments made here on camphub- does not include Wordpress Comments.'''
+
+    if not g.user:
+      return redirect("/")
+
+    all_comments = Camphub_Comment.query.all()
+    print("*********************")
+    print(all_comments)
+    
+    return render_template("comment_routes/camphub_comments.html", all_comments = all_comments)
+
+  
+@app.route("/camphub/users/posts")
+def view_user_posts():
+    '''View all camphub user posts.'''
+
+    if not g.user:
+      return redirect("/")
+
+    all_posts = Camphub_User_Post.query.all()
+    print("******ALL POSTS ARE*******")
+    print(all_posts)
+
+    return render_template("user_post_routes/all_posts.html", all_posts = all_posts)
+
+
+@app.route("/create/post/<int:user_id>", methods = ["GET", "POST"])
+def create_user_post(user_id):
+    '''Allow authorized users to create indiviudal posts on app.'''
+
+    if not g.user:
+        return redirect("/")
+
+    form = Camphub_User_Post_Form()
+
+    if form.validate_on_submit():
+        try:
+        
+            author_id = g.user.id
+            title = form.title.data
+            content = form.content.data
+
+            new_user_post = Camphub_User_Post(author_id = author_id, title = title, content = content)
+
+            db.session.add(new_user_post)
+            db.session.commit()
+            print(" *************** this is the new user post:")
+            print(new_user_post)
+
+            flash("Your post was added!")
+
+            return redirect("/camphub/users/posts")
+
+        except:
+
+            flash("There was an issue submitting the form. Please try again.")
+            return redirect(f"/create/post/{user_id}")
+
+
+    return render_template("user_post_routes/create_post.html", form = form)
+
+
+
+
+
+# 
+# 
+# Wordpress Routes
 # 
 # 
 
-@app.route("/camphub/posts")
+@app.route("/wordpress/posts/all")
 def camphub_posts():
     '''View camphub posts made by moderator/ creator.'''
 
@@ -235,14 +327,17 @@ def camphub_posts():
     return render_template("blog_routes/blog.html", author = author, url = url, date = date, title = title, content = content, post_id = post_id, site = site)
 
 
+
+# for camphub in app comments FOR WORDPRESS- COME BACK AND EDIT
 @app.route("/create/comment", methods = ["GET", "POST"])
-def camphub_comment():
+def create_camphub_comment():
     '''Create new camphub comment - EXCLUSIVELY ON MODERATOR POSTS.'''
 
     if not g.user:
       redirect("/")
-
-    form = Comment_Form()
+      
+    # come nack and create the form, plug in here
+    form = ()
 
     if form.validate_on_submit():
 
@@ -250,7 +345,7 @@ def camphub_comment():
           comment_user_id = g.user.id
           content = form.content.data
 
-          new_comment = Comment(comment_user_id = comment_user_id, content = content)
+          new_comment = Camphub_Comment(comment_user_id = comment_user_id, content = content)
 
           db.session.add(new_comment)
           db.session.commit()
@@ -267,87 +362,6 @@ def camphub_comment():
 
     return render_template("comment_routes/new_comment.html", form = form)
 
-
-@app.route("/comment/<int:user_id>/<int:post_id>")
-def make_post_comment(user_id, post_id):
-
-  # FOR SOME REASON THIS ROUTE IS NOT BEING FOUND ON THE SERVER
-  return redirect("/")
-
-    
-# this is for ALL comments. 
-@app.route("/camphub/comments")
-def view_camphub_comments():
-    '''View comments made here on camphub- does not include Wordpress Comments.'''
-
-    if not g.user:
-      return redirect("/")
-
-    all_comments = Comment.query.all()
-    print("*********************")
-    print(all_comments)
-    
-    return render_template("comment_routes/camphub_comments.html", all_comments = all_comments)
-
-  
-@app.route("/camphub/users/posts")
-def view_user_posts():
-    '''View all camphub user posts.'''
-
-    if not g.user:
-      return redirect("/")
-
-    all_posts = User_Post.query.all()
-    print("******ALL POSTS ARE*******")
-    print(all_posts)
-
-    return render_template("user_post_routes/all_posts.html", all_posts = all_posts)
-
-
-@app.route("/create/post/<int:user_id>", methods = ["GET", "POST"])
-def create_user_post(user_id):
-    '''Allow authorized users to create indiviudal posts on app.'''
-
-    if not g.user:
-        return redirect("/")
-
-    form = Create_Post_Form()
-
-    if form.validate_on_submit():
-        try:
-        
-            author_id = g.user.id
-            title = form.title.data
-            content = form.content.data
-
-            new_user_post = User_Post(author_id = author_id, title = title, content = content)
-
-            db.session.add(new_user_post)
-            db.session.commit()
-            print(" *************** this is the new user post:")
-            print(new_user_post)
-
-            flash("Your post was added!")
-
-            return redirect("/camphub/users/posts")
-
-        except:
-
-            flash("There was an issue submitting the form. Please try again.")
-            return redirect(f"/create/post/{user_id}")
-
-
-    return render_template("user_post_routes/create_post.html", form = form)
-
-
-
-
-
-# 
-# 
-# Wordpress Routes
-# 
-# 
 
 @app.route("/wordpress/comments")
 def wordpress_comments():

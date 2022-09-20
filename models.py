@@ -75,27 +75,8 @@ class Camphub_User_Post(db.Model):
     content = db.Column(db.Text, nullable = False)
 
     users = db.relationship("User")
+    camphub_comments = db.relationship("Camphub_Comment")
     post_comments = db.relationship("Camphub_Post_Comment")
-
-
-
-# class Wordpress_Comment(db.Model):
-
-#     __tablename__ = "comments"
-
-#     def __repr__(self):
-#         '''Holds comment id, user_id, and content.'''
-
-#         c = self
-#         return f"id: {c.id}, written by {c.comment_user_id}, content: {c.content} "    
-
-#     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
-#     comment_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable = False)
-#     content = db.Column(db.Text, nullable = False) 
-
-#     users = db.relationship("User")
-#     post_comments = db.relationship("Post_Comment")
-
 
 
 class Camphub_Comment(db.Model):
@@ -110,9 +91,11 @@ class Camphub_Comment(db.Model):
 
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
     comment_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable = False)
+    camphub_post_id = db.Column(db.Integer, db.ForeignKey("camphub_user_posts.id"), nullable = False)
     content = db.Column(db.Text, nullable = False) 
 
     users = db.relationship("User")
+    posts = db.relationship("Camphub_User_Post")
     post_comments = db.relationship("Camphub_Post_Comment")
 
 
@@ -136,3 +119,19 @@ class Camphub_Post_Comment(db.Model):
     comments = db.relationship("Camphub_Comment")
     
 
+class Wordpress_Post_Comment(db.Model):
+
+    __tablename__ = "wordpress_post_comments"
+
+    def __repr__(self):
+        '''Holds wordpress article id and the user_id and suer_comment made.'''
+
+        c = self
+        return f"id: {c.id}, written by {c.comment_user_id}, content: {c.content} "    
+
+    id = db.Column(db.Integer, primary_key = True, autoincrement = True)
+    wordpress_article_id = db.Column(db.Integer, nullable = False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable = False)
+    user_comment = db.Column(db.Text, nullable = False) 
+
+    users = db.relationship("User")

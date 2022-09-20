@@ -36,6 +36,11 @@ class Camphub_Comment_Form(FlaskForm):
 
     content = TextAreaField("Comment", validators = [InputRequired()])
 
+class Wordpress_CH_Article_Comment_Form(FlaskForm):
+    '''Form for user to add an in-app comment from a Wordpress article.'''
+
+    user_comment = TextAreaField("Comment", validators = [InputRequired()])
+
 class Suggest_Topic_Form(FlaskForm):
       '''Form to allow users to suggest'''
 

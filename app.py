@@ -2,8 +2,8 @@ from flask import Flask, render_template, redirect, flash, redirect, session, g,
 from flask_debugtoolbar import DebugToolbarExtension
 import requests
 from telegraph_api import Telegraph
-from models import db, connect_db, User, Camphub_User_Post, Camphub_Comment, Camphub_Post_Comment
-from forms import Signup_Form, Login_Form, Edit_Profile_form, Camphub_Comment_Form, Camphub_User_Post_Form
+from models import db, connect_db, User, Camphub_User_Post, Camphub_Comment, Camphub_Post_Comment, Wordpress_Post_Comment
+from forms import Signup_Form, Login_Form, Edit_Profile_form, Camphub_Comment_Form, Camphub_User_Post_Form, Wordpress_CH_Article_Comment_Form
 from sqlalchemy.exc import IntegrityError
 import os
 
@@ -178,44 +178,14 @@ def render_homepage(user_id):
 
 # 
 # 
-# Camphub blog routes
+# Camphub IN-APP ROUTES
 # 
 # 
-# IN -APP POSTS AND COMMENTS
 
-@app.route("/new/comment/<int:post_id>/<int:user_id>")
-def make_post_comment(post_id, user_id):
-      '''Allow authorized user to create a camphub (in-app) comment to an existing in-app post.'''
 
-      if not g.user:
-          return redirect("/")
+# # # # # # # # # # # # # # # # # # # # POSTS SECTION FOR IN-APP  
 
-      # come back and add 404 page
-      post = Camphub_User_Post.query.filter_by(id = post_id).first().or404()
-      user = User.query.filter_by(id = user_id).first().or404()
 
-      if not post or user: 
-          flash("Post does not exist.")
-          return redirect("/camphub/users/posts")
-
-          return redirect("/")
-
-    
-# this is for ALL IN comments. 
-@app.route("/camphub/comments")
-def view_camphub_comments():
-    '''View comments made here on camphub- does not include Wordpress Comments.'''
-
-    if not g.user:
-      return redirect("/")
-
-    all_comments = Camphub_Comment.query.all()
-    print("*********************")
-    print(all_comments)
-    
-    return render_template("comment_routes/camphub_comments.html", all_comments = all_comments)
-
-  
 @app.route("/camphub/users/posts")
 def view_user_posts():
     '''View all camphub user posts.'''
@@ -227,7 +197,25 @@ def view_user_posts():
     print("******ALL POSTS ARE*******")
     print(all_posts)
 
-    return render_template("user_post_routes/all_posts.html", all_posts = all_posts)
+    return render_template("wp_in_app_routes/all_posts.html", all_posts = all_posts)
+
+@app.route("/view/camphub/<int:post_id>")
+def view_given_post(post_id):
+    '''Display given camphub post to authorized user.'''
+
+    if not g.user:
+      flash("Unauothorzed access- please signup, or login if you have an account.")
+      return redirect("/signup")
+
+    post = Camphub_User_Post.query.filter_by(id = post_id).first_or_404()
+
+    if not post:
+        flash("Post does not exist- please try again")
+        return redirect("/camphub/users/posts")
+
+    comments = Camphub_Comment.query.filter_by(camphub_post_id = post_id)
+
+    return render_template("user_post_routes/single_post.html", post = post, comments = comments)
 
 
 @app.route("/create/post/<int:user_id>", methods = ["GET", "POST"])
@@ -266,7 +254,78 @@ def create_user_post(user_id):
     return render_template("user_post_routes/create_post.html", form = form)
 
 
+# # # # # # # # # # # # # # # # # # # # COMMENTS SECTION FOR IN-APP 
 
+# this is for ALL IN APP comments. 
+@app.route("/camphub/comments/all")
+def view_camphub_comments():
+    '''View comments made here on camphub- does not include Wordpress Comments.'''
+
+    if not g.user:
+      return redirect("/")
+
+    all_comments = Camphub_Comment.query.all()
+    print("*********************")
+    print(all_comments)
+    
+    return render_template("user_post_routes/camphub_comments.html", all_comments = all_comments)
+
+
+# view one comment
+
+@app.route("/view/<int:post_id>/<int:comment_id>")
+def view_given_comment(post_id, comment_id):
+  return "this worked"
+
+
+@app.route("/new/comment/<int:post_id>/<int:user_id>", methods = ["GET", "POST"])
+def make_post_comment(post_id, user_id):
+      '''Allow authorized user to create a camphub (in-app) comment to an existing IN-APP post.'''
+
+      if not g.user:
+          return redirect("/")
+
+      # come back and add 404 page
+      post = Camphub_User_Post.query.filter_by(id = post_id).first_or_404()
+      user = User.query.filter_by(id = user_id).first_or_404()
+
+      form = Camphub_Comment_Form()
+
+      print("*****post and user are")
+      # print(post, user)
+
+      if not post and user: 
+          flash("Post or user do not exist.")
+          return redirect("/camphub/users/posts")
+
+      if form.validate_on_submit():
+          try:
+              print("form was submitted")
+              comment_user_id = user_id
+              camphub_post_id = post_id
+              content = form.content.data
+
+              print("****************")
+              print(comment_user_id, camphub_post_id, content)
+
+              new_post_comment = Camphub_Comment(comment_user_id = comment_user_id, camphub_post_id = camphub_post_id, content= content)
+
+              print("*******new post here")
+              print("new_post_comment")
+
+              db.session.add(new_post_comment)
+              db.session.commit()
+              print("***********NEW COMMENT")
+              print(new_post_comment)
+              flash("Comment created!")
+
+              return redirect(f"/view/camphub/{post_id}")
+
+          except: 
+              flash("Something went wrong - please try again.")
+              return redirect(f"/view/camphub/{post_id}")
+              
+      return render_template("/user_post_routes/new_comment.html", form = form, post = post)
 
 
 # 
@@ -275,9 +334,9 @@ def create_user_post(user_id):
 # 
 # 
 
-@app.route("/wordpress/posts/all")
+@app.route("/wordpress/articles/all")
 def camphub_posts():
-    '''View camphub posts made by moderator/ creator.'''
+    '''View all camphub articles made by moderator/ creator.'''
 
     if not g.user:
         redirect("/")
@@ -286,119 +345,93 @@ def camphub_posts():
 
     resp = requests.get(f"{base_url}/{camphub_site}/posts/")
     resp = resp.json()
-
-    # need post ID - link to then another route
-
+    
     print("***************************")
     print(resp)
-    # wordpress_posts = posts['posts']
 
-    author = []
-    url = []
-    content = []
-    title = []
-    date = []
-    post_id = []
-    site = []
+    articles = resp["posts"]
+    articles = sorted(articles, key=lambda d: d['date'])
 
+    return render_template("blog_routes/articles.html", articles = articles)
 
-    # url = resp['posts'][0]['URL']
-    # for i in range(len(resp['posts'])): for all but it prints too many?
-    print("******************************")
+@app.route("/wordpress/camphub/article/<int:article_id>")
+def view_article_CH_comment(article_id):
+    '''Allow authorized user to view single article/ comments.'''
 
-    for i in range(len(resp['posts'])-1):
-      author.append(resp['posts'][i]['author']['nice_name'])
-      url.append(resp['posts'][i]['short_URL'])
-      date.append(resp['posts'][i]['modified'][:10])
-      title.append(resp['posts'][i]['title'])
-      content.append(resp['posts'][i]['content'])
-      post_id.append(resp['posts'][i]['ID'])
-      site.append(resp['posts'][i]['meta']['links']['site'])
-      print("*************")
-      print(post_id)
+    if not g.user:
+        flash("Please signup or login if you have an existing account.")
+        return redirect("/signup")
 
-    
-      # print(i, resp['posts'][i])
+    resp = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}")
+    article = resp.json()
 
-      print("****************************")
-      print(author, url, date, title, content, post_id, site)
-    
-    print("**********************")
-    return render_template("blog_routes/blog.html", author = author, url = url, date = date, title = title, content = content, post_id = post_id, site = site)
+    article_id = article["ID"]
+
+    print("THIS IS THE RESP OBJ")
+    print(article)
+
+    return render_template("wp_in_app_routes/single_article.html", article = article, article_id = article_id)
 
 
-
-# for camphub in app comments FOR WORDPRESS- COME BACK AND EDIT
-@app.route("/create/comment", methods = ["GET", "POST"])
-def create_camphub_comment():
+@app.route("/create/comment/<int:article_id>", methods = ["GET", "POST"])
+def create_WP_camphub_comment(article_id):
     '''Create new camphub comment - EXCLUSIVELY ON MODERATOR POSTS.'''
 
     if not g.user:
       redirect("/")
+
+    try:
+        resp = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}")
+        article = resp.json()
+        article_id =article["ID"]
+        
+    except:
+        flash("Article does not exist.")
+        return redirect("/wordpress/articles/all")
       
-    # come nack and create the form, plug in here
-    form = ()
+    form = Wordpress_CH_Article_Comment_Form()
 
     if form.validate_on_submit():
 
         try: 
-          comment_user_id = g.user.id
-          content = form.content.data
+          print("******************HIT TRY")
+          wordpress_article_id = article_id
+          print(wordpress_article_id)
+          user_id = g.user.id
+          print(user_id)
+          user_comment = form.user_comment.data
+          print(user_comment)
+          print("******************HIT TRY")
+          print(wordpress_article_id, user_comment)
 
-          new_comment = Camphub_Comment(comment_user_id = comment_user_id, content = content)
+          new_comment = Wordpress_Post_Comment(wordpress_article_id = wordpress_article_id, user_id = user_id, user_comment = user_comment)
 
+          print("NEW COMMENT IS:")
           db.session.add(new_comment)
-          db.session.commit()
+          print(new_comment)
+          # db.session.commit()
 
           print("NEW COMMENT IS ************")
           print(new_comment)
           flash("Your comment was added to camphub comments.")
-          return redirect("/camphub/comments")
+          return redirect(f"/wordpress/camphub/article/{article_id}")
 
         except:
           flash("Something went wrong- please try again.")
-          return redirect("/create/comment")
+          return redirect(f"/create/comment/{article_id}")
 
 
-    return render_template("comment_routes/new_comment.html", form = form)
+    return render_template("wp_in_app_routes/new_comment.html", form = form, article = article, article_id = article_id)
 
 
-@app.route("/wordpress/comments")
-def wordpress_comments():
-    '''View existing Wordpress Camphub comments.'''
-
-    if not g.user:
-        redirect("/")
-
-    resp = requests.get(f"{base_url}/{camphub_site}/comments/")
-    resp = resp.json()
-
-    wordpress_comments = []
-    wp_comment_id = []
-
-    # NEED TO INCLUDE POST ID
-    post_id = []
-
-    for i in range(len(resp['comments'])):
-      wordpress_comments.append(resp['comments'][i]['raw_content'])
-      wp_comment_id.append(resp['comments'][i]["ID"])
-
-    print("*************COMMENTS ARE:")  
-    print(wordpress_comments, wp_comment_id)
-    print("************LENGTH IS")
-    print(len(wordpress_comments), len(wp_comment_id))
-
-    return render_template("comment_routes/wordpress_comments.html", wordpress_comments = wordpress_comments, wp_comment_id = wp_comment_id)
-
-
-@app.route("/wordpress/comment/<int:post_id>")
-def view_wordpress_comment(post_id):
-    '''View replies to given post.'''
+@app.route("/wordpress/comments/<int:article_id>")
+def view_wordpress_comment(article_id):
+    '''View wordpress replies to given post.'''
 
     if not g.user:
       return redirect("/")
 
-    post = requests.get(f"{base_url}/{site_id}/posts/{post_id}")
+    post = requests.get(f"{base_url}/{site_id}/posts/{article_id}")
     post = post.json()
 
     author = post['author']['nice_name']
@@ -408,7 +441,7 @@ def view_wordpress_comment(post_id):
     # print("PAY ATT HERE*********************")
     # print(author, title, content)
 
-    comments = requests.get(f"{base_url}/{camphub_site}/posts/{post_id}/replies/")
+    comments = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}/replies/")
     comments = comments.json()
 
     comment_id = []

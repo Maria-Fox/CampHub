@@ -1,12 +1,19 @@
-{%extends "base.html"%} {%block title %} <title>Wordpress Comments</title> {%endblock%}
+{%extends "base.html"%} {%block title %} <title>New Post Comment</title> {%endblock%}
 <!-- page content here -->
 
 {%block content%} {% if g.user%}
 
 <div>
-<h1>Create a New Comment</h1>
+  <div id = "post-for-comment">
+      <h1>{{post.title}}</h1>
+      <p><small>{{post.users.username}}</small></p>
+      <blockquote>{{post.content}}</blockquote>
 
-<form action = "/create/comment" method="post" >
+  </div>
+
+<h2>Add Comment</h2>
+
+<form action = "/new/comment/{{post.id}}/{{g.user.id}}" method="post" >
 
   {{form.hidden_tag()}} 
   {%for field in form if field.widget.input_type != 'hidden'%}

@@ -15,16 +15,18 @@
   <blockquote>{{post.content}}</blockquote>
 
   <!-- ON USER POST, NOT MODERATOR POST -->
-  <a href="/comment/{{post.id}}/{{g.user.id}}">Add Comment</a>
+  <a href="/new/comment/{{post.id}}/{{g.user.id}}">Add Comment</a>
 
 </div>
 
+
 {%endfor%}
+<a href="/create/post/{{g.user.id}}">Create a Post</a>
 
-{{author_name}}
+<!-- {{author_name}} -->
 
 
-<a href="/wordpress/posts/all">Return to Wordpress Posts</a>
+<a href="/wordpress/articles/all">Return to Wordpress Posts</a>
 
   {%else%}
   <h2>No Posts yet!</h2>

@@ -7,9 +7,12 @@
   <div>
     <h1>Post: {{post.title}}</h1>
     <p><small>Published by: {{post.users.username}}</small></p>
+    {% if g.user.id == post.author_id%}
+    <a href=""> Delete Post<i class="fa fa-trash" aria-hidden="true"></i></a>
+    {%endif%}
     <blockquote>{{post.content}}</blockquote>
   </div>
-
+ 
 
   <h2>Comment Section</h2>
   {% if comments%}
@@ -29,7 +32,7 @@
 </div>
   {%else%}
 
-  <h1>There are no comments, yet!</h1>
+  <h3>There are no comments, yet!</h3>
   <a href="/new/comment/{{post.id}}/{{g.user.id}}">Add Comment</a>
 
 {% endif %}

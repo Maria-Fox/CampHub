@@ -10,6 +10,9 @@
   {%if all_comments%} {% for comment in all_comments%}
   <div class="user-comment">
     <p><small>Published by: {{comment.comment_user_id}}</small></p>
+    {% if g.user.id == comment.comment_user_id%}
+    <a href=""> Delete Comment<i class="fa fa-trash" aria-hidden="true"></i></a>
+    {%endif%}
     <blockquote>{{comment.content}}</blockquote>
 
     {%endfor%} {%else%}

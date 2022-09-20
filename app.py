@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, flash, redirect, session, g,
 from flask_debugtoolbar import DebugToolbarExtension
 import requests
 from telegraph_api import Telegraph
-from models import db, connect_db, User, Camphub_User_Post, Camphub_Comment, Camphub_Post_Comment, Wordpress_Post_Comment
+from models import db, connect_db, User, Camphub_User_Post, Camphub_Comment, Wordpress_Post_Comment, User_Like
 from forms import Signup_Form, Login_Form, Edit_Profile_form, Camphub_Comment_Form, Camphub_User_Post_Form, Wordpress_CH_Article_Comment_Form
 from sqlalchemy.exc import IntegrityError
 import os
@@ -197,7 +197,7 @@ def view_user_posts():
     print("******ALL POSTS ARE*******")
     print(all_posts)
 
-    return render_template("wp_in_app_routes/all_posts.html", all_posts = all_posts)
+    return render_template("user_post_routes/all_posts.html", all_posts = all_posts)
 
 @app.route("/view/camphub/<int:post_id>")
 def view_given_post(post_id):
@@ -213,7 +213,7 @@ def view_given_post(post_id):
         flash("Post does not exist- please try again")
         return redirect("/camphub/users/posts")
 
-    comments = Camphub_Comment.query.filter_by(camphub_post_id = post_id)
+    comments = Camphub_Comment.query.filter_by(camphub_post_id = post_id).all()
 
     return render_template("user_post_routes/single_post.html", post = post, comments = comments)
 
@@ -271,11 +271,11 @@ def view_camphub_comments():
     return render_template("user_post_routes/camphub_comments.html", all_comments = all_comments)
 
 
-# view one comment
+# view one comment- should I have this 
 
 @app.route("/view/<int:post_id>/<int:comment_id>")
 def view_given_comment(post_id, comment_id):
-  return "this worked"
+  return "this route needs work"
 
 
 @app.route("/new/comment/<int:post_id>/<int:user_id>", methods = ["GET", "POST"])
@@ -347,12 +347,12 @@ def camphub_posts():
     resp = resp.json()
     
     print("***************************")
-    print(resp)
+    # print(resp)
 
     articles = resp["posts"]
     articles = sorted(articles, key=lambda d: d['date'])
 
-    return render_template("blog_routes/articles.html", articles = articles)
+    return render_template("article_routes/articles.html", articles = articles)
 
 @app.route("/wordpress/camphub/article/<int:article_id>")
 def view_article_CH_comment(article_id):
@@ -365,12 +365,21 @@ def view_article_CH_comment(article_id):
     resp = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}")
     article = resp.json()
 
-    article_id = article["ID"]
+    replies = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}/replies/")
+    replies = replies.json()
+
+    print("*************************")
+    print(replies)
+
+    user_comments_on_WP_article = Wordpress_Post_Comment.query.filter_by(wordpress_article_id = article_id).all()
+
+    print("this is in house")
+    print(user_comments_on_WP_article)
 
     print("THIS IS THE RESP OBJ")
-    print(article)
+    # print(article)
 
-    return render_template("wp_in_app_routes/single_article.html", article = article, article_id = article_id)
+    return render_template("wp_in_app_routes/single_article.html", article = article, replies = replies, user_comments_on_WP_article = user_comments_on_WP_article)
 
 
 @app.route("/create/comment/<int:article_id>", methods = ["GET", "POST"])
@@ -394,25 +403,16 @@ def create_WP_camphub_comment(article_id):
     if form.validate_on_submit():
 
         try: 
-          print("******************HIT TRY")
           wordpress_article_id = article_id
-          print(wordpress_article_id)
           user_id = g.user.id
-          print(user_id)
           user_comment = form.user_comment.data
-          print(user_comment)
-          print("******************HIT TRY")
-          print(wordpress_article_id, user_comment)
 
           new_comment = Wordpress_Post_Comment(wordpress_article_id = wordpress_article_id, user_id = user_id, user_comment = user_comment)
 
-          print("NEW COMMENT IS:")
           db.session.add(new_comment)
           print(new_comment)
-          # db.session.commit()
+          db.session.commit()
 
-          print("NEW COMMENT IS ************")
-          print(new_comment)
           flash("Your comment was added to camphub comments.")
           return redirect(f"/wordpress/camphub/article/{article_id}")
 
@@ -422,37 +422,5 @@ def create_WP_camphub_comment(article_id):
 
 
     return render_template("wp_in_app_routes/new_comment.html", form = form, article = article, article_id = article_id)
-
-
-@app.route("/wordpress/comments/<int:article_id>")
-def view_wordpress_comment(article_id):
-    '''View wordpress replies to given post.'''
-
-    if not g.user:
-      return redirect("/")
-
-    post = requests.get(f"{base_url}/{site_id}/posts/{article_id}")
-    post = post.json()
-
-    author = post['author']['nice_name']
-    title =  post['title']
-    content = post['content']
-
-    # print("PAY ATT HERE*********************")
-    # print(author, title, content)
-
-    comments = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}/replies/")
-    comments = comments.json()
-
-    comment_id = []
-    comment_content = []
-
-
-    for i in range(len(comments['comments'])):
-      if comments['comments']['status'] == "approved":
-        comment_id.push(comments['comments'][i]['ID'])
-        comment_content.push(comments['comments'][i]['raw_comment'])
-
-    return render_template("blog_routes/wp_post_comments.html", author = author, title = title, content = content, comment_id = comment_id, comment_content = comment_content)
 
 

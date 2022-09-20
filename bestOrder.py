@@ -254,7 +254,7 @@ def view_wordpress_comment(article_id):
         comment_id.push(comments['comments'][i]['ID'])
         comment_content.push(comments['comments'][i]['raw_comment'])
 
-    return render_template("blog_routes/wp_post_comments.html", author = author, title = title, content = content, comment_id = comment_id, comment_content = comment_content)
+    return render_template("article_routes/wp_post_comments.html", author = author, title = title, content = content, comment_id = comment_id, comment_content = comment_content)
 
 
 # newlist = sorted(list_to_be_sorted, key=lambda d: d['date'])

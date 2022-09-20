@@ -10,8 +10,13 @@
 {%if all_posts%}
 {% for post in all_posts%}
 <div class = "user-post">
-  <h2>{{post.title}}</h2>
+  
+  <h2><a href="/view/camphub/{{post.id}}">{{post.title}}</a></h2>
   <p><small>Published by: {{post.users.username}}</small></p>
+
+  {% if g.user.id == post.author_id%}
+  <a href=""> Delete Post <i class="fa fa-trash" aria-hidden="true"></i></a>
+  {%endif%}
   <blockquote>{{post.content}}</blockquote>
 
   <!-- ON USER POST, NOT MODERATOR POST -->

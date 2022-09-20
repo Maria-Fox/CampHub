@@ -55,8 +55,8 @@ class User(db.Model):
     school_name = db.Column(db.String, nullable = False)
     field_of_study = db.Column(db.String, nullable = False)
 
-    posts = db.relationship("Camphub_User_Post")
-    comments = db.relationship("Camphub_Comment")
+    posts = db.relationship("Camphub_User_Post", cascade = "all, delete")
+    comments = db.relationship("Camphub_Comment", cascade = "all, delete")
 
 
 class Camphub_User_Post(db.Model):
@@ -65,7 +65,7 @@ class Camphub_User_Post(db.Model):
         '''Holds user post information.'''
 
         p = self
-        return f"{p.id} Title: {p.title}, written by user w/ id: {p.author_id}. The blog is about {p.content}."
+        return f"{p.id} Title: {p.title}, written by user w/ id: {p.author_id}. The post is about {p.content}."
 
     __tablename__ = "camphub_user_posts"
 
@@ -75,8 +75,7 @@ class Camphub_User_Post(db.Model):
     content = db.Column(db.Text, nullable = False)
 
     users = db.relationship("User")
-    camphub_comments = db.relationship("Camphub_Comment")
-    post_comments = db.relationship("Camphub_Post_Comment")
+    camphub_comments = db.relationship("Camphub_Comment", cascade = "all, delete")
 
 
 class Camphub_Comment(db.Model):
@@ -95,39 +94,17 @@ class Camphub_Comment(db.Model):
     content = db.Column(db.Text, nullable = False) 
 
     users = db.relationship("User")
-    posts = db.relationship("Camphub_User_Post")
-    post_comments = db.relationship("Camphub_Post_Comment")
-
-
-
-class Camphub_Post_Comment(db.Model):
-    '''Maps an id to each comment made on a post.'''
-
-    __tablename__ = "camphub_post_comments"
-
-    def __repr__(self):
-        '''Holds comment id, user_id, and content.'''
-
-        pc = self
-        return f"id: {pc.blog_id}, post {pc.camphub_post_id}, comment: {pc.comment_id}  "    
-
-    id = db.Column(db.Integer, primary_key = True, autoincrement = True)
-    camphub_post_id = db.Column(db.Integer, db.ForeignKey("camphub_user_posts.id"), nullable = False)
-    comment_id = db.Column(db.Integer, db.ForeignKey("camphub_comments.id"), nullable = False)
-
-    posts = db.relationship("Camphub_User_Post")
-    comments = db.relationship("Camphub_Comment")
-    
+    posts = db.relationship("Camphub_User_Post")    
 
 class Wordpress_Post_Comment(db.Model):
 
     __tablename__ = "wordpress_post_comments"
 
     def __repr__(self):
-        '''Holds wordpress article id and the user_id and suer_comment made.'''
+        '''Holds wordpress article id along with a comment made by the user.'''
 
         c = self
-        return f"id: {c.id}, written by {c.comment_user_id}, content: {c.content} "    
+        return f"id: {c.id}, WP Article id: {c.wordpress_article_id}- Comment made by: {c.user_id}. Content: {c.user_comment}"    
 
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
     wordpress_article_id = db.Column(db.Integer, nullable = False)
@@ -135,3 +112,30 @@ class Wordpress_Post_Comment(db.Model):
     user_comment = db.Column(db.Text, nullable = False) 
 
     users = db.relationship("User")
+
+
+# POSSIBLE ADDITION- unsure if I should split it up into article likes and post likes
+
+class User_Like(db.Model):
+    """Holds user likes."""
+
+    __tablename__ = 'user_likes'
+
+    def __repr__(self):
+        '''Holds wordpress article id along with a comment made by the user.'''
+
+        l = self
+        return f"Id: {l.id} for User: {l.user_id}: Optional likes include: user_post_id {l.user_post_id}, comment id: {l.user_comment_id}, WP: article id: {l.wp_article_id}, & WP article comment id: {l.wp_article_comment_id}"
+
+    id = db.Column(db.Integer, primary_key = True, autoincrement = True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable = False)
+    user_post_id = db.Column(db.Integer, db.ForeignKey("camphub_user_posts.id"),nullable = True)
+    user_comment_id = db.Column(db.Integer, db.ForeignKey("camphub_comments.id"), nullable = True)
+    # I NEED TO ACCESS THE ARTICLE _ID- BUT IT CANNOT BE A PRIMARY KEY IN THE WP_POST_COMMENTS TABLE- SO, MAYBE USE RELATIONSHIP?
+    wp_article_id = db.Column(db.Integer, nullable = True)
+    wp_article_comment_id = db.Column(db.Integer, db.ForeignKey("wordpress_post_comments.id"), nullable = True)
+
+    users = db.relationship("User", backref = "user_likes")
+    user_posts = db.relationship("Camphub_User_Post", backref = "user_post_likes")
+    user_comments = db.relationship("Camphub_Comment", backref = "user_comment_likes")
+    wordpress_post_comments = db.relationship("Wordpress_Post_Comment", backref = "wordpress_post_likes")

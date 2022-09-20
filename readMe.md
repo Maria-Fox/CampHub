@@ -25,17 +25,17 @@ _subject to change as project progresses_ Please see .png file or models.py file
 
 Likely going to come back and add "groups" - endpoint that would allow students to break into their respective field chats rather than an all open discussion. I'll await for user feedback to make changes.
 
-b. Issues that may arrise while working with the Blogger API include the API itself being down, or OAUTH2 Google server not working.
+b. Issues that may arrise while working with the Wordpress API include the API itself being down, or OAUTH2 Google server not working.
 
 c. The only sensitive information to hide is the user password which will be encoded by bcrypt.
 
-d. Functionality includes: Ueser creating account, chatting w/ other users. Liking/ commenting on user bloggs. Etc.
+d. Functionality includes: Ueser creating account, chatting w/ other users. Liking/ commenting on user posts. Etc.
 
 e. The first 3 user flows includes:
 1- user visits website & clicks "create" adding a username, password, and profile image url. Formally welcomed to app.
 
-2 User flow 1 + user hits "create blog/ post" user adds title and description is post fields. User hits "post" button and blog is rendered on the page.
+2 User flow 1 + user chooses from options to either view wordpress articles, create their own post, or view omments.
 
-3- User flow 1 + 2, + user can review and interact with other blog posts on-site.
+3- User flow 1 + 2, + user can review and interact with the articles or posts on-site.
 
 f. I plan on implimenting a few button/ links to articles and study/ anxiety approach techniques within the application. Include community guideines ad student support fetaures to really tailor it to a student. For stretch goals, I can see creating a LinkedIn group for users who re ready to target job searching so the community grows together.

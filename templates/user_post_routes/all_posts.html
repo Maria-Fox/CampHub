@@ -18,9 +18,8 @@
   {% if g.user.id == post.author_id%}
   <a href="/camphub/delete/post/{{post.id}}"> Delete Post <i class="fa fa-trash" aria-hidden="true"></i></a>
   {%endif%}
-  <p><small>Published by: {{post.users.username}}</small></p>
+  <p><small>Published by: {{post.users.username}} on {{post.date_time}}</small></p>
   
-
   
   <blockquote>{{post.content}}</blockquote>
 

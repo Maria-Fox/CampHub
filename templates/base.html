@@ -21,10 +21,6 @@
   </head>
   <body>
     <!-- for all pages -->
-    <p id="app-icon">
-      CampHub
-      <i class="fa-solid fa-campground"></i>
-    </p>
 
     <!-- NAV BAR-->
     {% if not g.user %}
@@ -74,6 +70,10 @@
           </button>
         </form>
         <!-- add branding here -->
+        <p id="app-icon">
+          <a href="/" id="logo">CampHub</a>
+          <i class="fa-solid fa-campground"></i>
+        </p>
       </form>
     </nav>
     {%endif%}
@@ -93,9 +93,7 @@
     {%block content%}
     <!-- add other pg stuff here -->
 
-    <div id="welcome-banner">
-      <div></div>
-    </div>
+    <div id="page-content"></div>
 
     <!-- <p>
       Are you a bootcamp student? Camphub's goal is to assist you in your new

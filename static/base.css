@@ -34,11 +34,14 @@ a:active {
 #app-icon {
   float: right;
   position: absolute;
-  top: -12px;
+  top: -15px;
   right: 15px;
-  /* color: blanchedalmond; */
   font-size: 25px;
-  /* color: rgba(29, 98, 102, 0.589); */
+  color: rgba(29, 98, 102, 0.589);
+}
+
+#logo {
+  color: rgba(29, 98, 102, 0.589);
 }
 
 #sin-button,
@@ -72,4 +75,9 @@ a:active {
   height: 100%;
   position: relative;
   margin: auto;
+}
+
+/* styling for each pg? */
+#page-content {
+  border: 5px solid white;
 }

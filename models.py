@@ -56,8 +56,8 @@ class User(db.Model):
     school_name = db.Column(db.String, nullable = False)
     field_of_study = db.Column(db.String, nullable = False)
 
-    posts = db.relationship("Camphub_User_Post", cascade = "all, delete")
-    comments = db.relationship("Camphub_Comment", cascade = "all, delete")
+    posts = db.relationship("Camphub_User_Post", cascade="all, delete-orphan")
+    comments = db.relationship("Camphub_Comment", cascade="all, delete-orphan")
 
 
 class Camphub_User_Post(db.Model):
@@ -73,8 +73,9 @@ class Camphub_User_Post(db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable = False)
     title = db.Column(db.String, nullable = False)
+    date_time = db.Column(db.DateTime, default = datetime.utcnow(), nullable = False)
     content = db.Column(db.Text, nullable = False)
-    
+
 
     users = db.relationship("User")
     camphub_comments = db.relationship("Camphub_Comment", cascade = "all, delete")
@@ -93,7 +94,9 @@ class Camphub_Comment(db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
     comment_user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable = False)
     camphub_post_id = db.Column(db.Integer, db.ForeignKey("camphub_user_posts.id"), nullable = False)
+    date_time = db.Column(db.DateTime, default = datetime.utcnow(), nullable = False)
     content = db.Column(db.Text, nullable = False) 
+    
 
     users = db.relationship("User")
     posts = db.relationship("Camphub_User_Post")    
@@ -111,6 +114,7 @@ class Wordpress_Post_Comment(db.Model):
     id = db.Column(db.Integer, primary_key = True, autoincrement = True)
     wordpress_article_id = db.Column(db.Integer, nullable = False)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable = False)
+    date_time = db.Column(db.DateTime, default = datetime.utcnow(), nullable = False)
     user_comment = db.Column(db.Text, nullable = False) 
 
     users = db.relationship("User")

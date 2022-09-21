@@ -1,7 +1,6 @@
 from flask import Flask, render_template, redirect, flash, redirect, session, g, abort, request, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 import requests
-from telegraph_api import Telegraph
 from models import db, connect_db, User, Camphub_User_Post, Camphub_Comment, Wordpress_Post_Comment, User_Like
 from forms import Signup_Form, Login_Form, Edit_Profile_form, Camphub_Comment_Form, Camphub_User_Post_Form, Wordpress_CH_Article_Comment_Form
 from sqlalchemy.exc import IntegrityError
@@ -80,15 +79,9 @@ def signup():
         password = form.password.data
         school_name = form.school_name.data
         field_of_study = form.field_of_study.data
-
-        print("******************************")
+      
         # hashes given password to securly store in db. Return new user instance w/ hashed data. Add to db.session.
         user = User.register(username, password, school_name, field_of_study)
-
-        print(user)
-
-        print("******************************")
-        print("******************************")
 
         db.session.commit()
 
@@ -124,9 +117,9 @@ def signin():
         if user:
             flash(f"Welcome {user.username}!")
             complete_login(user)
-            # return redirect to whichever route renders the blog itself
-            # return redirect(f"blogs/{blog_id}")
+      
             return redirect (f"/home/{user.id}")
+
         elif not user:
               flash("Incorrect username or password. Please try again.")
               return redirect("/login")
@@ -165,6 +158,30 @@ def edit_profile(user_id):
       return redirect(f"/home/{user_id}")
 
     return render_template("user_routes/editProfile.html", form = form, user = user)
+
+# THIS ROUTE IS NOT WORKING- PERHAPS SOMETHING TO DO W/ THE DELETE CASCADE IN MODELS.
+@app.route("/delete/user/<int:user_id>")
+def delete_user(user_id):
+    '''Delete user account.'''
+
+    if not g.user:
+        return redirect("/signup")
+
+    try:
+        user = User(id = user_id)
+        print("******** THIS IS THE USER : ")
+        print(user)
+
+        db.session.delete(user)
+        db.session.commit()
+
+        flash("Account was deleted!")
+        return redirect("/signup")
+
+    except:
+        flash("Unsuccessful attempt, please try again.")
+        return redirect(f"/edit/profile/{user_id}")
+
 
 @app.route("/home/<int:user_id>")
 def render_homepage(user_id):
@@ -207,7 +224,7 @@ def view_given_post(post_id):
       flash("Unauothorzed access- please signup, or login if you have an account.")
       return redirect("/signup")
 
-    post = Camphub_User_Post.query.filter_by(id = post_id).first_or_404()
+    post = Camphub_User_Post.query.filter_by(id = post_id).first()
 
     if not post:
         flash("Post does not exist- please try again")
@@ -254,6 +271,31 @@ def create_user_post(user_id):
     return render_template("user_post_routes/create_post.html", form = form)
 
 
+@app.route("/camphub/delete/post/<int:post_id>")
+def delete_post(post_id):
+    '''Delete the given user post and post comments.'''
+
+    if not g.user:
+        return redirect("/signup")
+
+    post = Camphub_User_Post.query.filter_by(id = post_id, author_id = g.user.id).first()
+
+    if not post:
+        flash("Post does not exist, so it cannot be deleted.")
+        return redirect("/camphub/users/posts")
+
+    try: 
+        db.session.delete(post)
+        db.session.commit()
+        flash("Deleted post!")
+
+        return redirect("/camphub/users/posts")
+
+    except:
+        flash("Something went wrong- please try again.")
+        return redirect("/camphub/users/posts")
+
+
 # # # # # # # # # # # # # # # # # # # # COMMENTS SECTION FOR IN-APP 
 
 # this is for ALL IN APP comments. 
@@ -286,8 +328,8 @@ def make_post_comment(post_id, user_id):
           return redirect("/")
 
       # come back and add 404 page
-      post = Camphub_User_Post.query.filter_by(id = post_id).first_or_404()
-      user = User.query.filter_by(id = user_id).first_or_404()
+      post = Camphub_User_Post.query.filter_by(id = post_id).first()
+      user = User.query.filter_by(id = user_id).first()
 
       form = Camphub_Comment_Form()
 
@@ -326,6 +368,31 @@ def make_post_comment(post_id, user_id):
               return redirect(f"/view/camphub/{post_id}")
               
       return render_template("/user_post_routes/new_comment.html", form = form, post = post)
+
+
+@app.route("/camphub/delete/<int:post_id>/<int:comment_id>")
+def delete_post_comment(post_id, comment_id):
+    '''Delete given comment of given user post.'''
+
+    if not g.user:
+      return redirect("/signup")
+
+    delete_comment = Camphub_Comment.query.filter_by(camphub_post_id = post_id, id = comment_id).first()
+
+    if not delete_comment:
+      flash("Unable to delete a post or comment that does not exist.")
+      return redirect("/camphub/users/posts")
+
+    try:
+        db.session.delete(delete_comment)
+        db.session.commit()
+        flash("Comment deleted!")
+
+        return redirect(f"/view/camphub/{post_id}")
+
+    except:
+          flash("Something went wrong- please try agaib.")
+          return (f"/view/camphub/{post_id}")
 
 
 # 
@@ -381,7 +448,6 @@ def view_article_CH_comment(article_id):
 
     return render_template("wp_in_app_routes/single_article.html", article = article, replies = replies, user_comments_on_WP_article = user_comments_on_WP_article)
 
-
 @app.route("/create/comment/<int:article_id>", methods = ["GET", "POST"])
 def create_WP_camphub_comment(article_id):
     '''Create new camphub comment - EXCLUSIVELY ON MODERATOR POSTS.'''
@@ -422,5 +488,30 @@ def create_WP_camphub_comment(article_id):
 
 
     return render_template("wp_in_app_routes/new_comment.html", form = form, article = article, article_id = article_id)
+
+@app.route("/wordpress/delete/<int:article_id>/<int:comment_id>")
+def delete_wordpress_comment(article_id, comment_id):
+    '''Delete user in-app wordpress comment.'''
+
+    if not g.user:
+        return redirect("/signup")
+
+    comment_to_delete = Wordpress_Post_Comment.query.filter_by(id = comment_id, wordpress_article_id = article_id).first()
+
+    if not comment_to_delete:
+      return redirect("/wordpress/articles/all")
+
+    try:
+        db.session.delete(comment_to_delete)
+        db.session.commit()
+        flash("Deleted comment!")
+
+        return redirect(f"/wordpress/camphub/article/{article_id}")
+
+    except:
+        flash("Something went wrong- please try again.")
+        return redirect(f"/wordpress/camphub/article/{article_id}")
+
+
 
 

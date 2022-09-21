@@ -53,7 +53,7 @@
   <div>
   <p><small>Published by: {{comment.users.username}}</small></p>
   {% if g.user.id == comment.user_id%}
-  <a href=""> Delete Comment <i class="fa fa-trash" aria-hidden="true"></i></a>
+  <a href="/wordpress/delete/{{comment.wordpress_article_id}}/{{comment.id}}"> Delete Comment <i class="fa fa-trash" aria-hidden="true"></i></a>
   {%endif%}
   <blockquote>{{comment.user_comment}}</blockquote>
 </div>

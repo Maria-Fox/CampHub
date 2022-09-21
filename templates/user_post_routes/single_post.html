@@ -8,7 +8,7 @@
     <h1>Post: {{post.title}}</h1>
     <p><small>Published by: {{post.users.username}}</small></p>
     {% if g.user.id == post.author_id%}
-    <a href=""> Delete Post<i class="fa fa-trash" aria-hidden="true"></i></a>
+    <a href="/camphub/delete/post/{{post.id}}"> Delete Post <i class="fa fa-trash" aria-hidden="true"></i></a>
     {%endif%}
     <blockquote>{{post.content}}</blockquote>
   </div>
@@ -20,11 +20,15 @@
   {%for comment in comments %}
   <div id = "comment-section">
 
-    <p><small>{{comment.users.username}}</small></p>
-    <blockquote>{{comment.content}}</blockquote>
+    <p><small>Published By: {{comment.users.username}}</small></p>
+    <blockquote>Comment: {{comment.content}}</blockquote>
+
+    {% if g.user.id == comment.comment_user_id%}
+    <a href="/camphub/delete/{{post.id}}/{{comment.id}}"> Delete Comment <i class="fa fa-trash" aria-hidden="true"></i></a>
+    {%endif%}
   </div>
   {% endfor%}
-
+<br>
   <div>
 <a href="/new/comment/{{post.id}}/{{g.user.id}}">Add Comment</a>
 <br>

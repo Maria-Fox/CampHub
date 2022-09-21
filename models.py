@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 import bcrypt
 from flask_bcrypt import Bcrypt, generate_password_hash, check_password_hash
 from sqlalchemy import ForeignKey, insert
+from datetime import datetime
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
@@ -73,6 +74,7 @@ class Camphub_User_Post(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable = False)
     title = db.Column(db.String, nullable = False)
     content = db.Column(db.Text, nullable = False)
+    
 
     users = db.relationship("User")
     camphub_comments = db.relationship("Camphub_Comment", cascade = "all, delete")

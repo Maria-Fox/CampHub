@@ -12,7 +12,7 @@
   <div>
     <blockquote>{{comment}}</blockquote>
     {% if g.user.id == comment.user_id%}
-    <a href=""> Delete <i class="fa fa-trash" aria-hidden="true"></i></a>
+    <a href="/wordpress/delete/{{comment.wordpress_article_id}}/{{comment.id}}"> Delete <i class="fa fa-trash" aria-hidden="true"></i></a>
     {%endif%}
     <small><a href="https://wordpress.com/home/camphub2022">Respond to Comment in Wordpress</a></small>
   </div>

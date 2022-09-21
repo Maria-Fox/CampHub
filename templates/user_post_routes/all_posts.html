@@ -5,33 +5,39 @@
 
 <div>
   <h1> Camphub User Posts - All </h1>
+  <a href="/create/post/{{g.user.id}}">Create a Post</a>
+  <br>
+  <a href="/wordpress/articles/all">Return to Wordpress Posts</a>
 
 
 {%if all_posts%}
 {% for post in all_posts%}
 <div class = "user-post">
   
-  <h2><a href="/view/camphub/{{post.id}}">{{post.title}}</a></h2>
-  <p><small>Published by: {{post.users.username}}</small></p>
-
+  <h2><a href="/view/camphub/{{post.id}}">Post: {{post.title}}</a></h2>
   {% if g.user.id == post.author_id%}
-  <a href=""> Delete Post <i class="fa fa-trash" aria-hidden="true"></i></a>
+  <a href="/camphub/delete/post/{{post.id}}"> Delete Post <i class="fa fa-trash" aria-hidden="true"></i></a>
   {%endif%}
+  <p><small>Published by: {{post.users.username}}</small></p>
+  
+
+  
   <blockquote>{{post.content}}</blockquote>
 
   <!-- ON USER POST, NOT MODERATOR POST -->
   <a href="/new/comment/{{post.id}}/{{g.user.id}}">Add Comment</a>
+  <a href="/view/camphub/{{post.id}}">See Comments</a>
 
 </div>
 
 
 {%endfor%}
-<a href="/create/post/{{g.user.id}}">Create a Post</a>
+
 
 <!-- {{author_name}} -->
 
 
-<a href="/wordpress/articles/all">Return to Wordpress Posts</a>
+
 
   {%else%}
   <h2>No Posts yet!</h2>

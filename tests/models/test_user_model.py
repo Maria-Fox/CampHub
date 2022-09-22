@@ -1,15 +1,12 @@
 """User model tests."""
 
-# To run tests: python3 -m unittest test/test_user_model.py
+# To run tests: python3 -m unittest tests/models/test_user_model.py
 
-import os 
 from unittest import TestCase
-
 from models import db, User
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgres:///camphub_test"
 
 from app import app 
-
 db.create_all()
 
 class UserModelTestCase(TestCase):
@@ -49,6 +46,8 @@ class UserModelTestCase(TestCase):
       self.assertEqual(test_user.school_name, "Springboard")
       self.assertEqual(test_user.field_of_study, "Software Dev")
 
+    #      #      #      #      #      #      #      #      #      #  
+
 
     def test_user_missing_data(self):
         '''Test creating a user instance (no methods) with missing data.'''
@@ -59,6 +58,8 @@ class UserModelTestCase(TestCase):
         db.session.commit()
 
         self.assertIsNotInstance(test_user, User)
+
+    #      #      #      #      #      #      #      #      #      #  
 
 
     def test_user_register(self):
@@ -77,7 +78,9 @@ class UserModelTestCase(TestCase):
         self.assertEqual(testing_user.username, "test_user")
         self.assertEqual(testing_user.school_name, "Springboard")
         self.assertEqual(testing_user.field_of_study, "Software Dev")
-        
+
+    #      #      #      #      #      #      #      #      #      #  
+
 
     def test_user_register_missing_data(self):
         '''Test creating a user instance using the class register method with missing data.'''
@@ -98,6 +101,8 @@ class UserModelTestCase(TestCase):
         self.assertIsNotNone(user)
         self.assertIsInstance(user, User)
         self.assertEqual(user.id, self.user1.id)
+
+    #      #      #      #      #      #      #      #      #      #  
 
 
     def test_invalid_user(self):

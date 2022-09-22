@@ -98,7 +98,7 @@ def signup():
 
 
 @app.route("/login", methods = ["GET", "POST"])
-def signin():
+def login():
     '''Render login form. Authenticate login post requests and redirect user to home page.'''
 
     form = Login_Form()
@@ -121,8 +121,8 @@ def signin():
             return redirect (f"/home/{user.id}")
 
         elif not user:
-              flash("Incorrect username or password. Please try again.")
-              return redirect("/login")
+            flash("Incorrect username or password. Please try again.")
+            return redirect("/login")
 
     return render_template("user_routes/login.html", form = form)
 
@@ -143,19 +143,31 @@ def edit_profile(user_id):
     if not g.user:
         redirect("/signup")
 
-    user = User.query.get_or_404(user_id)
-    form = Edit_Profile_form(obj = user)
+    user = User.query.get(user_id)
+    
+    if g.user != user_id:
+        flash("You may only edit your profile.")
+        return redirect(f"/home/{g.user.id}")
+    else: 
+      form = Edit_Profile_form(obj = user)
 
     if form.validate_on_submit():
 
-      user.username = form.username.data 
-      user.school_name = form.school_name.data
-      user.field_of_study = form.field_of_study.data
+        try:
 
-      db.session.add(user)
-      db.session.commit()
+            user.username = form.username.data 
+            user.school_name = form.school_name.data
+            user.field_of_study = form.field_of_study.data
 
-      return redirect(f"/home/{user_id}")
+            db.session.add(user)
+            db.session.commit()
+
+            flash("Profile was updated!")
+            return redirect(f"/home/{user_id}")
+
+        except:
+          flash ("Something went wrong- please try again.")
+          return redirect(f"/edit/profile/{user_id}")
 
     return render_template("user_routes/editProfile.html", form = form, user = user)
 
@@ -189,6 +201,12 @@ def render_homepage(user_id):
 
     if not g.user:
         return redirect ("/")
+
+    user = User.query.get(user_id)
+
+    if user != g.user:
+        flash("Please sign up or log in to view the home page.")
+        return redirect("/signup")
   
     return render_template("user_routes/home.html")
 
@@ -241,6 +259,11 @@ def create_user_post(user_id):
 
     if not g.user:
         return redirect("/")
+
+    user = User.query.get(user_id)
+
+    if g.user != user:
+        return redirect("/signup")
 
     form = Camphub_User_Post_Form()
 
@@ -435,6 +458,7 @@ def camphub_posts():
 
     return render_template("article_routes/articles.html", articles = articles)
 
+# NEED EDITS TO ACCOUNT FOR ARTICLE_ID NOT EXISTING- ADD TRY/CATCH 
 @app.route("/wordpress/camphub/article/<int:article_id>")
 def view_article_CH_comment(article_id):
     '''Allow authorized user to view single article/ comments.'''

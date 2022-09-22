@@ -412,11 +412,25 @@ def camphub_posts():
 
     resp = requests.get(f"{base_url}/{camphub_site}/posts/")
     resp = resp.json()
+    # print("**************** LETS SEE:")
+    print(resp)
     
-    print("***************************")
-    # print(resp)
+    content = []
 
     articles = resp["posts"]
+
+    # remove the HTML tags at the beginning and end of the response content
+    # for i in range(len(resp["posts"])):
+    #   original_content_as_array = str(resp["posts"][i]["content"])
+    #   text_array = original_content_as_array.split(">")
+    #   text_array.remove([0])
+    #   final_content = " ".join(text_array)
+    #   text_array : list = final_content.split("<")
+    #   text_array.remove(text_array[-1])
+    #   final_content = " ".join(text_array)
+
+      # content.append([{"art_id": i, "content": final_content }])
+
     articles = sorted(articles, key=lambda d: d['date'])
 
     return render_template("article_routes/articles.html", articles = articles)
@@ -511,7 +525,5 @@ def delete_wordpress_comment(article_id, comment_id):
     except:
         flash("Something went wrong- please try again.")
         return redirect(f"/wordpress/camphub/article/{article_id}")
-
-
 
 

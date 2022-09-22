@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-import bcrypt
+# import bcrypt
 from flask_bcrypt import Bcrypt, generate_password_hash, check_password_hash
 from sqlalchemy import ForeignKey, insert
 from datetime import datetime

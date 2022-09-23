@@ -1,4 +1,4 @@
-{%extends "base.html"%} {%block title %} <title>Camphub User Posts</title> {%endblock%}
+{%extends "base.html"%} {%block title %} <title>Camphub User Post</title> {%endblock%}
 <!-- page content here -->
 
 {%block content%} {% if g.user%}
@@ -30,14 +30,14 @@
   {% endfor%}
 <br>
   <div>
-<a href="/new/comment/{{post.id}}/{{g.user.id}}">Add Comment</a>
+<a href="/create/comment/{{post.id}}/{{g.user.id}}">Add Comment</a>
 <br>
 <a href="/camphub/users/posts">Return to User Posts</a>
 </div>
   {%else%}
 
   <h3>There are no comments, yet!</h3>
-  <a href="/new/comment/{{post.id}}/{{g.user.id}}">Add Comment</a>
+  <a href="/create/comment/{{post.id}}/{{g.user.id}}">Add Comment</a>
 
 {% endif %}
 

@@ -24,7 +24,7 @@
   <blockquote>{{post.content}}</blockquote>
 
   <!-- ON USER POST, NOT MODERATOR POST -->
-  <a href="/new/comment/{{post.id}}/{{g.user.id}}">Add Comment</a>
+  <a href="/create/comment/{{post.id}}/{{g.user.id}}">Add Comment</a>
   <a href="/view/camphub/{{post.id}}">See Comments</a>
 
 </div>
@@ -40,10 +40,7 @@
 
   {%else%}
   <h2>No Posts yet!</h2>
-  <h3><a href="/create/post/{{g.user.id}}">Make a post here at CampHub</a></h3>
-  <h4><a href="https://wordpress.com/home/camphub2022">Create Post in Wordpress</a></h4>
 
-  <a href="/new/wordpress/posts/all">Return to CampHub Posts</a>
   {%endif%}
 
 

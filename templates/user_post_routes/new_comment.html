@@ -13,7 +13,7 @@
 
 <h2>Add Comment</h2>
 
-<form action = "/new/comment/{{post.id}}/{{g.user.id}}" method="post" >
+<form action = "/create/comment/{{post.id}}/{{g.user.id}}" method="post" >
 
   {{form.hidden_tag()}} 
   {%for field in form if field.widget.input_type != 'hidden'%}

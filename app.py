@@ -263,7 +263,8 @@ def create_user_post(user_id):
     user = User.query.get(user_id)
 
     if g.user != user:
-        return redirect("/signup")
+        flash("Unauhorized route.")
+        return redirect(f"/home/{g.user.id}")
 
     form = Camphub_User_Post_Form()
 
@@ -343,7 +344,7 @@ def view_given_comment(post_id, comment_id):
   return "this route needs work"
 
 
-@app.route("/new/comment/<int:post_id>/<int:user_id>", methods = ["GET", "POST"])
+@app.route("/create/comment/<int:post_id>/<int:user_id>", methods = ["GET", "POST"])
 def make_post_comment(post_id, user_id):
       '''Allow authorized user to create a camphub (in-app) comment to an existing IN-APP post.'''
 
@@ -356,8 +357,9 @@ def make_post_comment(post_id, user_id):
 
       form = Camphub_Comment_Form()
 
-      print("*****post and user are")
-      # print(post, user)
+      if g.user != user:
+        flash("unauthorized route.")
+        return redirect(f"/home/{g.user.id}")
 
       if not post and user: 
           flash("Post or user do not exist.")

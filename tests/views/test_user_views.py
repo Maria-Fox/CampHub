@@ -32,18 +32,7 @@ class CamphubCommentModelTestCase(TestCase):
       user1.id = 888
       user2.id = 777
 
-      first_post = Camphub_User_Post(author_id = 888, title = "First Post Made", content = "This is where the content would show.")
-
-      first_post.id = 111
-
-      user2_comment = Camphub_Comment(comment_author_id = 777, camphub_post_id = 111, content = "Content for post number 111.")
-
-      user1_wordpress_comment = Wordpress_Post_Comment(wordpress_article_id = 8, user_id = 888, user_content = "This would be a comment on the Wordpress article w/ ID 8.")
-
       db.session.add.all([user1, user2])
-      db.session.commit()
-
-      db.sesssion.commit.all([first_post, user2_comment, user1_wordpress_comment])
       db.session.commit()
 
       self.user1 = user1
@@ -105,6 +94,7 @@ class CamphubCommentModelTestCase(TestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertIn("<h3>Why was Camphub created?</h3>", html)
             self.assertTrue("session[CURR_USER_KEY] = self.user1.id")
+
 
     #      #      #      #      #      #      #      #      #      #  
 

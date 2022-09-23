@@ -1,0 +1,14 @@
+{% extends base.html %} {% block title %}
+
+<title>Page not Found</title>
+
+{% endblock %} {% block content %} {% if g.user%}
+<h1>Page not found, check your spelling and try again.</h1>
+<h2>Looking for a short cut?</h2>
+<a href="/wordpress/articles/all">Returnn to Wordpress Posts</a>
+<a href="/camphub/users/posts">Camphub User Posts</a>
+
+{% else %}
+<h1>Page not found, check your spelling and try again.</h1>
+<a href="signup">Sign up</a>
+{% endblock%}

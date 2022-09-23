@@ -56,7 +56,7 @@ class CamphubCommentModelTestCase(TestCase):
         '''Test viewing all user_posts.'''
 
         with self.client as c:
-            resp = c.get("camphub/users/posts")
+            resp = c.get("/camphub/users/posts")
 
             html = resp.get_resp(as_text = True)
 
@@ -102,7 +102,7 @@ class CamphubCommentModelTestCase(TestCase):
         '''Test getting new post form.'''
 
         with self.client as c:
-            resp = c.get(f"create/post/{self.user1.id}")
+            resp = c.get(f"/create/post/{self.user1.id}")
 
             html = resp.get_resp(as_text = True)
 

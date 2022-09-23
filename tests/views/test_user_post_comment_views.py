@@ -77,7 +77,7 @@ class CamphubCommentModelTestCase(TestCase):
         '''Test creating a new post comment.'''
 
         with self.client as c:
-            resp = c.post(f"create/comment/{self.first_post.id}/{self.user2.id}", data = {"comment_user_id": self.user2.id, "camphub_post_id": self.first_post.id, "content" : "The first comment to be tested."}, follow_redirects = True)
+            resp = c.post(f"/create/comment/{self.first_post.id}/{self.user2.id}", data = {"comment_user_id": self.user2.id, "camphub_post_id": self.first_post.id, "content" : "The first comment to be tested."}, follow_redirects = True)
 
             html = resp.get_resp(as_text = True)
 
@@ -93,7 +93,7 @@ class CamphubCommentModelTestCase(TestCase):
 
         with self.client as c:
             # user with id: 8462 does not exist
-            resp = c.post(f"create/comment/{self.first_post.id}/8462", follow_redirects = True)
+            resp = c.post(f"/create/comment/{self.first_post.id}/8462", follow_redirects = True)
 
             html = resp.get_resp(as_text = True)
 
@@ -108,7 +108,7 @@ class CamphubCommentModelTestCase(TestCase):
 
         with self.client as c:
             # post with id: 999 does not exist
-            resp = c.post(f"create/comment/999/{self.user1.id}", follow_redirects = True)
+            resp = c.post(f"/create/comment/999/{self.user1.id}", follow_redirects = True)
 
             html = resp.get_resp(as_text = True)
 

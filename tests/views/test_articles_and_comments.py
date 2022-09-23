@@ -56,7 +56,7 @@ class CamphubCommentModelTestCase(TestCase):
         '''Testing viewing all wordpress articles.'''
 
         with self.client as c:
-            resp = c.get(f"wordpress/aricles/all")
+            resp = c.get(f"/wordpress/aricles/all")
 
             html = resp.get_resp(as_text = True)
 
@@ -67,13 +67,73 @@ class CamphubCommentModelTestCase(TestCase):
     #      #      #      #      #      #      #      #      #      # 
 
     def test_viewing_single_article(self):
-        '''Testing viewing single wordpress article.'''
+        '''Testing viewing valid single wordpress article.'''
 
         with self.client as c:
             # hard coding 8. Again, it is a confrimed article ID - see tests/models/test_wordpress_post_comments.py for further details.
-            resp = c.get(f"wordpress/camphub/article/8")
+            resp = c.get(f"/wordpress/camphub/article/8")
 
             html = resp.get_resp(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn('<title>Wordpress Article</title>', html)
+
+    #      #      #      #      #      #      #      #      #      # 
+
+
+    def test_viewing_invalid_article(self):
+        '''Testing viewing invalid wordpress article.'''
+
+        with self.client as c:
+            resp = c.get("/wordpress/camphub/article/9876", follow_redirects = True)
+
+            html = resp.get_resp(as_text = True)
+
+            self.assertEqual(resp.status_codde, 200)
+            self.assertIn("<h1>Wordpress Articles</h1>", html)
+
+
+    #      #      #      #      #      #      #      #      #      # 
+
+    def test_creating_article_comment(self):
+        '''Test creating a valid comment on wordpress article.'''
+
+        with self.client as c:
+          with c.session_transaction() as sess:
+            sess[CURR_USER_KEY] = self.user1.id
+            
+            resp = 
+
+
+
+
+    #      #      #      #      #      #      #      #      #      # 
+
+    def test_deleting_wordpress_comment(self):
+        '''Test deleting a valid wordpress comment id.'''
+
+        with self.client as c:
+          # hard coding article_id as 8. See tests/models/test_wordpress_post_comments.py for further details.
+            resp = c.post(f"/wordpress/delete/8/{self.user1_wordpress_comment.id}", follow_redirects = True)
+
+            html = resp.get_resp(as_text = True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<title>Wordpress Article</title>', html)
+            self.assertIn('<li>Deleted comment!</li>', html)
+            wordpress_comments = Wordpress_Post_Comment.query.all()
+            self.assertEqual(len(wordpress_comments), 0) 
+
+    #      #      #      #      #      #      #      #      #      # 
+
+    def test_deleting_invalid_wordpress_comment(self):
+        '''Test deleting an invalid wordpress comment id.'''
+
+        with self.client as c:
+          # hard coding article_id as 8. See tests/models/test_wordpress_post_comments.py for further details.
+            resp = c.post(f"/wordpress/delete/78946/{self.user1_wordpress_comment.id}", follow_redirects = True)
+
+            html = resp.get_resp(as_text = True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<li>Something went wrong- please try again</li>.', html)

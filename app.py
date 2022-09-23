@@ -211,6 +211,12 @@ def render_homepage(user_id):
     return render_template("user_routes/home.html")
 
 
+@app.errorhandler(404)
+def page_not_found(e):
+    '''Return 404 page.'''
+    return render_template("404.html"), 404
+
+
 # 
 # 
 # Camphub IN-APP ROUTES
@@ -469,24 +475,30 @@ def view_article_CH_comment(article_id):
         flash("Please signup or login if you have an existing account.")
         return redirect("/signup")
 
-    resp = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}")
-    article = resp.json()
+    try:
 
-    replies = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}/replies/")
-    replies = replies.json()
+        resp = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}")
+        article = resp.json()
 
-    print("*************************")
-    print(replies)
+        replies = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}/replies/")
+        replies = replies.json()
 
-    user_comments_on_WP_article = Wordpress_Post_Comment.query.filter_by(wordpress_article_id = article_id).all()
+        print("*************************")
+        print(replies)
 
-    print("this is in house")
-    print(user_comments_on_WP_article)
+        user_comments_on_WP_article = Wordpress_Post_Comment.query.filter_by(wordpress_article_id = article_id).all()
 
-    print("THIS IS THE RESP OBJ")
-    # print(article)
+        print("this is in house")
+        print(user_comments_on_WP_article)
 
-    return render_template("wp_in_app_routes/single_article.html", article = article, replies = replies, user_comments_on_WP_article = user_comments_on_WP_article)
+        print("THIS IS THE RESP OBJ")
+        # print(article)
+
+        return render_template("wp_in_app_routes/single_article.html", article = article, replies = replies, user_comments_on_WP_article = user_comments_on_WP_article)
+
+    except:
+        flash("Please view an existing article from the list below.")
+        return redirect("/wordpress/articles/all")
 
 @app.route("/create/comment/<int:article_id>", methods = ["GET", "POST"])
 def create_WP_camphub_comment(article_id):

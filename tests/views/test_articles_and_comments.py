@@ -56,6 +56,9 @@ class CamphubCommentModelTestCase(TestCase):
         '''Testing viewing all wordpress articles.'''
 
         with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user1.id
+
             resp = c.get(f"/wordpress/aricles/all")
 
             html = resp.get_resp(as_text = True)
@@ -70,6 +73,9 @@ class CamphubCommentModelTestCase(TestCase):
         '''Testing viewing valid single wordpress article.'''
 
         with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user1.id
+
             # hard coding 8. Again, it is a confrimed article ID - see tests/models/test_wordpress_post_comments.py for further details.
             resp = c.get(f"/wordpress/camphub/article/8")
 
@@ -85,6 +91,9 @@ class CamphubCommentModelTestCase(TestCase):
         '''Testing viewing invalid wordpress article.'''
 
         with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user1.id
+
             resp = c.get("/wordpress/camphub/article/9876", follow_redirects = True)
 
             html = resp.get_resp(as_text = True)
@@ -99,21 +108,30 @@ class CamphubCommentModelTestCase(TestCase):
         '''Test creating a valid comment on wordpress article.'''
 
         with self.client as c:
-          with c.session_transaction() as sess:
-            sess[CURR_USER_KEY] = self.user1.id
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user2.id
             
-            resp = 
+            # hard coding article_id as 8. See tests/models/test_wordpress_post_comments.py for further details.
+            resp = c.get("create/comment/8", data = {"comment_user_id": self.user2.id, "camphub_post_id": 8, "content": "This comment is being made by user 2."}, follow_redirects = True)
 
+            html = resp.get_resp(as_text = True)
 
+            self.assertEqual(resp.status_code, 201)
+            self.assertIn("<title>Wordpress Article</title>", html)
+            wordpress_comments = Wordpress_Post_Comment.query.filter_by(wordpress_article_id = 8).all()
+            self.assertEqual(len(wordpress_comments), 2)
 
 
     #      #      #      #      #      #      #      #      #      # 
 
     def test_deleting_wordpress_comment(self):
-        '''Test deleting a valid wordpress comment id.'''
+        '''Test deleting a valid existing wordpress comment id.'''
 
         with self.client as c:
-          # hard coding article_id as 8. See tests/models/test_wordpress_post_comments.py for further details.
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user1.id
+              # hard coding article_id as 8. See tests/models/test_wordpress_post_comments.py for further details.
+              
             resp = c.post(f"/wordpress/delete/8/{self.user1_wordpress_comment.id}", follow_redirects = True)
 
             html = resp.get_resp(as_text = True)
@@ -130,7 +148,10 @@ class CamphubCommentModelTestCase(TestCase):
         '''Test deleting an invalid wordpress comment id.'''
 
         with self.client as c:
-          # hard coding article_id as 8. See tests/models/test_wordpress_post_comments.py for further details.
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user1.id
+
+            # hard coding an invalid wordpress article ID.
             resp = c.post(f"/wordpress/delete/78946/{self.user1_wordpress_comment.id}", follow_redirects = True)
 
             html = resp.get_resp(as_text = True)

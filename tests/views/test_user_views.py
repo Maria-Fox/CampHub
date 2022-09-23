@@ -66,6 +66,8 @@ class CamphubCommentModelTestCase(TestCase):
             # or 200 (bc or redirect), if 201 fails, but a new user was created, so I'm thinking 201
             self.assertEqual(resp.status_code, 201)
             self.assertIn("<h3>Why was Camphub created?</h3>", html)
+            users = User.query.all()
+            self.assertTrue(len(users), 3)
 
     #      #      #      #      #      #      #      #      #      #  
 
@@ -73,6 +75,7 @@ class CamphubCommentModelTestCase(TestCase):
         '''Test getting login page.'''
 
         with self.client as c:
+          
             resp = c.get("/login")
 
             html = resp.get_data(as_text = True)
@@ -87,14 +90,15 @@ class CamphubCommentModelTestCase(TestCase):
         '''Test authentication an existing user.'''
 
         with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user1.id
+
             resp = c.post("/login", data = {"username": "user1", "password" : "password1"}, follow_redirects = True)
 
             html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn("<h3>Why was Camphub created?</h3>", html)
-            self.assertTrue("session[CURR_USER_KEY] = self.user1.id")
-
 
     #      #      #      #      #      #      #      #      #      #  
 
@@ -132,6 +136,9 @@ class CamphubCommentModelTestCase(TestCase):
       '''Test getting profile edit form.'''
 
       with self.client as c:
+          with c.session_transaction() as sess:
+              sess[CURR_USER_KEY] = self.user1.id
+
           resp = c.get(f"/edit/profile{self.user1.id}")
 
           html = resp.get_data(as_text = True)
@@ -146,12 +153,15 @@ class CamphubCommentModelTestCase(TestCase):
         '''Test submitting edit profile form with valid credentials and all fields complete.'''
 
         with self.client as c:
-            resp = c.post(f"/edit/profile/{self. user1.id}", data = {"username": "updatedUser1", "school_name": "Springboard", "field_of_study": "Software Dev"}, follow_redirects = True)
+          with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user1.id
 
-            html = resp.get_data(as_text = True)
+          resp = c.post(f"/edit/profile/{self. user1.id}", data = {"username": "updatedUser1", "school_name": "Springboard", "field_of_study": "Software Dev"}, follow_redirects = True)
 
-            self.assertEqual(resp.status_code, 200)
-            self.assertIn('<h3>Why was Camphub created?</h3>', html)
+          html = resp.get_data(as_text = True)
+
+          self.assertEqual(resp.status_code, 200)
+          self.assertIn('<h3>Why was Camphub created?</h3>', html)
 
 
     #      #      #      #      #      #      #      #      #      #  
@@ -175,17 +185,31 @@ class CamphubCommentModelTestCase(TestCase):
         '''Test logging out..'''
 
         with self.client as c:
-            resp = c.get("/logout", follow_redirects = True)
+          with c.session_transaction() as sess:
+              sess[CURR_USER_KEY] = self.user1.id
 
-            html = resp.get_data(as_text = True)
+          resp = c.get("/logout", follow_redirects = True)
 
-            # redirects to the signup pg.
-            self.assertEqual(resp.status_code, 200)
-            self.assertIn('<h2>Notice to User:</h2>', html)
+          html = resp.get_data(as_text = True)
+
+          self.assertEqual(resp.status_code, 200)
+          self.assertIn('<h2>Notice to User:</h2>', html)
 
             
-            
+   #      #      #      #      #      #      #      #      #      #  
 
+    def test_get_logout_without_user(self):
+        '''Test logging out without valid session[id].'''
+
+        with self.client as c:
+
+          resp = c.get("/logout", follow_redirects = True)
+
+          html = resp.get_data(as_text = True)
+
+          # redirects to the signup pg.
+          self.assertEqual(resp.status_code, 200)
+          self.assertIn('<h2>Notice to User:</h2>', html)
 
     
 

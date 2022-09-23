@@ -56,12 +56,32 @@ class CamphubCommentModelTestCase(TestCase):
         '''Test viewing all user_posts.'''
 
         with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user1.id
+
             resp = c.get("/camphub/users/posts")
 
             html = resp.get_resp(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn('<h1> Camphub User Posts - All </h1>', html)
+
+    #      #      #      #      #      #      #      #      #      #  
+
+
+    def test_viewing_all_posts_no_user(self):
+        '''Test viewing all user_posts without being signed in/ session id.'''
+
+        with self.client as c:
+
+            resp = c.get("/camphub/users/posts", follow_redirects = True)
+
+            html = resp.get_resp(as_text = True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<h2>Notice to User:</h2>', html)
+            posts = Camphub_User_Post.query.all()
+            self.assertEqual(len(posts), 1)
 
 
     #      #      #      #      #      #      #      #      #      #  
@@ -71,6 +91,9 @@ class CamphubCommentModelTestCase(TestCase):
         '''Test viewing given user_post.'''
 
         with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user1.id
+
             resp = c.get(f"/view/camphub/{self.first_post.id}")
 
             html = resp.get_resp(as_text = True)
@@ -86,6 +109,9 @@ class CamphubCommentModelTestCase(TestCase):
         '''Test viewing invalid user_post.'''
 
         with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user1.id
+
             resp = c.get("/view/camphub/73", follow_redirects = True)
 
             html = resp.get_resp(as_text = True)
@@ -96,12 +122,14 @@ class CamphubCommentModelTestCase(TestCase):
 
     #      #      #      #      #      #      #      #      #      #  
 
-    # get and post route
 
     def test_getting_create_post_form(self):
         '''Test getting new post form.'''
 
         with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user1.id
+            
             resp = c.get(f"/create/post/{self.user1.id}")
 
             html = resp.get_resp(as_text = True)
@@ -117,12 +145,17 @@ class CamphubCommentModelTestCase(TestCase):
         '''Testing submitting new post w/ valid user.'''
 
         with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user1.id
+
             resp = c.post(f"create/post/{self.user1.id}", data = {"author_id": {self.user1.id}, "title": "Creating a new post!", "content": "Getting some good testing practice, in!"})
 
             html = resp.get_resp(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
-            self.assertIn('<h1> Camphub User Posts - All </h1>', html)   
+            self.assertIn('<h1> Camphub User Posts - All </h1>', html) 
+            all_posts = Camphub_User_Post.query.all()
+            self.assertEqual(len(all_posts), 2)  
 
 
     #      #      #      #      #      #      #      #      #      #  
@@ -132,10 +165,72 @@ class CamphubCommentModelTestCase(TestCase):
         '''Testing submitting new post w/ invalid user.'''
 
         with self.client as c:
-          # route would be redirected
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user1.id
+
             resp = c.post("create/post/639", follow_redirects = True)
 
             html = resp.get_resp(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn('<h3>Why was Camphub created?</h3>', html) 
+
+
+    #      #      #      #      #      #      #      #      #      #  
+
+
+    def test_deleting_post(self):
+        '''Testing deleting valid post'''
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user1.id
+
+            resp = c.post(f"camphub/delete/post/{self.first_post.id}", follow_redirects = True)
+
+            html = resp.get_resp(as_text = True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<h1> Camphub User Posts - All </h1>', html) 
+            posts = Camphub_User_Post.query.all()
+            self.assertEqual(len(posts), 0)
+
+
+    #      #      #      #      #      #      #      #      #      #  
+
+
+    def test_deleting_post_unauth_user(self):
+        '''Testing deleting valid post- without being post creator'''
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user2.id
+
+            resp = c.post(f"camphub/delete/post/{self.first_post.id}", follow_redirects = True)
+
+            html = resp.get_resp(as_text = True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<h1> Camphub User Posts - All </h1>', html)
+            posts = Camphub_User_Post.query.all()
+            self.assertEqual(len(posts), 1) 
+
+
+    #      #      #      #      #      #      #      #      #      #  
+
+
+    def test_deleting_post_unauth_user(self):
+        '''Testing deleting valid post- without being signed in/ no session[id]..'''
+
+        with self.client as c:
+
+            resp = c.post(f"camphub/delete/post/{self.first_post.id}", follow_redirects = True)
+
+            html = resp.get_resp(as_text = True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('    <h2>Notice to User:</h2>', html)
+            posts = Camphub_User_Post.query.all()
+            self.assertEqual(len(posts), 1) 
+
+    

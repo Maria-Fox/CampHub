@@ -62,14 +62,17 @@ class CamphubCommentModelTestCase(TestCase):
         '''Testing viewing existing post comment.'''
 
         with self.client as c:
-            resp = c.get(f"/view/{self.first_post.id}/{self.user2_comment.id}")
+          with c.session_transaction() as sess:
+              sess[CURR_USER_KEY] = self.user2.id
 
-            html = resp.get_resp(as_text = True)
+          resp = c.get(f"/view/{self.first_post.id}/{self.user2_comment.id}")
 
-            self.assertIsInstance(self.first_post, Camphub_User_Post)
-            self.assertIsInstance(self.user2_comment, Camphub_Comment)
-            self.assertEqual(self.user2_comment.content, "Content for post number 111")
-            self.assertIn("")
+          html = resp.get_resp(as_text = True)
+
+          self.assertIsInstance(self.first_post, Camphub_User_Post)
+          self.assertIsInstance(self.user2_comment, Camphub_Comment)
+          self.assertEqual(self.user2_comment.content, "Content for post number 111")
+            
 
     #      #      #      #      #      #      #      #      #      #  
 
@@ -77,21 +80,28 @@ class CamphubCommentModelTestCase(TestCase):
         '''Test creating a new post comment.'''
 
         with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user2.id
+
             resp = c.post(f"/create/comment/{self.first_post.id}/{self.user2.id}", data = {"comment_user_id": self.user2.id, "camphub_post_id": self.first_post.id, "content" : "The first comment to be tested."}, follow_redirects = True)
 
             html = resp.get_resp(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn('<h2>Comment Section</h2>', html)
+            post = Camphub_User_Post.query.filter_by( camphub_post_id = self.first_post.id).all()
+            self.assertEqual(len(post), 2)
 
 
     #      #      #      #      #      #      #      #      #      #  
 
 
-    def test_posting_invalid_user_post_comment(self):
-        '''Test creating a new post comment with invalid user- assume g.user is active/correct.'''
+    def test_posting_invalid_user(self):
+        '''Test creating a new post comment with invalid user id.'''
 
         with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user1.id
             # user with id: 8462 does not exist
             resp = c.post(f"/create/comment/{self.first_post.id}/8462", follow_redirects = True)
 
@@ -103,12 +113,65 @@ class CamphubCommentModelTestCase(TestCase):
 
     #      #      #      #      #      #      #      #      #      #  
 
-    def test_posting_invalid_post_comment(self):
-        '''Test creating a new post comment with invalid user- assume g.user is active/correct.'''
+
+    def test_posting_against_invalid_post_id(self):
+        '''Test creating a new post comment with invalid user_post id.'''
 
         with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user1.id
+
+            resp = c.post(f"/create/comment/8956/{self.user1.id}", follow_redirects = True)
+
+            html = resp.get_resp(as_text = True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<h1> Camphub User Posts - All </h1>', html)
+
+
+    #      #      #      #      #      #      #      #      #      # 
+
+    def test_posting_without_signin(self):
+        '''Test creating a new post comment without being signed in.'''
+
+        with self.client as c:
+          
             # post with id: 999 does not exist
-            resp = c.post(f"/create/comment/999/{self.user1.id}", follow_redirects = True)
+            resp = c.post(f"/create/comment/{self.first_post.id}/{self.user1.id}", follow_redirects = True)
+
+            html = resp.get_resp(as_text = True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<h2>Notice to User:</h2>', html)
+
+
+    #      #      #      #      #      #      #      #      #      #  
+
+    def test_deleting_post_user_comment(self):
+        '''Test deleting a post with a valid user.'''
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user2.id
+
+            resp = c.post(f"/camphub/delete/{self.first_post.id}/{self.user2_comment}", follow_redirects = True)
+
+            html = resp.get_resp(as_text = True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<title>Camphub User Post</title>', html)
+
+
+    #      #      #      #      #      #      #      #      #      #  
+
+    def test_deleting_other_user_comment(self):
+        '''Test deleting a post without being the comment creator.'''
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user1.id
+
+            resp = c.post(f"/camphub/delete/{self.first_post.id}/{self.user2_comment}", follow_redirects = True)
 
             html = resp.get_resp(as_text = True)
 
@@ -118,6 +181,17 @@ class CamphubCommentModelTestCase(TestCase):
 
     #      #      #      #      #      #      #      #      #      #  
 
+    def test_deleting_comment__without_signin(self):
+        '''Test deleting a post without being signed in/ no session[id].'''
+
+        with self.client as c:               
+
+            resp = c.post(f"/camphub/delete/{self.first_post.id}/{self.user2_comment}", follow_redirects = True)
+
+            html = resp.get_resp(as_text = True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<h2>Notice to User:</h2>', html)
 
 
-
+    #      #      #      #      #      #      #      #      #      # 

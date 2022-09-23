@@ -103,7 +103,7 @@ class CamphubCommentModelTestCase(TestCase):
     #      #      #      #      #      #      #      #      #      #  
 
     def test_post_invalid_credentials(self):
-        '''Test failing invalid credentials.'''
+        '''Test invalid credentials.'''
 
         with self.client as c:
             resp = c.post("/login", data = {"username": "NotRealUser", "password" : "password1"}, follow_redirects = True)
@@ -129,8 +129,61 @@ class CamphubCommentModelTestCase(TestCase):
             self.assertNotEqual(resp.status_code, 200)
             self.assertIn('<div id="login-form">', html)
 
-          
+
+   #      #      #      #      #      #      #      #      #      #  
+
+
+    def test_get_home(self):
+      '''Test getting home with valid user.'''
+
+      with self.client as c:
+          with c.session_transaction() as sess:
+              sess[CURR_USER_KEY] = self.user1.id
+
+          resp = c.get(f"/home/{self.user1.id}")
+
+          html = resp.get_data(as_text = True)
+
+          self.assertEqual(resp.status_code, 200)
+          self.assertIn('<h3>Why was Camphub created?</h3>', html)
+
+
     #      #      #      #      #      #      #      #      #      #  
+
+
+    def test_get_home_unauth_user(self):
+      '''Test getting home with unauth user.'''
+
+      with self.client as c:
+          with c.session_transaction() as sess:
+              sess[CURR_USER_KEY] = self.user2.id
+
+          resp = c.get(f"/home/{self.user1.id}", follow_redirects = True)
+
+          html = resp.get_data(as_text = True)
+
+          self.assertEqual(resp.status_code, 200)
+          self.assertIn('<h3>Why was Camphub created?</h3>', html)
+
+
+     #      #      #      #      #      #      #      #      #      #  
+
+
+    def test_get_home_without_signin(self):
+      '''Test getting home with valid user.'''
+
+      with self.client as c:
+
+          resp = c.get(f"/home/{self.user1.id}", follow_redirects = True)
+
+          html = resp.get_data(as_text = True)
+
+          self.assertEqual(resp.status_code, 200)
+          self.assertIn('<h2>Notice to User:</h2>', html)
+
+
+    #      #      #      #      #      #      #      #      #      #  
+
 
     def test_get_edit_profile(self):
       '''Test getting profile edit form.'''
@@ -166,7 +219,7 @@ class CamphubCommentModelTestCase(TestCase):
 
     #      #      #      #      #      #      #      #      #      #  
 
-    def test_get_edit_profile(self):
+    def test_get_edit_profilinvalid_creds(self):
         '''Test submitting edit profile form with invalid credentials.'''
 
         with self.client as c:

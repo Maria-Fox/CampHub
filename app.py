@@ -144,8 +144,8 @@ def edit_profile(user_id):
         redirect("/signup")
 
     user = User.query.get(user_id)
-    
-    if g.user != user_id:
+
+    if g.user != user:
         flash("You may only edit your profile.")
         return redirect(f"/home/{g.user.id}")
     else: 
@@ -205,8 +205,7 @@ def render_homepage(user_id):
     user = User.query.get(user_id)
 
     if user != g.user:
-        flash("Please sign up or log in to view the home page.")
-        return redirect("/signup")
+        return redirect(f"/home/{g.user.id}")
   
     return render_template("user_routes/home.html")
 

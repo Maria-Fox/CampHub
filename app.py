@@ -1,8 +1,9 @@
+import json
 from flask import Flask, render_template, redirect, flash, redirect, session, g, abort, request, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 import requests
-from models import db, connect_db, User, Camphub_User_Post, Camphub_Comment, Wordpress_Post_Comment, User_Like
-from forms import Signup_Form, Login_Form, Edit_Profile_form, Camphub_Comment_Form, Camphub_User_Post_Form, Wordpress_CH_Article_Comment_Form
+from models import db, connect_db, User, Camphub_User_Post, Camphub_Comment, Wordpress_Post_Comment, Suggest_Topic, User_Like
+from forms import Signup_Form, Login_Form, Edit_Profile_form, Camphub_Comment_Form, Camphub_User_Post_Form, Wordpress_CH_Article_Comment_Form, Suggest_Topic_Form
 from sqlalchemy.exc import IntegrityError
 import os
 
@@ -20,9 +21,6 @@ CURR_USER_KEY = "curr_user"
 base_url = "https://public-api.wordpress.com/rest/v1.1/sites"
 camphub_site = "camphub2022.wordpress.com"
 site_id = 210640995
-
-# wordpress specifc variables to be later assigned or modified as query's are requested
-wordpress_item = ""
 
 connect_db(app)
 db.create_all()
@@ -45,26 +43,33 @@ def complete_login(user):
 
     session[CURR_USER_KEY] = user.id
 
-
-# def do_logout():
-#     """Logout user."""
-
-#     if CURR_USER_KEY in session:
-#         del session[CURR_USER_KEY]
-
-
-
-# # # # # # # # # # # # # # # # # # # # # # # # # #  Sign up/Signin Routes
+# # # # # # # # # # # # # # # # # # # # #  Sign up/Signin Routes
 
 @app.route("/")
 def app_home():
-    '''Home page- routes user to approporiate page.'''
+    '''Home page- routes user to appropriate page.'''
 
     if g.user:
         return redirect(f"/home/{g.user.id}")
 
-    return redirect("/signup")
+    return redirect("/camphub")
 
+@app.route("/camphub")
+def landing_page():
+    '''Show landing page.'''
+
+    if g.user:
+      return redirect(f"/home/{g.user.id}")
+
+    return render_template("landing_page.html")
+
+
+@app.route("/camphub/breakdown")
+def camphub_info():
+    '''Render camphub breakdown.'''
+
+    return render_template("breakdown.html")
+    
 
 @app.route("/signup", methods = ["GET", "POST"])
 def signup():
@@ -84,15 +89,13 @@ def signup():
         user = User.register(username, password, school_name, field_of_study)
 
         db.session.commit()
+        complete_login(user)
+
+        return redirect(f"/home/{user.id}")
 
     except IntegrityError:
         flash("Username already exists- please choose a new username.")
         return render_template("user_routes/signup.html", form = form)
-
-    # assigned globally and to session
-    session[CURR_USER_KEY] = user.id
-
-    return redirect(f"/home/{user.id}")
   
   return render_template("user_routes/signup.html", form = form)
 
@@ -115,10 +118,10 @@ def login():
         user = User.authenticate(username, given_password)
   
         if user:
-            flash(f"Welcome {user.username}!")
-            complete_login(user)
+                flash(f"Welcome {user.username}!")
+                complete_login(user)
       
-            return redirect (f"/home/{user.id}")
+                return redirect (f"/home/{user.id}")
 
         elif not user:
             flash("Incorrect username or password. Please try again.")
@@ -133,7 +136,7 @@ def logout():
       return redirect("/signup")
 
     del session[CURR_USER_KEY]
-    return redirect("/signup")
+    return redirect("/camphub")
 
 
 @app.route("/edit/profile/<int:user_id>", methods = ["GET", "POST"])
@@ -143,35 +146,32 @@ def edit_profile(user_id):
     if not g.user:
         redirect("/signup")
 
-    user = User.query.get(user_id)
-
-    if g.user != user:
-        flash("You may only edit your profile.")
-        return redirect(f"/home/{g.user.id}")
-    else: 
-      form = Edit_Profile_form(obj = user)
+    user = User.query.get_or_404(user_id)
+    form = Edit_Profile_form(obj = user)
 
     if form.validate_on_submit():
 
         try:
 
-            user.username = form.username.data 
-            user.school_name = form.school_name.data
-            user.field_of_study = form.field_of_study.data
+            if User.authenticate(user.username, form.password.data):
 
-            db.session.add(user)
-            db.session.commit()
+                user.username = form.username.data 
+                user.school_name = form.school_name.data
+                user.field_of_study = form.field_of_study.data
 
-            flash("Profile was updated!")
-            return redirect(f"/home/{user_id}")
+                db.session.add(user)
+                db.session.commit()
+
+                flash("Profile was updated!", "success")
+                return redirect(f"/home/{user_id}")
 
         except:
-          flash ("Something went wrong- please try again.")
+          flash ("Please check your spelling and try again.")
           return redirect(f"/edit/profile/{user_id}")
 
     return render_template("user_routes/editProfile.html", form = form, user = user)
 
-# THIS ROUTE IS NOT WORKING- PERHAPS SOMETHING TO DO W/ THE DELETE CASCADE IN MODELS.
+
 @app.route("/delete/user/<int:user_id>")
 def delete_user(user_id):
     '''Delete user account.'''
@@ -180,9 +180,7 @@ def delete_user(user_id):
         return redirect("/signup")
 
     try:
-        user = User(id = user_id)
-        print("******** THIS IS THE USER : ")
-        print(user)
+        user = User.query.get_or_404(user_id)
 
         db.session.delete(user)
         db.session.commit()
@@ -209,11 +207,18 @@ def render_homepage(user_id):
   
     return render_template("user_routes/home.html")
 
+@app.route("/camphub/direction")
+def camphub_direction():
+    '''Provide new users option for directions/ assistance on where to go/ what they can do.'''
+
+    return render_template("user_routes/directions.html")
+
 
 @app.errorhandler(404)
 def page_not_found(e):
     '''Return 404 page.'''
     return render_template("404.html"), 404
+
 
 
 # 
@@ -247,11 +252,7 @@ def view_given_post(post_id):
       flash("Unauothorzed access- please signup, or login if you have an account.")
       return redirect("/signup")
 
-    post = Camphub_User_Post.query.filter_by(id = post_id).first()
-
-    if not post:
-        flash("Post does not exist- please try again")
-        return redirect("/camphub/users/posts")
+    post = Camphub_User_Post.query.filter_by(id = post_id).first_or_404()
 
     comments = Camphub_Comment.query.filter_by(camphub_post_id = post_id).all()
 
@@ -328,12 +329,14 @@ def delete_post(post_id):
 # # # # # # # # # # # # # # # # # # # # COMMENTS SECTION FOR IN-APP 
 
 # this is for ALL IN APP comments. 
-@app.route("/camphub/comments/all")
-def view_camphub_comments():
+@app.route("/camphub/<int:user_id>/comments/all")
+def view_camphub_comments(user_id):
     '''View comments made here on camphub- does not include Wordpress Comments.'''
 
     if not g.user:
       return redirect("/")
+
+    user = User.query.get_or_404(user_id)
 
     all_comments = Camphub_Comment.query.all()
     print("*********************")
@@ -356,14 +359,13 @@ def make_post_comment(post_id, user_id):
       if not g.user:
           return redirect("/")
 
-      # come back and add 404 page
-      post = Camphub_User_Post.query.filter_by(id = post_id).first()
-      user = User.query.filter_by(id = user_id).first()
-
       form = Camphub_Comment_Form()
 
+      post = Camphub_User_Post.query.filter_by(id = post_id).first()
+      user = User.query.get(user_id)
+
       if g.user != user:
-        flash("unauthorized route.")
+        flash("Unauthorized route.")
         return redirect(f"/home/{g.user.id}")
 
       if not post and user: 
@@ -377,19 +379,12 @@ def make_post_comment(post_id, user_id):
               camphub_post_id = post_id
               content = form.content.data
 
-              print("****************")
-              print(comment_user_id, camphub_post_id, content)
-
               new_post_comment = Camphub_Comment(comment_user_id = comment_user_id, camphub_post_id = camphub_post_id, content= content)
-
-              print("*******new post here")
-              print("new_post_comment")
 
               db.session.add(new_post_comment)
               db.session.commit()
-              print("***********NEW COMMENT")
-              print(new_post_comment)
-              flash("Comment created!")
+              
+              flash("Created Comment!")
 
               return redirect(f"/view/camphub/{post_id}")
 
@@ -425,6 +420,53 @@ def delete_post_comment(post_id, comment_id):
           return (f"/view/camphub/{post_id}")
 
 
+# # # # # # # # # # # # # # # # # # # # # # # # Suggest a Topic 
+
+@app.route("/suggest/topic/<int:user_id>", methods = ["GET", "POST"])
+def suggest_topic(user_id):
+    '''Allow user to suggest a moderator article for discussion. '''
+
+    if not g.user:
+        return redirect("/signup")
+
+    user = User.query.get_or_404(user_id)
+
+    form = Suggest_Topic_Form()
+
+    if form.validate_on_submit():
+      try :
+        print("try **************************ran")
+
+        topic = form.topic.data
+        print("try **************************ran")
+
+        print(topic)
+
+        details = form.details.data
+        print("try **************************ran")
+
+        print(details)
+
+        new_suggestion = Suggest_Topic(user_id = user_id, topic = topic, details = details)
+
+        print(type(Suggest_Topic))
+        print(Suggest_Topic)
+
+        print("new_suggestion is: *********")
+        print(new_suggestion)
+
+        db.session.add(new_suggestion)
+        db.session.commit()
+
+        flash("Request was submitted!")
+        return redirect(f"/home/{user_id}")
+      except:
+          flash("Something went wrong- please try again.")
+
+      
+    return render_template("user_routes/suggestTopic.html", form = form)
+
+
 # 
 # 
 # Wordpress Routes
@@ -442,28 +484,21 @@ def camphub_posts():
 
     resp = requests.get(f"{base_url}/{camphub_site}/posts/")
     resp = resp.json()
-    # print("**************** LETS SEE:")
-    print(resp)
     
-    content = []
-
     articles = resp["posts"]
+    
+    #  This needs work - the tags are removed w/ loop but unable to render on pg- something to do w/ the endfor?
 
-    # remove the HTML tags at the beginning and end of the response content
-    # for i in range(len(resp["posts"])):
-    #   original_content_as_array = str(resp["posts"][i]["content"])
-    #   text_array = original_content_as_array.split(">")
-    #   text_array.remove([0])
-    #   final_content = " ".join(text_array)
-    #   text_array : list = final_content.split("<")
-    #   text_array.remove(text_array[-1])
-    #   final_content = " ".join(text_array)
+    for i in range(len(resp["posts"])):
+      final_content = (resp["posts"][i]["content"][4:-5])
+      print(final_content)
 
-      # content.append([{"art_id": i, "content": final_content }])
+
+    print("CONTENT IS: ********")
 
     articles = sorted(articles, key=lambda d: d['date'])
 
-    return render_template("article_routes/articles.html", articles = articles)
+    return render_template("article_routes/articles.html", articles = articles, final_content = final_content)
 
 # NEED EDITS TO ACCOUNT FOR ARTICLE_ID NOT EXISTING- ADD TRY/CATCH 
 @app.route("/wordpress/camphub/article/<int:article_id>")
@@ -479,19 +514,21 @@ def view_article_CH_comment(article_id):
         resp = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}")
         article = resp.json()
 
+        print("article ran")
+        # print(article)
+
         replies = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}/replies/")
         replies = replies.json()
+        print("replies ran")
+        replies = replies["comments"]
 
         print("*************************")
-        print(replies)
+        # print(replies)
 
         user_comments_on_WP_article = Wordpress_Post_Comment.query.filter_by(wordpress_article_id = article_id).all()
 
         print("this is in house")
         print(user_comments_on_WP_article)
-
-        print("THIS IS THE RESP OBJ")
-        # print(article)
 
         return render_template("wp_in_app_routes/single_article.html", article = article, replies = replies, user_comments_on_WP_article = user_comments_on_WP_article)
 
@@ -530,7 +567,7 @@ def create_WP_camphub_comment(article_id):
           print(new_comment)
           db.session.commit()
 
-          flash("Your comment was added to camphub comments.")
+          flash("Your comment was added to CampHub comments.")
           return redirect(f"/wordpress/camphub/article/{article_id}")
 
         except:

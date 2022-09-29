@@ -1,0 +1,79 @@
+/* Signup Page, Login Pg, Update user profile*/
+
+#signup-title {
+  text-align: center;
+}
+
+#reg-form,
+#edit-profile-form {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  font-size: 20px;
+}
+
+.field-label {
+  padding: 10px;
+}
+
+.user-cred-button {
+  margin: 10px;
+}
+
+.user-cred-button:hover {
+  background-color: rgba(182, 231, 233, 0.767);
+  color: whitesmoke;
+}
+
+/* Login Page */
+
+#register-form-div,
+#login-form-div,
+#profile-edit-form-div,
+#delete-acct-div {
+  margin: 0;
+  top: 50%;
+  left: 50%;
+  max-width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  color: whitesmoke;
+  display: flex;
+  flex-direction: column;
+  width: 60%;
+  size: 3rem;
+  border: 2px solid whitesmoke;
+  border-radius: 5px;
+  padding: 5px;
+}
+
+#login-form {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  font-size: 20px;
+}
+
+/* editProfile.html */
+
+#profile-button:hover {
+  background-color: rgba(182, 231, 233, 0.767);
+  color: whitesmoke;
+}
+
+#del-acct-button {
+  max-width: 100%;
+  /* background-color: #e94848dc; */
+  padding: 10px;
+  width: 900px;
+  margin-top: 60px;
+}
+
+#delete-zone {
+  font-size: 20px;
+  text-align: center;
+}
+
+#del-acct-button:hover {
+  background-color: #e94848dc;
+}

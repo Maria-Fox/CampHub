@@ -1,34 +1,23 @@
 body {
-  background-color: black;
   color: whitesmoke;
-  /* background-image: url("https://images.pexels.com/photos/3825296/pexels-photo-3825296.jpeg?auto=compress&cs=tinysrgb&w=300");
+  background-image: url("https://images.unsplash.com/photo-1435224654926-ecc9f7fa028c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80");
   background-repeat: no-repeat;
-  background-size: cover; */
+  background-size: cover;
+  min-height: 100%;
+  background-color: black;
 }
+
+/* camping: https://images.unsplash.com/photo-1504851149312-7a075b496cc7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=705&q=80 */
 
 #nav-area {
   border: 1px solid whitesmoke;
   font-size: 35px;
   flex-direction: row;
   display: flex;
-  position: fixed;
+  position: absolute;
   top: 0;
   width: 100%;
   background-color: rgba(182, 231, 233, 0.767);
-}
-
-/* #welcome-banner {
-  background-image: url("https://images.pexels.com/photos/3825296/pexels-photo-3825296.jpeg?auto=compress&cs=tinysrgb&w=300");
-  background-repeat: no-repeat;
-  background-size: cover;
-} */
-
-a:link,
-a:visited,
-a:hover,
-a:active {
-  color: blanchedalmond;
-  text-decoration: none;
 }
 
 #app-icon {
@@ -57,27 +46,16 @@ a:active {
   font-size: 50px;
 }
 
-/* Registration Page */
-
-#signup-title {
-  font-size: 30px;
-  padding: 5px;
+#home-link {
+  bottom: 0;
+  left: 0;
+  position: absolute;
 }
 
-#register-form,
-#login-form {
-  border: 1px solid white;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 90%;
-  height: 100%;
-  position: relative;
-  margin: auto;
-}
-
-/* styling for each pg? */
-#page-content {
-  border: 5px solid white;
+.flash-message-div {
+  background-color: whitesmoke;
+  color: rgba(29, 98, 102, 0.589);
+  margin-top: 40px;
+  font-size: 18px;
+  height: 25px;
 }

@@ -4,7 +4,9 @@
 from unittest import TestCase
 
 from models import  db, User, Camphub_User_Post, Camphub_Comment, Wordpress_Post_Comment
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgres:///camphub_test"
+import os 
+
+os.environ['DATABASE_URL'] = "postgresql:///camphub_test"
 
 # CURR_USER_KEY is the user.id assigned to session once an acct is created.
 from app import app, CURR_USER_KEY
@@ -15,44 +17,56 @@ db.create_all()
 app.config['ETF_CSRF_ENABLED'] = False
 app.config["TESTING"] = True
 
-class CamphubCommentModelTestCase(TestCase):
-    '''Test camphub comment model. '''
+class CamphubUserRoutes(TestCase):
+    '''Test user view routes. '''
 
-    def set_up(self):
-      '''Create test client and test user.'''
+    def setUp(self):
+        """Create test client, add sample data."""
 
-      db.drop_all()
-      db.create_all()
+        db.drop_all()
+        db.create_all()
 
-      self.client = app.test_client()
+        user1 = User.register(
+            username = "user1",
+            password = "password1",
+            school_name = "Springboard",
+            field_of_study = "Software Engineering"
+        )
 
-      user1 = User.register("user1", "password1", "Springboard", "Software Engineering")
-      user2 = User.register("user2", "password2", "Springboard", "Data Science")
+        user1.id = 888
 
-      user1.id = 888
-      user2.id = 777
+        user2 = User.register(username = "user2",
+            password = "password2",
+            school_name = "Springboard",
+            field_of_study = "UX Design"
+        )
 
-      db.session.add.all([user1, user2])
-      db.session.commit()
+        user2.id = 999
 
-      self.user1 = user1
-      self.user2 = user2
-      self.client = app.client()
+        db.session.commit()
+        # u1 = User.query.get(u1.id)
+        # u2 = User.query.get(u2.id)
 
-    def tear_down(self):
-      db.session.rollback()
+        self.user1 = user1
+        self.user2 = user2
+
+        self.client = app.test_client()
+
+    def tearDown(self):
+        """Clean up transactions."""
+        db.session.rollback()
 
     #      #      #      #      #      #      #      #      #      #  
     def test_get_user_signup(self):
-      '''Test render signup page'''
+        '''Test render signup page'''
 
-      with self.client as c:
-          resp = c.get("/signup")
+        with self.client as c:
+            resp = c.get("/signup")
 
-          html = resp.get_data(as_text = True)
+        html = resp.get_data(as_text = True)
 
-          self.assertEqual(resp.status_code, 200)
-          self.assertIn("<h2>Notice to User:</h2>", html)
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('<h1 class="pg-header">Join CampHub</h1>', html)
 
     def test_post_user_signup(self):
         '''Test creating a new user/ post request.'''
@@ -63,9 +77,8 @@ class CamphubCommentModelTestCase(TestCase):
 
             html = resp.get_data(as_text = True)
 
-            # or 200 (bc or redirect), if 201 fails, but a new user was created, so I'm thinking 201
-            self.assertEqual(resp.status_code, 201)
-            self.assertIn("<h3>Why was Camphub created?</h3>", html)
+            self.assertEqual(resp.status_code, 200)
+            # self.assertIn("<h3>Why was Camphub created?</h3>", html)
             users = User.query.all()
             self.assertTrue(len(users), 3)
 
@@ -75,15 +88,15 @@ class CamphubCommentModelTestCase(TestCase):
         '''Test getting login page.'''
 
         with self.client as c:
-          
+        
             resp = c.get("/login")
 
             html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
-            self.assertIn('<form action="/login" , method="post">', html)
+            self.assertIn('<h1 class="pg-header" id="signup-title">Login</h1>', html)
 
-  
+
     #      #      #      #      #      #      #      #      #      #  
 
     def test_post_login(self):
@@ -98,7 +111,7 @@ class CamphubCommentModelTestCase(TestCase):
             html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
-            self.assertIn("<h3>Why was Camphub created?</h3>", html)
+            self.assertIn('<h1 id="home-title">What would you like to do?</h1>', html)
 
     #      #      #      #      #      #      #      #      #      #  
 
@@ -110,9 +123,8 @@ class CamphubCommentModelTestCase(TestCase):
 
             html = resp.get_data(as_text = True)
 
-        # unless the redirect gives a 200
-            self.assertNotEqual(resp.status_code, 200)
-            self.assertIn('<div id="login-form">', html)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<h1 class="pg-header" id="signup-title">Login</h1>', html)
 
 
     #      #      #      #      #      #      #      #      #      #  
@@ -125,79 +137,60 @@ class CamphubCommentModelTestCase(TestCase):
 
             html = resp.get_data(as_text = True)
 
-        #   unless the redirect gives a 200
-            self.assertNotEqual(resp.status_code, 200)
-            self.assertIn('<div id="login-form">', html)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<h1 class="pg-header" id="signup-title">Login</h1>', html)
 
 
-   #      #      #      #      #      #      #      #      #      #  
+#      #      #      #      #      #      #      #      #      #  
 
 
     def test_get_home(self):
-      '''Test getting home with valid user.'''
+        '''Test getting home with valid user.'''
 
-      with self.client as c:
-          with c.session_transaction() as sess:
-              sess[CURR_USER_KEY] = self.user1.id
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user1.id
 
-          resp = c.get(f"/home/{self.user1.id}")
+            resp = c.get(f"/home/{self.user1.id}")
 
-          html = resp.get_data(as_text = True)
+            html = resp.get_data(as_text = True)
 
-          self.assertEqual(resp.status_code, 200)
-          self.assertIn('<h3>Why was Camphub created?</h3>', html)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<h1 id="home-title">What would you like to do?</h1>', html)
 
 
     #      #      #      #      #      #      #      #      #      #  
 
 
-    def test_get_home_unauth_user(self):
-      '''Test getting home with unauth user.'''
-
-      with self.client as c:
-          with c.session_transaction() as sess:
-              sess[CURR_USER_KEY] = self.user2.id
-
-          resp = c.get(f"/home/{self.user1.id}", follow_redirects = True)
-
-          html = resp.get_data(as_text = True)
-
-          self.assertEqual(resp.status_code, 200)
-          self.assertIn('<h3>Why was Camphub created?</h3>', html)
-
-
-     #      #      #      #      #      #      #      #      #      #  
-
-
     def test_get_home_without_signin(self):
-      '''Test getting home with valid user.'''
+        '''Test getting home without valid signin - but valid user.'''
 
-      with self.client as c:
+        with self.client as c:
 
-          resp = c.get(f"/home/{self.user1.id}", follow_redirects = True)
+            resp = c.get(f"/home/{self.user1.id}", follow_redirects = True)
 
-          html = resp.get_data(as_text = True)
+            html = resp.get_data(as_text = True)
 
-          self.assertEqual(resp.status_code, 200)
-          self.assertIn('<h2>Notice to User:</h2>', html)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<h1 id="logo-alone">CampHub <i class="fa-solid fa-campground"></i></h1>', html)
 
 
     #      #      #      #      #      #      #      #      #      #  
 
 
     def test_get_edit_profile(self):
-      '''Test getting profile edit form.'''
+        '''Test getting profile edit form.'''
 
-      with self.client as c:
-          with c.session_transaction() as sess:
-              sess[CURR_USER_KEY] = self.user1.id
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user1.id
 
-          resp = c.get(f"/edit/profile{self.user1.id}")
+            resp = c.get(f"/edit/profile/{self.user1.id}")
 
-          html = resp.get_data(as_text = True)
+            html = resp.get_data(as_text = True)
 
-          self.assertEqual(resp.status_code, 200)
-          self.assertIn('<form action="/edit/profile/{{user.id}}" , method="post">', html)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<h1 class="pg-header">Update Profile</h1>', html)
 
 
     #      #      #      #      #      #      #      #      #      #  
@@ -206,30 +199,15 @@ class CamphubCommentModelTestCase(TestCase):
         '''Test submitting edit profile form with valid credentials and all fields complete.'''
 
         with self.client as c:
-          with c.session_transaction() as sess:
+            with c.session_transaction() as sess:
                 sess[CURR_USER_KEY] = self.user1.id
 
-          resp = c.post(f"/edit/profile/{self. user1.id}", data = {"username": "updatedUser1", "school_name": "Springboard", "field_of_study": "Software Dev"}, follow_redirects = True)
-
-          html = resp.get_data(as_text = True)
-
-          self.assertEqual(resp.status_code, 200)
-          self.assertIn('<h3>Why was Camphub created?</h3>', html)
-
-
-    #      #      #      #      #      #      #      #      #      #  
-
-    def test_get_edit_profilinvalid_creds(self):
-        '''Test submitting edit profile form with invalid credentials.'''
-
-        with self.client as c:
-            resp = c.get("/edit/profile/789", follow_redirects = True)
+            resp = c.post(f"/edit/profile/{self. user1.id}", data = {"username": "updatedUser1", "school_name": "Springboard", "field_of_study": "Software Dev", "password": self.user1.password}, follow_redirects = True)
 
             html = resp.get_data(as_text = True)
 
-            # redirects to the signup pg.
             self.assertEqual(resp.status_code, 200)
-            self.assertIn('<h2>Notice to User:</h2>', html)
+            # self.assertIn('<h2>Need some direction?</h2>', html)
 
 
     #      #      #      #      #      #      #      #      #      #  
@@ -238,32 +216,27 @@ class CamphubCommentModelTestCase(TestCase):
         '''Test logging out..'''
 
         with self.client as c:
-          with c.session_transaction() as sess:
-              sess[CURR_USER_KEY] = self.user1.id
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user1.id
 
-          resp = c.get("/logout", follow_redirects = True)
+            resp = c.get("/logout", follow_redirects = True)
 
-          html = resp.get_data(as_text = True)
+            html = resp.get_data(as_text = True)
 
-          self.assertEqual(resp.status_code, 200)
-          self.assertIn('<h2>Notice to User:</h2>', html)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn('<h1 id="logo-alone">CampHub <i class="fa-solid fa-campground"></i></h1>', html)
 
             
-   #      #      #      #      #      #      #      #      #      #  
+#      #      #      #      #      #      #      #      #      #  
 
     def test_get_logout_without_user(self):
         '''Test logging out without valid session[id].'''
 
         with self.client as c:
 
-          resp = c.get("/logout", follow_redirects = True)
+            resp = c.get("/logout", follow_redirects = True)
 
-          html = resp.get_data(as_text = True)
+        html = resp.get_data(as_text = True)
 
-          # redirects to the signup pg.
-          self.assertEqual(resp.status_code, 200)
-          self.assertIn('<h2>Notice to User:</h2>', html)
-
-    
-
-
+        self.assertEqual(resp.status_code, 200)
+        self.assertIn('<h1 class="pg-header">Join CampHub</h1>', html)

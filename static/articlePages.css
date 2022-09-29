@@ -1,0 +1,83 @@
+/* article page styles for posts and comments */
+
+/* article_routes/articles.html */
+.pg-header,
+#comment-header {
+  text-align: center;
+  margin-top: 43px;
+}
+
+.wp-article {
+  border: 1px solid whitesmoke;
+  padding: 10px;
+}
+
+.article-option-div {
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  direction: row;
+  border: 2px solid whitesmoke;
+  border-radius: 3px;
+}
+
+.art-option {
+  display: flex;
+  direction: row;
+  margin: 10px;
+}
+
+/* CREATE NEW COMMENT: new_comment.html*/
+
+#chosen-article {
+  border: 1px solid whitesmoke;
+  padding: 10px;
+}
+
+#comment-form {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  font-size: 20px;
+  border: 2px solid whitesmoke;
+  border-radius: 3px;
+}
+
+.comment-button:hover {
+  background-color: rgba(182, 231, 233, 0.767);
+  color: whitesmoke;
+}
+
+/* styling for wp_in_app_routes/single_article.html */
+
+.type-of-comment {
+  font-size: 24px;
+  text-align: center;
+}
+
+.wordpress-comments {
+  text-align: left;
+  justify-content: left;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid whitesmoke;
+  border-radius: 3px;
+  padding: 10px;
+}
+
+.ch-comments {
+  text-align: left;
+  justify-content: left;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid whitesmoke;
+  border-radius: 3px;
+  padding: 10px;
+}
+
+.del-art-comm-button {
+  position: absolute;
+  float: right;
+  right: 2%;
+  margin-top: 3px;
+}

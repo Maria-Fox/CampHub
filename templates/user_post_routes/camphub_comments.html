@@ -2,7 +2,7 @@
 <title>Camphub Comments</title> {%endblock%}
 <!-- page content here -->
 
-{%block content%} {% if g.user%}
+{%block content%}
 
 <div>
   <h1>Camphub Comments - All</h1>
@@ -16,30 +16,26 @@
       >
     </p>
     {% if g.user.id == comment.comment_user_id%}
-    <a href="">
+    <a href="/camphub/delete/{{comment.camphub_post_id}}/{{comment.id}}">
       Delete Comment <i class="fa fa-trash" aria-hidden="true"></i
     ></a>
     {%endif%}
     <blockquote>{{comment.content}}</blockquote>
 
     {%endfor%} {%else%}
-    <h2>No comments yet!</h2>
-    <h3><a href="/create/comment">Make a comment here at CampHub</a></h3>
-    <h4>
-      <a href="https://wordpress.com/home/camphub2022"
-        >Create Comment in Wordpress</a
-      >
-    </h4>
+    <div class="user-comment">
+      <h2>No comments yet!</h2>
+      <h3><a href="/create/comment">Make a comment here at CampHub</a></h3>
+      <h4>
+        <a href="https://wordpress.com/home/camphub2022"
+          >Create Comment in Wordpress</a
+        >
+      </h4>
+    </div>
 
     <a href="/wordpres/articles/all">Return to Wordpress Posts</a>
     {%endif%}
   </div>
-
-  <!-- not auth user -->
-  {%else%}
-  <p>Please create an account or sign in to view blogs.</p>
-  <a href="/signup">Sign Up</a>
-  {%endif%}
 
   <!-- do not touch below -->
   {%endblock%}

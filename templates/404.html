@@ -1,4 +1,4 @@
-{% extends base.html %} {% block title %}
+{% extends "base.html" %} {% block title %}
 
 <title>Page not Found</title>
 
@@ -10,5 +10,5 @@
 
 {% else %}
 <h1>Page not found, check your spelling and try again.</h1>
-<a href="signup">Sign up</a>
-{% endblock%}
+<a href="/signup">Sign up</a>
+{% endif %} {% endblock%}

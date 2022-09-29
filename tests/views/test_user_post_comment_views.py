@@ -1,10 +1,13 @@
 """Camphub comment view tests."""
 # To run tests: python3 -m unittest tests/views/test_user_post_comment_views.py
 
+import os
 from unittest import TestCase
 
 from models import  db, User, Camphub_User_Post, Camphub_Comment, Wordpress_Post_Comment
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgres:///camphub_test"
+import os
+
+os.environ['DATABASE_URL'] = "postgresql:///camphub_test"
 
 # CURR_USER_KEY is the user.id assigned to session once an acct is created.
 from app import app, CURR_USER_KEY
@@ -15,45 +18,57 @@ db.create_all()
 app.config['ETF_CSRF_ENABLED'] = False
 app.config["TESTING"] = True
 
-class CamphubCommentModelTestCase(TestCase):
+class CamphubUserCommentRoutes(TestCase):
     '''Test camphub comment model. '''
 
-    def set_up(self):
-      '''Create test client and test user.'''
+    def setUp(self):
+        """Create test client, add sample data."""
 
-      db.drop_all()
-      db.create_all()
+        db.drop_all()
+        db.create_all()
 
-      self.client = app.test_client()
+        user1 = User.register(
+            username = "user1",
+            password = "password1",
+            school_name = "Springboard",
+            field_of_study = "Software Engineering"
+        )
 
-      user1 = User.register("user1", "password1", "Springboard", "Software Engineering")
-      user2 = User.register("user2", "password2", "Springboard", "Data Science")
+        user1.id = 888
 
-      user1.id = 888
-      user2.id = 777
+        user2 = User.register(username = "user2",
+            password = "password2",
+            school_name = "Springboard",
+            field_of_study = "UX Design"
+        )
 
-      db.session.add.all([user1, user2])
-      db.session.commit()
+        user2.id = 999
 
-      first_post = Camphub_User_Post(author_id = 888, title = "First Post Made", content = "This is where the content would show.")
+        db.session.add_all([user1, user2])
+        db.session.commit()
 
-      first_post.id = 111
+        first_post = Camphub_User_Post(author_id = 888, title = "First Post Made", content = "This is where the content would show.")
 
-      user2_comment = Camphub_Comment(comment_author_id = 777, camphub_post_id = 111, content = "Content for post number 111.")
+        first_post.id = 111
 
-      user2_comment.id = 789
+        db.session.add(first_post)
+        db.session.commit()
 
-      db.sesssion.add(first_post, user2_comment)
-      db.session.commit()
+        user2_comment = Camphub_Comment(comment_user_id = 999, camphub_post_id = 111, content = "Content for post number 111.")
 
-      self.user1 = user1
-      self.user2 = user2
-      self.first_post = first_post
-      self.user2_comment = user2_comment
-      self.client = app.client()
+        db.session.add(user2_comment)
+        db.session.commit()
+        
+        self.user1 = user1
+        self.user2 = user2
+        self.first_post = first_post
+        self.user2_comment = user2_comment
 
-    def tear_down(self):
-      db.session.rollback()
+        self.client = app.test_client()
+
+    def tearDown(self):
+        """Clean up transactions."""
+        db.session.rollback()
 
 
     #      #      #      #      #      #      #      #      #      # 
@@ -62,17 +77,17 @@ class CamphubCommentModelTestCase(TestCase):
         '''Testing viewing existing post comment.'''
 
         with self.client as c:
-          with c.session_transaction() as sess:
-              sess[CURR_USER_KEY] = self.user2.id
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.user2.id
 
-          resp = c.get(f"/view/{self.first_post.id}/{self.user2_comment.id}")
+            resp = c.get(f"/view/{self.first_post.id}/{self.user2_comment.id}")
 
-          html = resp.get_resp(as_text = True)
+            html = resp.get_data(as_text = True)
 
-          self.assertIsInstance(self.first_post, Camphub_User_Post)
-          self.assertIsInstance(self.user2_comment, Camphub_Comment)
-          self.assertEqual(self.user2_comment.content, "Content for post number 111")
-            
+            self.assertIsInstance(self.first_post, Camphub_User_Post)
+            self.assertIsInstance(self.user2_comment, Camphub_Comment)
+            self.assertEqual(self.user2_comment.content, "Content for post number 111")
+                
 
     #      #      #      #      #      #      #      #      #      #  
 
@@ -85,7 +100,7 @@ class CamphubCommentModelTestCase(TestCase):
 
             resp = c.post(f"/create/comment/{self.first_post.id}/{self.user2.id}", data = {"comment_user_id": self.user2.id, "camphub_post_id": self.first_post.id, "content" : "The first comment to be tested."}, follow_redirects = True)
 
-            html = resp.get_resp(as_text = True)
+            html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn('<h2>Comment Section</h2>', html)
@@ -105,7 +120,7 @@ class CamphubCommentModelTestCase(TestCase):
             # user with id: 8462 does not exist
             resp = c.post(f"/create/comment/{self.first_post.id}/8462", follow_redirects = True)
 
-            html = resp.get_resp(as_text = True)
+            html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn('<h1> Camphub User Posts - All </h1>', html)
@@ -123,7 +138,7 @@ class CamphubCommentModelTestCase(TestCase):
 
             resp = c.post(f"/create/comment/8956/{self.user1.id}", follow_redirects = True)
 
-            html = resp.get_resp(as_text = True)
+            html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn('<h1> Camphub User Posts - All </h1>', html)
@@ -139,7 +154,7 @@ class CamphubCommentModelTestCase(TestCase):
             # post with id: 999 does not exist
             resp = c.post(f"/create/comment/{self.first_post.id}/{self.user1.id}", follow_redirects = True)
 
-            html = resp.get_resp(as_text = True)
+            html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn('<h2>Notice to User:</h2>', html)
@@ -156,7 +171,7 @@ class CamphubCommentModelTestCase(TestCase):
 
             resp = c.post(f"/camphub/delete/{self.first_post.id}/{self.user2_comment}", follow_redirects = True)
 
-            html = resp.get_resp(as_text = True)
+            html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn('<title>Camphub User Post</title>', html)
@@ -173,7 +188,7 @@ class CamphubCommentModelTestCase(TestCase):
 
             resp = c.post(f"/camphub/delete/{self.first_post.id}/{self.user2_comment}", follow_redirects = True)
 
-            html = resp.get_resp(as_text = True)
+            html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn('<h1> Camphub User Posts - All </h1>', html)
@@ -188,7 +203,7 @@ class CamphubCommentModelTestCase(TestCase):
 
             resp = c.post(f"/camphub/delete/{self.first_post.id}/{self.user2_comment}", follow_redirects = True)
 
-            html = resp.get_resp(as_text = True)
+            html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn('<h2>Notice to User:</h2>', html)

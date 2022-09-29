@@ -5,22 +5,17 @@
 
 <!--  -->
 
-<div id="register-form">
-  <h1 class="page-title" id="signup-title">Join CampHub</h1>
+<h1 class="pg-header">Join CampHub</h1>
 
-  <div id="notice-to-user">
-    <h2>Notice to User:</h2>
-    <p>ADD SOMETHING ABT HOW THE WEBSITE WORKS / WORDPRESS</p>
-  </div>
-
-  <br />
-  <form action="/signup" , method="post">
+<div id="register-form-div">
+  <form action="/signup" , method="post" id="reg-form">
     <!--come back and style the form - leaving to work on functionality for now  -->
 
     {{form.hidden_tag()}} {%for field in form if field.widget.input_type !=
-    'hidden'%} {{field.label}} {{field}} {%for error in field.errors%}
-    {{error}}{%endfor%} {%endfor%}
-    <button type="submit">Create Account</button>
+    'hidden'%} {{field.label(class = "field-label")}} {{field}} {%for error in
+    field.errors%} {{error}} {%endfor%} {%endfor%}
+
+    <button type="submit" class="user-cred-button">Create Account</button>
   </form>
 </div>
 

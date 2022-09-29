@@ -1,57 +1,56 @@
 {%extends "base.html"%} {%block title %} <title>Camphub User Post</title> {%endblock%}
 <!-- page content here -->
 
-{%block content%} {% if g.user%}
+{%block content%} 
 
 <div>
-  <div>
-    <h1>Post: {{post.title}}</h1>
+  <h1 class = "pg-header">Post: {{post.title}}</h1>
+  <div class = "user-post">
     <p><small>Published by: {{post.users.username}} on {{post.date_time}}</small></p>
-    {% if g.user.id == post.author_id%}
-    <a href="/camphub/delete/post/{{post.id}}"> Delete Post <i class="fa fa-trash" aria-hidden="true"></i></a>
-    {%endif%}
-    <blockquote>{{post.content}}</blockquote>
-  </div>
- 
 
-  <h2>Comment Section</h2>
+    {% if g.user.id == post.author_id%}
+    <a href="/camphub/delete/post/{{post.id}}" class = "delete-button"> Delete Post <i class="fa fa-trash" aria-hidden="true"></i></a>
+    {%endif%}
+
+    <blockquote>{{post.content}}</blockquote>
+
+    <div class = "post-route-options">
+      <a href="/create/comment/{{post.id}}/{{g.user.id}}" class = "post-option">Add Comment</a>
+    <a href="/camphub/users/posts" class = "post-option">Return to User Posts</a>
+
+
+    </div>
+  </div>
+
+
+  <h2 id = "user-comments-header">Comment Section</h2>
   {% if comments%}
   
   {%for comment in comments %}
-  <div id = "comment-section">
+  <div class = "camphub-comments">
 
     <p><small>Published By: {{comment.users.username}} on {{comment.date_time}}</small></p>
-    <blockquote>Comment: {{comment.content}}</blockquote>
 
     {% if g.user.id == comment.comment_user_id%}
-    <a href="/camphub/delete/{{post.id}}/{{comment.id}}"> Delete Comment <i class="fa fa-trash" aria-hidden="true"></i></a>
+    <a href="/camphub/delete/{{post.id}}/{{comment.id}}" class = "delete-ch-comment" > Delete Comment <i class="fa fa-trash" aria-hidden="true"></i></a>
     {%endif%}
+
+    <blockquote>Comment: {{comment.content}}</blockquote>
+
   </div>
   {% endfor%}
-<br>
-  <div>
-<a href="/create/comment/{{post.id}}/{{g.user.id}}">Add Comment</a>
-<br>
-<a href="/camphub/users/posts">Return to User Posts</a>
-</div>
+  
+
   {%else%}
 
-  <h3>There are no comments, yet!</h3>
-  <a href="/create/comment/{{post.id}}/{{g.user.id}}">Add Comment</a>
+  <div class = "camphub-comments">
+    <h3>There are no comments, yet!</h3>
+    <a href="/create/comment/{{post.id}}/{{g.user.id}}">Add Comment</a>
+  </div>
 
 {% endif %}
 
-
-
-
-
-
 </div>
-  <!-- not auth user -->
-  {%else%}
-  <p>Please create an account or sign in to view blogs.</p>
-  <a href="/signup">Sign Up</a>
-  {%endif%}
 
   <!-- do not touch below -->
   {%endblock%}

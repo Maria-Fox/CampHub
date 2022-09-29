@@ -1,27 +1,29 @@
 {%extends "base.html"%} {%block title %} <title>Articles</title> {%endblock%}
 <!-- page content here -->
 
-{%block content%} {% if g.user%}
-<h1>Wordpress Articles</h1>
+{%block content%} 
+<h1 class = "pg-header">Wordpress Articles</h1>
 
 {% if articles%}
 {% for article in articles%}
-<div>
-  
-  <h1>{{article.title}}</h1>
+<div class = "wp-article">  
+  <h1 class = "article-title">{{article.title}}</h1>
   <p><small>Published by: {{article.author.nice_name}} on {{article.modified}}</small></p>
   <a href="{{article.short_URL}}">Link to Worpress Article</a>
   <blockquote>{{article.content}}</blockquote>
-<!-- {{article.site_id}} -->
-<div>
-  <a href="/create/comment/{{article.ID}}">Add Camphub Comment</a>
+
+  {{final_content}}
+
+
+  <div class = "article-option-div">
+  <a href="/create/comment/{{article.ID}}" class = "art-option">Add CampHub Comment</a>
+  <a href="https://wordpress.com/home/camphub2022" target = "_blank" class = "art-option">Add WordPress Comment</a>
+  <a href="/wordpress/camphub/article/{{article.ID}}" class = "art-option">See All Comments</a>
 </div>
-<div>
-  <a href="https://wordpress.com/home/camphub2022">Add Wordpress Comment</a>
-  <br>
-  <a href="/wordpress/camphub/article/{{article.ID}}">See All Comments</a>
 </div>
   {%endfor %}
+
+
 
   {% else %}
   <h1>No posts, yet!</h1>
@@ -33,13 +35,6 @@
   <!-- <a href="/wordpress/comments">ALL WordPress Comments</a> -->
   </div>
 </div>
-
-
-  <!-- not auth user -->
-  {%else%}
-  <p>Please create an account or sign in to view blogs.</p>
-  <a href="/signup">Sign Up</a>
-  {%endif%}
 
   <!-- do not touch below -->
   {%endblock%}

@@ -1,0 +1,26 @@
+{%extends "base.html"%} {%block title %} <title>Suggest a Topic</title> {%endblock%}
+<!-- page content here -->
+
+{%block content%} 
+
+<h1 class = "pg-header">Suggest an Article Topic for the Moderator</h1>
+
+
+<form action = "/suggest/topic/{{g.user.id}}" method="post"  id = "suggest-ch-article-form" >
+
+  {{form.hidden_tag()}} 
+  {%for field in form if field.widget.input_type != 'hidden'%}
+
+  {{field.label (class = "post-field") }} 
+  {{field}} 
+  
+  {%for error in field.errors%}
+  {{error}}{%endfor%} {%endfor%}
+  <button type="submit" class = "comment-button">Request Topic</button>
+</form>
+
+</div>
+
+  <!-- do not touch below -->
+  {%endblock%}
+</div>

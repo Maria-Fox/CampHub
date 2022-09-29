@@ -5,16 +5,17 @@
 
 <!--  -->
 
-<div id="login-form">
-  <h1 class="page-title" id="signup-title">Login</h1>
+<h1 class="pg-header" id="signup-title">Login</h1>
+
+<div id="login-form-div">
   <br />
-  <form action="/login" , method="post">
+  <form action="/login" , method="post" , id="login-form">
     <!--come back and style the form - leaving to work on functionality for now  -->
 
     {{form.hidden_tag()}} {%for field in form if field.widget.input_type !=
-    'hidden'%} {{field.label}} {{field}} {%for error in field.errors%}
-    {{error}}{%endfor%} {%endfor%}
-    <button type="submit">Login</button>
+    'hidden'%} {{field.label (class = "field-label")}} {{field}} {%for error in
+    field.errors%} {{error}}{%endfor%} {%endfor%}
+    <button type="submit" class="user-cred-button">Login</button>
   </form>
 </div>
 

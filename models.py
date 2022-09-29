@@ -58,6 +58,9 @@ class User(db.Model):
 
     posts = db.relationship("Camphub_User_Post", cascade="all, delete-orphan")
     comments = db.relationship("Camphub_Comment", cascade="all, delete-orphan")
+    wordpress_comments = db.relationship("Wordpress_Post_Comment", cascade="all, delete-orphan")
+    suggestions = db.relationship("Suggest_Topic", cascade="all, delete-orphan")
+
 
 
 class Camphub_User_Post(db.Model):
@@ -120,6 +123,25 @@ class Wordpress_Post_Comment(db.Model):
     users = db.relationship("User")
 
 
+class Suggest_Topic(db.Model):
+    '''Allow users to suggest article topics to be posted by the moderator on the official WordPress blog for discussion in-app and outside.'''
+
+    def __repr__(self):
+        '''Allows users to suggest moderator topics.'''
+
+        s = self
+        return f"{s.user_id} suggested {s.title}"
+
+    __tablename__ = "suggest_topics"
+
+    id = db.Column(db.Integer, primary_key = True, autoincrement = True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable = False)
+    topic = db.Column(db.String, nullable = False)
+    details = db.Column(db.Text, nullable = False)
+
+    users = db.relationship("User")
+
+
 # POSSIBLE ADDITION- unsure if I should split it up into article likes and post likes
 
 class User_Like(db.Model):
@@ -145,3 +167,5 @@ class User_Like(db.Model):
     user_posts = db.relationship("Camphub_User_Post", backref = "user_post_likes")
     user_comments = db.relationship("Camphub_Comment", backref = "user_comment_likes")
     wordpress_post_comments = db.relationship("Wordpress_Post_Comment", backref = "wordpress_post_likes")
+
+

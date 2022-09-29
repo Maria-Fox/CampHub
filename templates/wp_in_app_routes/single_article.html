@@ -2,10 +2,10 @@
 <title>Wordpress Article</title> {%endblock%}
 <!-- page content here -->
 
-{%block content%} {% if g.user%}
+{%block content%}
 
-<div>
-  <h1>{{article.title}}</h1>
+<h1 class="pg-header">{{article.title}}</h1>
+<div class="wp-article">
   <p>
     <small>
       Published by: {{article.author.nice_name}} on {{article.date}}</small
@@ -14,68 +14,64 @@
   <a href="{{article.URL}}">Link to Webpress Article</a>
   <blockquote>{{article.content}}</blockquote>
 
-  <div>
-    <a href="/create/comment/{{article.ID}}">Make a Comment</a>
-    <a href="https://wordpress.com/home/camphub2022"
+  <div class="article-option-div">
+    <a href="/create/comment/{{article.ID}}" class="art-option">Add Comment</a>
+    <a href="https://wordpress.com/home/camphub2022" class="art-option"
       >Make a Wordpress Comment</a
     >
   </div>
 </div>
 
 <div>
-  <h1>{% if replies.comments %}</h1>
-  {% for rep in replies%}
-  <div>
-    <p><small>Published by: {{rep.author.name}} on {{rep.date}}</small></p>
+  <h1 class="type-of-comment">WordPress Comments</h1>
+  {% if replies %} {% for rep in replies%}
+  <div class="wordpress-comments">
+    <p>
+      <small>Published by: {{rep.author.name}} </small>
+      <br />
+      <small>Date and Time Published: {{rep.date}}</small>
+    </p>
     <blockquote>{{rep.raw_content}}</blockquote>
   </div>
   {% endfor %} {%else%}
 
-  <h2>No Wordpress comments, yet!</h2>
-
+  <div class="wordpress-comments">
+    <h2>No Wordpress comments, yet!</h2>
+  </div>
   {% endif %}
 
-  <h2>CampHub Comments</h2>
+  <h2 class="type-of-comment">CampHub Comments</h2>
 
   <div>
     {% if user_comments_on_WP_article%} {% for comment in
     user_comments_on_WP_article %}
-    <div>
+
+    <div class="ch-comments">
       <p>
-        <small
-          >Published by: {{comment.users.username}} on
-          {{comment.date_time}}</small
-        >
+        <small>Published by: {{comment.users.username}}</small>
+        <br />
+        <small>Date and Time Published: {{comment.date_time}}</small>
       </p>
+
       {% if g.user.id == comment.user_id%}
       <a
         href="/wordpress/delete/{{comment.wordpress_article_id}}/{{comment.id}}"
-      >
-        Delete Comment <i class="fa fa-trash" aria-hidden="true"></i
+        class="del-art-comm-button"
+        >Delete Comment <i class="fa fa-trash" aria-hidden="true"></i
       ></a>
       {%endif%}
+
       <blockquote>{{comment.user_comment}}</blockquote>
     </div>
     {%endfor%}
   </div>
   {% else %}
 
-  <h1>No Camphub comments, yet!</h1>
-
-  <div>
-    <a href="/create/comment/{{article.ID}}">Make a Comment</a>
-    <a href="https://wordpress.com/home/camphub2022"
-      >Make a Wordpress Comment</a
-    >
+  <div class="ch-comments">
+    <h1>No CampHub comments, yet!</h1>
   </div>
 
   {% endif %}
-  <!-- not auth user -->
-  {%else%}
-  <p>Please create an account or sign in to view blogs.</p>
-  <a href="/signup">Sign Up</a>
-  {%endif%}
-
-  <!-- do not touch below -->
-  {%endblock%}
 </div>
+<!-- do not touch below -->
+{%endblock%}

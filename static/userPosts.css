@@ -1,0 +1,153 @@
+/* All user post route styling  */
+
+/* user_post_routes/all_posts.html */
+
+.post-header {
+  text-align: center;
+  margin-top: 50px;
+}
+
+#user-post-routing {
+  display: flex;
+  direction: row;
+  justify-content: center;
+}
+
+.route-option {
+  margin: 10px;
+  justify-content: center;
+  border: 1px solid whitesmoke;
+  border-radius: 3px;
+  padding: 10px;
+  background-color: rgba(182, 231, 233, 0.767);
+}
+
+.user-post {
+  border: 1px solid whitesmoke;
+  border-radius: 3px;
+  padding: 10px;
+}
+
+.post-route-options {
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  direction: row;
+  border: 2px solid whitesmoke;
+  border-radius: 3px;
+}
+
+.post-option {
+  display: flex;
+  direction: row;
+  margin: 10px;
+  justify-content: center;
+}
+
+.delete-button {
+  position: relative;
+  float: right;
+  right: 2%;
+  margin-top: -45px;
+}
+
+/* /user_post_routes/create_post.html */
+
+#post-form {
+  margin: 0;
+  bottom: 40%;
+  left: 50%;
+  max-width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  color: whitesmoke;
+  display: flex;
+  flex-direction: column;
+  width: 60%;
+  size: 3rem;
+  border: 2px solid whitesmoke;
+  border-radius: 5px;
+  padding: 12px;
+}
+
+.post-field {
+  padding: 12px;
+  margin: 10px;
+  font-size: large;
+}
+
+#new-post-button:hover {
+  background-color: rgba(182, 231, 233, 0.767);
+  color: whitesmoke;
+}
+
+/* user_post_routes/new_comment.html */
+
+.diff-sections,
+#post-for-comment {
+  border: 1px solid whitesmoke;
+  border-radius: 3px;
+  padding: 10px;
+}
+
+#new-ch-comment-form {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  font-size: 20px;
+  border: 2px solid whitesmoke;
+  border-radius: 3px;
+}
+
+#comment-button:hover {
+  background-color: rgba(182, 231, 233, 0.767);
+  color: whitesmoke;
+}
+
+/* /user_post_routes/single_post.html */
+
+#user-comments-header {
+  text-align: center;
+}
+
+.camphub-comments {
+  text-align: left;
+  justify-content: left;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid whitesmoke;
+  border-radius: 3px;
+  padding: 10px;
+}
+
+.delete-ch-comment {
+  position: absolute;
+  float: right;
+  right: 2%;
+  margin-top: 3px;
+}
+
+/* differences.html */
+
+#diff-header {
+  font-size: 30px;
+  margin-top: 60px;
+  text-align: center;
+}
+
+#suggest-ch-article-form {
+  margin: 0;
+  bottom: 40%;
+  left: 50%;
+  max-width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  color: whitesmoke;
+  display: flex;
+  flex-direction: column;
+  width: 60%;
+  size: 3rem;
+  border: 2px solid whitesmoke;
+  border-radius: 5px;
+  padding: 20px;
+}

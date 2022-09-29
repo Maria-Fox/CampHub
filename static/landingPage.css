@@ -1,0 +1,49 @@
+body {
+  color: whitesmoke;
+  background-image: url("images/landing_pg.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  min-height: 100%;
+  background-color: black;
+}
+
+/* backup:
+https://images.unsplash.com/photo-1538136465928-ec04e6789f72?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=764&q=80 */
+
+#landing-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  justify-content: center;
+  margin: auto;
+  margin-bottom: 0%;
+}
+
+#logo-alone {
+  font-size: 3rem;
+  color: rgba(182, 231, 233, 0.767);
+  text-align: center;
+  margin-bottom: 0%;
+}
+
+.landing-options {
+  padding: 5px;
+}
+
+#land-option-div {
+  padding: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  position: relative;
+  top: 50%;
+}
+
+.ch-landing-pg-opt {
+  margin: 10px;
+  margin-top: 0%;
+  padding: 4px;
+  text-align: center;
+}

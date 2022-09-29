@@ -4,7 +4,9 @@
 from unittest import TestCase
 
 from models import  db, User, Camphub_User_Post, Camphub_Comment, Wordpress_Post_Comment
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgres:///camphub_test"
+import os
+
+os.environ['DATABASE_URL'] = "postgresql:///camphub_test"
 
 # CURR_USER_KEY is the user.id assigned to session once an acct is created.
 from app import app, CURR_USER_KEY
@@ -15,40 +17,42 @@ db.create_all()
 app.config['ETF_CSRF_ENABLED'] = False
 app.config["TESTING"] = True
 
-class CamphubCommentModelTestCase(TestCase):
+class WordpressCommentRoutes(TestCase):
     '''Test camphub comment model. '''
 
-    def set_up(self):
-      '''Create test client and test user.'''
+    def setUp(self):
+        """Create test client, add sample data."""
 
-      db.drop_all()
-      db.create_all()
+        db.drop_all()
+        db.create_all()
 
-      self.client = app.test_client()
+        user1 = User.register(
+            username = "user1",
+            password = "password1",
+            school_name = "Springboard",
+            field_of_study = "Software Engineering"
+        )
 
-      user1 = User.register("user1", "password1", "Springboard", "Software Engineering")
-      user2 = User.register("user2", "password2", "Springboard", "Data Science")
+        user1.id = 888
 
-      user1.id = 888
-      user2.id = 777
+        db.session.add(user1)
+        db.session.commit()
 
-      db.session.add.all([user1, user2])
-      db.session.commit()
+        user1_wordpress_comment = Wordpress_Post_Comment(wordpress_article_id = 8, user_id = 888, user_comment = "This would be a comment on the Wordpress article w/ ID 8.")
 
-      user1_wordpress_comment = Wordpress_Post_Comment(wordpress_article_id = 8, user_id = 888, user_content = "This would be a comment on the Wordpress article w/ ID 8.")
+        user1_wordpress_comment.id = 6543
 
-      user1_wordpress_comment.id = 6543
+        db.sesssion.add(user1_wordpress_comment)
+        db.session.commit()
 
-      db.sesssion.add(user1_wordpress_comment)
-      db.session.commit()
+        self.user1 = user1
+        self.user1_wordpress_comment = user1_wordpress_comment
 
-      self.user1 = user1
-      self.user2 = user2
-      self.user1_wordpress_comment = user1_wordpress_comment
-      self.client = app.client()
+        self.client = app.test_client()
 
-    def tear_down(self):
-      db.session.rollback()
+    def tearDown(self):
+        """Clean up transactions."""
+        db.session.rollback()
 
     #      #      #      #      #      #      #      #      #      # 
 
@@ -61,7 +65,7 @@ class CamphubCommentModelTestCase(TestCase):
 
             resp = c.get(f"/wordpress/aricles/all")
 
-            html = resp.get_resp(as_text = True)
+            html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn('<h1>Wordpress Articles</h1>', html)
@@ -79,7 +83,7 @@ class CamphubCommentModelTestCase(TestCase):
             # hard coding 8. Again, it is a confrimed article ID - see tests/models/test_wordpress_post_comments.py for further details.
             resp = c.get(f"/wordpress/camphub/article/8")
 
-            html = resp.get_resp(as_text = True)
+            html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn('<title>Wordpress Article</title>', html)
@@ -96,7 +100,7 @@ class CamphubCommentModelTestCase(TestCase):
 
             resp = c.get("/wordpress/camphub/article/9876", follow_redirects = True)
 
-            html = resp.get_resp(as_text = True)
+            html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_codde, 200)
             self.assertIn("<h1>Wordpress Articles</h1>", html)
@@ -114,7 +118,7 @@ class CamphubCommentModelTestCase(TestCase):
             # hard coding article_id as 8. See tests/models/test_wordpress_post_comments.py for further details.
             resp = c.get("create/comment/8", data = {"comment_user_id": self.user2.id, "camphub_post_id": 8, "content": "This comment is being made by user 2."}, follow_redirects = True)
 
-            html = resp.get_resp(as_text = True)
+            html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 201)
             self.assertIn("<title>Wordpress Article</title>", html)
@@ -134,7 +138,7 @@ class CamphubCommentModelTestCase(TestCase):
               
             resp = c.post(f"/wordpress/delete/8/{self.user1_wordpress_comment.id}", follow_redirects = True)
 
-            html = resp.get_resp(as_text = True)
+            html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn('<title>Wordpress Article</title>', html)
@@ -154,7 +158,7 @@ class CamphubCommentModelTestCase(TestCase):
             # hard coding an invalid wordpress article ID.
             resp = c.post(f"/wordpress/delete/78946/{self.user1_wordpress_comment.id}", follow_redirects = True)
 
-            html = resp.get_resp(as_text = True)
+            html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn('<li>Something went wrong- please try again</li>.', html)

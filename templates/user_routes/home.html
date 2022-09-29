@@ -1,92 +1,35 @@
-{%extends "base.html"%} {%block title %} <title>Home</title> {%endblock%}
+{%extends "base.html"%} {%block title %} 
+<link rel="stylesheet" href="/static/home.css" />
+
+
+<title>Home</title> {%endblock%}
 <!-- page content here -->
 
 {%block content%}
 <!--  -->
-{% if g.user%}
 
-<h1>What would you like to do?</h1>
+<h1 id="home-title">What would you like to do?</h1>
 <div id="user-options">
-  <div>
-    <form action="/wordpress/articles/all">
-      <button>View Wordpress Posts</button>
-    </form>
+  <div class="option-div">
+    <a href="/wordpress/articles/all"><button id="option">View WordPress Posts</button></a>
   </div>
-  <div>
-    <form action="/camphub/users/posts">
-      <button>View CampHub User Posts</button>
-    </form>
+  <div class="option-div">
+    <a href="/camphub/users/posts"><button id="option">View CampHub User Posts</button></a>
   </div>
-  <div>
-    <form action="/create/post/{{g.user.id}}">
-      <button>Create Post</button>
-    </form>
+  <div class="option-div">
+    <a href="/create/post/{{g.user.id}}"><button id="option">Create Post</button></a>
   </div>
-  <div>
-    <form action=""><button>Suggest a Topic</button></form>
+  <div class="option-div">
+    <a href="/suggest/topic/{{g.user.id}}"><button id="option">Suggest a Topic</button></a>
   </div>
-  <div>
-    <form action="/edit/profile/{{g.user.id}}" method="get">
-      <button>Update Profile</button>
-    </form>
+  <div class="option-div">
+      <a href="/edit/profile/{{g.user.id}}"><button id="option">Update Profile</button></a>
   </div>
-</div>
-
-<div id="direction">
-  <h2>Need some direction?</h2>
-
-  <h3>Why was Camphub created?</h3>
-  <p>
-    In an effort to create a safe environemnt for students, or
-    prospective-students to ask questions, provide honest feedback about a
-    bootcamp, create their own topics of discussion, as well as interact with
-    <a href="https://wordpress.com/home/camphub2022">CampHub Wordpress</a>.
-  </p>
-
-  <div id="differences">
-    <h4>What are the differences between Wordpress and Camphub?</h4>
-
-    <div id="">
-      <h5>Articles and Posts</h5>
-
-      <p>
-        Wordpress article topics are created by the moderator only. Users are
-        only permitted to make comments under moderator articles.
-      </p>
-      <p>
-        Here, Camphub-users are provided the option to view and comment on
-        Wordpress article posts, in addition to creating their own posts within
-        this application. This allows for more topics and further community
-        interaction. You're welcome to post discussion items, questions, or
-        topics you would like to receive feedback on. If you would like to
-        discuss a topic but do not feel comfortable posting about it, you may
-        complete the
-        <a href="/suggesttopic">suggest a topic</a> form and the CampHub
-        moderator will create the post on your behalf. No names/user details
-        will be shared.
-      </p>
-    </div>
-
-    <div id="">
-      <h6>Comments</h6>
-      <p>Wordpress only allows comments from Wordpress users.</p>
-      <p>
-        Here, Camphub-users may respond to Wordpress articles. Those comments
-        will only exist here, in Camphub. They are not published to Wordpress,
-        so no wordpress account is required, and you remain within this
-        community with further flexibility than Wordpress.
-      </p>
+    <div class="option-div">
+      <a href="/camphub/direction"><button id="option">Need Directions?</button></a>
     </div>
   </div>
+
+  <!-- do not touch below -->
+  {%endblock%}
 </div>
-
-<!-- {{resp}} -->
-
-<!-- if not signed in -->
-{%else%}
-<p>Please create an account or sign in to view posts.</p>
-<a href="/signup">Sign Up</a>
-{%endif%}
-
-<!-- do not touch below -->
-{%endblock%}

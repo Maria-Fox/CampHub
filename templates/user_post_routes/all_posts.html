@@ -4,7 +4,7 @@
 {%block content%} 
 
 <div>
-  <h1 class = "post-header"> Camphub User Posts - All </h1>
+  <h1 class = "pg-header"> Camphub User Posts</h1>
   <div id = "user-post-routing">
   <a href="/create/post/{{g.user.id}}" class = "route-option">Create a Post</a>
   <br>
@@ -18,7 +18,16 @@
   <h2><a href="/view/camphub/{{post.id}}">Post: {{post.title}}</a></h2>
 
   {% if g.user.id == post.author_id%}
-  <a href="/camphub/delete/post/{{post.id}}" class = "delete-button"> Delete Post <i class="fa fa-trash" aria-hidden="true"></i></a>
+
+
+  <form
+        action="/camphub/delete/post/{{post.id}}"
+        method="post"
+      >
+        <button class="delete-button">
+          Delete Post <i class="fa fa-trash" aria-hidden="true"></i>
+        </button>
+      </form>
   {%endif%}
 
 

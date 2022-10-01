@@ -42,7 +42,7 @@ class User(db.Model):
         '''Validate given form data comapred to db.'''
 
         user = User.query.filter_by(username = username).first()
-      
+    
         if user and bcrypt.check_password_hash(user.password, given_password):
             return user
         else:
@@ -64,7 +64,7 @@ class User(db.Model):
 
 
 class Camphub_User_Post(db.Model):
-  
+
     def __repr__(self):
         '''Holds user post information.'''
 

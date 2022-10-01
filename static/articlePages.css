@@ -4,12 +4,15 @@
 .pg-header,
 #comment-header {
   text-align: center;
-  margin-top: 43px;
+  margin-top: 30px;
 }
 
 .wp-article {
   border: 1px solid whitesmoke;
+  border-radius: 3px;
   padding: 10px;
+  background-color: #2e5563;
+  margin-bottom: 10%;
 }
 
 .article-option-div {
@@ -31,7 +34,10 @@
 
 #chosen-article {
   border: 1px solid whitesmoke;
+  border-radius: 3px;
   padding: 10px;
+  background-color: #2e5563;
+  margin-bottom: 5%;
 }
 
 #comment-form {
@@ -44,7 +50,7 @@
 }
 
 .comment-button:hover {
-  background-color: rgba(182, 231, 233, 0.767);
+  background-color: #2e5563;
   color: whitesmoke;
 }
 
@@ -63,6 +69,8 @@
   border: 2px solid whitesmoke;
   border-radius: 3px;
   padding: 10px;
+  background-color: #2e5563;
+  margin-bottom: 10%;
 }
 
 .ch-comments {
@@ -73,11 +81,18 @@
   border: 2px solid whitesmoke;
   border-radius: 3px;
   padding: 10px;
+  background-color: #2e5563;
+  margin-bottom: 10%;
 }
 
 .del-art-comm-button {
-  position: absolute;
-  float: right;
-  right: 2%;
-  margin-top: 3px;
+  position: relative;
+  left: 75%;
+  background-color: #2e5563;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  outline: none;
+  color: whitesmoke;
 }

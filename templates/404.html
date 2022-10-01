@@ -2,13 +2,15 @@
 
 <title>Page not Found</title>
 
-{% endblock %} {% block content %} {% if g.user%}
-<h1>Page not found, check your spelling and try again.</h1>
-<h2>Looking for a short cut?</h2>
-<a href="/wordpress/articles/all">Returnn to Wordpress Posts</a>
-<a href="/camphub/users/posts">Camphub User Posts</a>
+{% endblock %} {% block content %}
 
-{% else %}
-<h1>Page not found, check your spelling and try again.</h1>
-<a href="/signup">Sign up</a>
-{% endif %} {% endblock%}
+<h1 class="pg-header">Page not found, check your spelling and try again.</h1>
+
+<div id="not-found-div">
+  <h2>Looking for a short cut?</h2>
+  <a href="/wordpress/articles/all">View Wordpress Posts</a>
+  <br />
+  <a href="/camphub/users/posts">View Camphub User Posts</a>
+</div>
+
+{% endblock%}

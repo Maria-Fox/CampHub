@@ -1,0 +1,52 @@
+#info-div {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  size: 4rem;
+  text-align: left;
+  height: 87%;
+  background-color: transparent;
+}
+
+a:link,
+a:visited,
+a:active {
+  color: whitesmoke;
+  text-decoration: none;
+}
+
+a:hover {
+  color: antiquewhite;
+}
+
+ul {
+  list-style: none;
+}
+
+#breakdown-route-div {
+  padding: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.bd-link {
+  font-style: italic;
+}
+
+.landing-options {
+  border: 1px solid whitesmoke;
+  border-radius: 3px;
+  margin: 10px;
+  padding: 4px;
+  text-align: center;
+  font-style: normal;
+}
+
+.bd-link:hover {
+  color: #2e5563;
+}

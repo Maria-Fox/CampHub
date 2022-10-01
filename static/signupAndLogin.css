@@ -2,6 +2,7 @@
 
 #signup-title {
   text-align: center;
+  margin-top: 30px;
 }
 
 #reg-form,
@@ -21,7 +22,7 @@
 }
 
 .user-cred-button:hover {
-  background-color: rgba(182, 231, 233, 0.767);
+  background-color: #2e5563;
   color: whitesmoke;
 }
 
@@ -57,7 +58,7 @@
 /* editProfile.html */
 
 #profile-button:hover {
-  background-color: rgba(182, 231, 233, 0.767);
+  background-color: #2e5563;
   color: whitesmoke;
 }
 
@@ -75,5 +76,6 @@
 }
 
 #del-acct-button:hover {
-  background-color: #e94848dc;
+  background-color: #cc0e0edc;
+  color: whitesmoke;
 }

@@ -111,7 +111,7 @@ class CamphubUserRoutes(TestCase):
             html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
-            self.assertIn('<h1 id="home-title">What would you like to do?</h1>', html)
+            self.assertIn('<h1 class="pg-header">What would you like to do?</h1>', html)
 
     #      #      #      #      #      #      #      #      #      #  
 
@@ -156,7 +156,7 @@ class CamphubUserRoutes(TestCase):
             html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
-            self.assertIn('<h1 id="home-title">What would you like to do?</h1>', html)
+            self.assertIn('<h1 class="pg-header">What would you like to do?</h1>', html)
 
 
     #      #      #      #      #      #      #      #      #      #  

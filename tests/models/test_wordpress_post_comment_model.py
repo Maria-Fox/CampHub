@@ -18,7 +18,7 @@ class CamphubWordpressPostComment(TestCase):
     '''Test in-app wordpress_post_comment class/ test case. '''
 
     def set_up(self):
-      '''Create test client and test user.'''
+        '''Create test client and test user.'''
 
     def setUp(self):
         """Create test client, add sample data."""

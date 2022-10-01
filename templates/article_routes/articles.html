@@ -9,10 +9,11 @@
 <div class = "wp-article">  
   <h1 class = "article-title">{{article.title}}</h1>
   <p><small>Published by: {{article.author.nice_name}} on {{article.modified}}</small></p>
+  
+  
   <a href="{{article.short_URL}}">Link to Worpress Article</a>
-  <blockquote>{{article.content}}</blockquote>
-
-  {{final_content}}
+  
+  <blockquote>{{article.content|safe}}</blockquote>
 
 
   <div class = "article-option-div">

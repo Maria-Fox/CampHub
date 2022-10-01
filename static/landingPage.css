@@ -1,9 +1,8 @@
 body {
   color: whitesmoke;
-  background-image: url("images/landing_pg.jpg");
+  /* background-image: url("https://images.unsplash.com/photo-1504851149312-7a075b496cc7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8Y2FtcGluZ3xlbnwwfHwwfHw%3D&auto=format&fit=crop&w=700&q=60"); */
   background-repeat: no-repeat;
   background-size: cover;
-  min-height: 100%;
   background-color: black;
 }
 

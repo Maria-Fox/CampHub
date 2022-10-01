@@ -9,7 +9,14 @@
     <p><small>Published by: {{post.users.username}} on {{post.date_time}}</small></p>
 
     {% if g.user.id == post.author_id%}
-    <a href="/camphub/delete/post/{{post.id}}" class = "delete-button"> Delete Post <i class="fa fa-trash" aria-hidden="true"></i></a>
+    <form
+    action="/camphub/delete/post/{{post.id}}"
+    method="post"
+  >
+    <button class="delete-button">
+      Delete Post <i class="fa fa-trash" aria-hidden="true"></i>
+    </button>
+  </form>
     {%endif%}
 
     <blockquote>{{post.content}}</blockquote>
@@ -29,13 +36,25 @@
   {%for comment in comments %}
   <div class = "camphub-comments">
 
-    <p><small>Published By: {{comment.users.username}} on {{comment.date_time}}</small></p>
-
     {% if g.user.id == comment.comment_user_id%}
-    <a href="/camphub/delete/{{post.id}}/{{comment.id}}" class = "delete-ch-comment" > Delete Comment <i class="fa fa-trash" aria-hidden="true"></i></a>
+
+    <form
+    action="/camphub/delete/{{post.id}}/{{comment.id}}"
+    method="post"
+  >
+    <button class="delete-ch-comment">
+      Delete Comment <i class="fa fa-trash" aria-hidden="true"></i>
+    </button>
+  </form>
+
     {%endif%}
 
+
+
+    <p><small>Published By: {{comment.users.username}} on {{comment.date_time}}</small></p>
+
     <blockquote>Comment: {{comment.content}}</blockquote>
+    
 
   </div>
   {% endfor%}
@@ -45,7 +64,10 @@
 
   <div class = "camphub-comments">
     <h3>There are no comments, yet!</h3>
-    <a href="/create/comment/{{post.id}}/{{g.user.id}}">Add Comment</a>
+
+    <div class = "post-route-options">
+      <a href="/create/comment/{{post.id}}/{{g.user.id}}" class = "post-option">Add Comment</a>
+    </div>
   </div>
 
 {% endif %}

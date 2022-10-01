@@ -1,61 +1,51 @@
 body {
   color: whitesmoke;
-  background-image: url("https://images.unsplash.com/photo-1435224654926-ecc9f7fa028c?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80");
+  background-image: url("background.png");
+  background-color: black;
+  height: 100vh;
+  background-attachment: fixed;
+  background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-  min-height: 100%;
+  width: 100%;
   background-color: black;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
-
-/* camping: https://images.unsplash.com/photo-1504851149312-7a075b496cc7?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=705&q=80 */
 
 #nav-area {
   border: 1px solid whitesmoke;
-  font-size: 35px;
-  flex-direction: row;
-  display: flex;
-  position: absolute;
+  border-radius: 3px;
+  font-size: 18px;
   top: 0;
   width: 100%;
-  background-color: rgba(182, 231, 233, 0.767);
-}
-
-#app-icon {
-  float: right;
-  position: absolute;
-  top: -15px;
-  right: 15px;
-  font-size: 25px;
-  color: rgba(29, 98, 102, 0.589);
+  /* background-color: #2e5563; */
 }
 
 #logo {
-  color: rgba(29, 98, 102, 0.589);
+  color: whitesmoke;
 }
 
-#sin-button,
-#sup-button {
-  background-color: transparent;
-  color: rgba(21, 88, 92, 0.589);
-  border: none;
-  size: 6rem;
-}
+/* .nav-item {
+  color: #537179;
+} */
 
 .page-title {
   align-items: center;
   font-size: 50px;
 }
 
-#home-link {
-  bottom: 0;
-  left: 0;
-  position: absolute;
+#flash-div {
+  background-color: antiquewhite;
+  color: rgba(21, 88, 92, 0.589);
+  position: relative;
+  margin-top: 20%;
+  top: -90px;
 }
 
-.flash-message-div {
-  background-color: whitesmoke;
-  color: rgba(29, 98, 102, 0.589);
-  margin-top: 40px;
-  font-size: 18px;
-  height: 25px;
+/* 404 pg */
+
+#not-found-div {
+  text-align: center;
+  margin-top: 30px;
 }

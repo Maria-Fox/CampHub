@@ -3,15 +3,16 @@
 
 {%block content%} 
 
-<h1 id = "comment-header">New Comment on: "{{article.title}}"</h1>
+<h1 class = "pg-header">New Comment on: "{{article.title}}"</h1>
 
 <div id = "chosen-article">
-  <p><small> Published by: {{article.author.nice_name}} on {{article.date}}</small></p>
-
-  <a href="{{article.URL}}">Link to Webpress Article</a>
+  <p><small> Published by: {{article.author.nice_name}} on {{article.date}}</small>
+<br>
+  <a href="{{article.URL}}">Link to Webpress Article</a></p>
+  <br>
   
   <blockquote>
-    {{article.content}}
+    {{article.content|safe}}
   </blockquote>
   
   </div>

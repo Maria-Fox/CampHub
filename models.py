@@ -19,7 +19,7 @@ class User(db.Model):
     def __repr__(self):
         '''Holds user account info.'''
         u = self
-        return f"User ID: {u.id}, Contains {u.username}'s password, school name: {u.school_name}, field of study {u.field_of_study}, and optional profile image {u.profile_image_url}."
+        return f"User ID: {u.id}, Contains {u.username}'s password, school name: {u.school_name}, field of study {u.field_of_study}."
 
     @classmethod
     def register(cls, username, password, school_name, field_of_study):

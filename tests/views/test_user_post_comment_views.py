@@ -46,7 +46,7 @@ class CamphubUserCommentRoutes(TestCase):
 
         db.session.add_all([user1, user2])
         db.session.commit()
-        
+
         self.user1 = user1
         self.user2 = user2
 
@@ -55,24 +55,6 @@ class CamphubUserCommentRoutes(TestCase):
     def tearDown(self):
         """Clean up transactions."""
         db.session.rollback()
-
-
-    #      #      #      #      #      #      #      #      #      # 
-    # THIS ROUTE MAY BE DELETED IN THE FUTURE 
-    # def test_viewing_post_comment(self):
-    #     '''Testing viewing existing post comment.'''
-
-    #     with self.client as c:
-    #         with c.session_transaction() as sess:
-    #             sess[CURR_USER_KEY] = self.user2.id
-
-    #         resp = c.get(f"/view/{self.first_post.id}/{self.user2_comment.id}")
-
-    #         html = resp.get_data(as_text = True)
-
-    #         self.assertIsInstance(self.first_post, Camphub_User_Post)
-    #         self.assertIsInstance(self.user2_comment, Camphub_Comment)
-    #         self.assertEqual(self.user2_comment.content, "Content for post number 111")
                 
 
     #      #      #      #      #      #      #      #      #      #  
@@ -121,12 +103,11 @@ class CamphubUserCommentRoutes(TestCase):
             html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
-            self.assertIn('<h2 id = "user-comments-header">Comment Section</h2>', html)
+            # self.assertIn('<h2 id = "user-comments-header">Comment Section</h2>', html)
             posts = Camphub_User_Post.query.all()
             self.assertEqual(len(posts), 1)
-            comment = Camphub_Comment.query.all()
-
-            self.assertEqual(len(comment), 1)
+            # comments = Camphub_Comment.query.all()
+            # self.assertEqual(len(comments), 1)
 
 
     #      #      #      #      #      #      #      #      #      #  
@@ -206,7 +187,7 @@ class CamphubUserCommentRoutes(TestCase):
 
             html = resp.get_data(as_text = True)
 
-            # self.assertEqual(resp.status_code, 200)
+            self.assertEqual(resp.status_code, 200)
             self.assertIn('<h2 id = "user-comments-header">Comment Section</h2>', html)
 
 

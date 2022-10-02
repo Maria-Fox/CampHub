@@ -277,7 +277,7 @@ def view_article_CH_comment(article_id):
         flash("Please view an existing article from the list below.")
         return redirect("/wordpress/articles/all")
 
-        
+
 
 @app.route("/create/comment/<int:article_id>", methods = ["GET", "POST"])
 def create_WP_camphub_comment(article_id):
@@ -642,3 +642,22 @@ def suggest_topic(user_id):
 
     return render_template("user_routes/suggestTopic.html", form = form)
 
+
+##############################################################################
+# Turn off all caching in Flask
+#   (useful for dev; in production)
+#
+# https://stackoverflow.com/questions/34066804/disabling-caching-in-flask
+
+# @app.after_request
+# def add_header(req):
+#     """Add non-caching headers on every request."""
+
+#     req.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+#     req.headers["Pragma"] = "no-cache"
+#     req.headers["Expires"] = "0"
+#     req.headers['Cache-Control'] = 'public, max-age=0'
+#     return req
+    
+
+    

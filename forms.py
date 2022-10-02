@@ -10,7 +10,6 @@ class Signup_Form (FlaskForm):
     password = PasswordField("Password", validators=[InputRequired(), Length(min=6)])
     school_name = StringField("Bootcamp Name", validators = [InputRequired()])
     field_of_study = StringField("Field of Study", validators = [InputRequired()])
-    profile_image_url = URLField("Profile Image Url", validators = [Optional()])
 
 class Login_Form (FlaskForm):
     '''Form to authenticate existing user.'''

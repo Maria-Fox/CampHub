@@ -74,7 +74,7 @@ class CamphubUserPostRoutes(TestCase):
             html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
-            self.assertIn('<h1 class = "post-header"> Camphub User Posts - All </h1>', html)
+            self.assertIn('<title>Camphub User Posts</title>', html)
 
     #      #      #      #      #      #      #      #      #      #  
 
@@ -132,7 +132,7 @@ class CamphubUserPostRoutes(TestCase):
             html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
-            self.assertIn('<h1 class = "post-header" >Create a New Post</h1>', html)
+            self.assertIn('<title>Create Post</title>', html)
 
 
     #      #      #      #      #      #      #      #      #      #  
@@ -194,7 +194,7 @@ class CamphubUserPostRoutes(TestCase):
 
             html = resp.get_data(as_text = True)
             
-            self.assertIn('<h1 class = "post-header"> Camphub User Posts - All </h1>', html) 
+            self.assertIn('<title>Camphub User Posts</title>', html) 
             self.assertEqual(resp.status_code, 200)
             posts = Camphub_User_Post.query.all()
             self.assertEqual(len(posts), 0)

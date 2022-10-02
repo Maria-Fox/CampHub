@@ -89,10 +89,9 @@ def signup():
             password = form.password.data
             school_name = form.school_name.data
             field_of_study = form.field_of_study.data
-            profile_image_url = form.profile_image_url.data or default_profile_image
-        
+            
             # hashes given password to securly store in db. Return new user instance w/ hashed data. Add to db.session.
-            user = User.register(username, password, school_name, field_of_study, default_profile_image)
+            user = User.register(username, password, school_name, field_of_study)
 
             db.session.commit()
             complete_login(user)
@@ -164,8 +163,7 @@ def edit_profile(user_id):
                 user.username = form.username.data 
                 user.school_name = form.school_name.data
                 user.field_of_study = form.field_of_study.data
-                profile_image_url = form.profile_image_url.data or default_profile_image
-
+                
                 db.session.add(user)
                 db.session.commit()
 
@@ -233,6 +231,156 @@ def page_not_found(e):
 
 # 
 # 
+# Wordpress Routes
+# 
+# 
+
+@app.route("/wordpress/articles/all")
+def camphub_posts():
+    '''View all camphub articles made by moderator/ creator.'''
+
+    if not g.user:
+        redirect("/")
+
+    resp = requests.get(f"{base_url}/{camphub_site}/posts/")
+    resp = resp.json()
+    
+    articles = resp["posts"]
+
+    articles = sorted(articles, key=lambda d: d['date'])
+
+    return render_template("article_routes/articles.html", articles = articles)
+
+
+@app.route("/wordpress/camphub/article/<int:article_id>")
+def view_article_CH_comment(article_id):
+    '''Allow authorized user to view single article/ comments.'''
+
+    if not g.user:
+        flash("Please signup or login if you have an existing account.")
+        return redirect("/signup")
+
+    try:
+
+        resp = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}")
+        article = resp.json()
+
+        replies = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}/replies/")
+        replies = replies.json()
+        replies = replies["comments"]
+
+        user_comments_on_WP_article = Wordpress_Post_Comment.query.filter_by(wordpress_article_id = article_id).all()
+
+        return render_template("wp_in_app_routes/single_article.html", article = article, replies = replies, user_comments_on_WP_article = user_comments_on_WP_article)
+
+    except:
+        flash("Please view an existing article from the list below.")
+        return redirect("/wordpress/articles/all")
+
+        
+
+@app.route("/create/comment/<int:article_id>", methods = ["GET", "POST"])
+def create_WP_camphub_comment(article_id):
+    '''Create new camphub comment - EXCLUSIVELY ON MODERATOR POSTS.'''
+
+    if not g.user:
+        redirect("/")
+
+    try:
+        resp = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}")
+        article = resp.json()
+        article_id =article["ID"]
+        
+    except:
+        flash("Article does not exist.")
+        return redirect("/wordpress/articles/all")
+
+    form = Wordpress_CH_Article_Comment_Form()
+
+    if form.validate_on_submit():
+
+        try: 
+            wordpress_article_id = article_id
+            user_id = g.user.id
+            user_comment = form.user_comment.data
+
+            new_comment = Wordpress_Post_Comment(wordpress_article_id = wordpress_article_id, user_id = user_id, user_comment = user_comment)
+
+            db.session.add(new_comment)
+            db.session.commit()
+
+            flash("Your comment was added to CampHub comments.")
+            return redirect(f"/wordpress/camphub/article/{article_id}")
+
+        except:
+            flash("Something went wrong- please try again.")
+            return redirect(f"/create/comment/{article_id}")
+
+
+    return render_template("wp_in_app_routes/new_comment.html", form = form, article = article, article_id = article_id)
+
+@app.route("/wordpress/edit/<int:article_id>/<int:comment_id>", methods = ["GET", "POST"])
+def edit_article_comment(article_id, comment_id):
+    '''Edit valid article comment.'''
+
+    if not g.user:
+        return redirect("/signup")
+
+    comment = Wordpress_Post_Comment.query.get_or_404(comment_id)
+
+    form = Edit_Article_Comment_Form(obj = comment)
+
+    try:
+        resp = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}")
+        article = resp.json()
+        
+    except:
+        flash("Article does not exist.")
+        return redirect("/wordpress/articles/all")
+
+    if form.validate_on_submit():
+        try:
+            comment.user_comment = form.user_comment.data
+
+            db.session.add(comment)
+            db.session.commit()
+            
+            flash("Updated comment!")
+            return redirect(f"/wordpress/camphub/article/{article_id}")
+
+        except:
+            flash("Something went wrong- please try again.")
+            return redirect(f"/wordpress/camphub/article/{article_id}")
+
+    return render_template("wp_in_app_routes/editComment.html", form = form, article= article, comment = comment)
+
+
+@app.route("/wordpress/delete/<int:article_id>/<int:comment_id>", methods = ["POST"])
+def delete_wordpress_comment(article_id, comment_id):
+    '''Delete user in-app wordpress comment.'''
+
+    if not g.user:
+        return redirect("/signup")
+
+    comment_to_delete = Wordpress_Post_Comment.query.filter_by(id = comment_id, wordpress_article_id = article_id).first_or_404()
+
+    try:
+        db.session.delete(comment_to_delete)
+        db.session.commit()
+        flash("Deleted comment!")
+
+        return redirect(f"/wordpress/camphub/article/{article_id}")
+
+    except:
+        flash("Something went wrong- please try again.")
+        return redirect(f"/wordpress/camphub/article/{article_id}")
+
+
+
+
+
+# 
+# 
 # Camphub IN-APP ROUTES
 # 
 # 
@@ -290,11 +438,8 @@ def create_user_post(user_id):
 
             db.session.add(new_user_post)
             db.session.commit()
-            print(" *************** this is the new user post:")
-            print(new_user_post)
 
             flash("Your post was added!")
-
             return redirect("/camphub/users/posts")
 
         except:
@@ -359,7 +504,7 @@ def delete_post(post_id):
         return redirect("/camphub/users/posts")
 
 
-# # # # # # # # # # # # # # # # # # # # COMMENTS SECTION FOR IN-APP 
+# # # # # # # # # # # # # # # # #  # # # # # # # COMMENTS SECTION FOR IN-APP 
 
 # this is for ALL IN APP comments. 
 @app.route("/camphub/<int:user_id>/comments/all")
@@ -372,9 +517,7 @@ def view_camphub_comments(user_id):
     user = User.query.get_or_404(user_id)
 
     all_comments = Camphub_Comment.query.all()
-    print("*********************")
-    print(all_comments)
-    
+
     return render_template("user_post_routes/camphub_comments.html", all_comments = all_comments)
 
 
@@ -498,150 +641,4 @@ def suggest_topic(user_id):
             flash("Something went wrong- please try again.")
 
     return render_template("user_routes/suggestTopic.html", form = form)
-
-
-# 
-# 
-# Wordpress Routes
-# 
-# 
-
-@app.route("/wordpress/articles/all")
-def camphub_posts():
-    '''View all camphub articles made by moderator/ creator.'''
-
-    if not g.user:
-        redirect("/")
-
-    resp = requests.get(f"{base_url}/{camphub_site}/posts/")
-    resp = resp.json()
-    
-    articles = resp["posts"]
-
-    articles = sorted(articles, key=lambda d: d['date'])
-
-    return render_template("article_routes/articles.html", articles = articles)
-
-# NEED EDITS TO ACCOUNT FOR ARTICLE_ID NOT EXISTING- ADD TRY/CATCH 
-@app.route("/wordpress/camphub/article/<int:article_id>")
-def view_article_CH_comment(article_id):
-    '''Allow authorized user to view single article/ comments.'''
-
-    if not g.user:
-        flash("Please signup or login if you have an existing account.")
-        return redirect("/signup")
-
-    try:
-
-        resp = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}")
-        article = resp.json()
-
-        replies = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}/replies/")
-        replies = replies.json()
-        replies = replies["comments"]
-
-        user_comments_on_WP_article = Wordpress_Post_Comment.query.filter_by(wordpress_article_id = article_id).all()
-
-        return render_template("wp_in_app_routes/single_article.html", article = article, replies = replies, user_comments_on_WP_article = user_comments_on_WP_article)
-
-    except:
-        flash("Please view an existing article from the list below.")
-        return redirect("/wordpress/articles/all")
-
-@app.route("/create/comment/<int:article_id>", methods = ["GET", "POST"])
-def create_WP_camphub_comment(article_id):
-    '''Create new camphub comment - EXCLUSIVELY ON MODERATOR POSTS.'''
-
-    if not g.user:
-        redirect("/")
-
-    try:
-        resp = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}")
-        article = resp.json()
-        article_id =article["ID"]
-        
-    except:
-        flash("Article does not exist.")
-        return redirect("/wordpress/articles/all")
-
-    form = Wordpress_CH_Article_Comment_Form()
-
-    if form.validate_on_submit():
-
-        try: 
-            wordpress_article_id = article_id
-            user_id = g.user.id
-            user_comment = form.user_comment.data
-
-            new_comment = Wordpress_Post_Comment(wordpress_article_id = wordpress_article_id, user_id = user_id, user_comment = user_comment)
-
-            db.session.add(new_comment)
-            db.session.commit()
-
-            flash("Your comment was added to CampHub comments.")
-            return redirect(f"/wordpress/camphub/article/{article_id}")
-
-        except:
-            flash("Something went wrong- please try again.")
-            return redirect(f"/create/comment/{article_id}")
-
-
-    return render_template("wp_in_app_routes/new_comment.html", form = form, article = article, article_id = article_id)
-
-@app.route("/wordpress/edit/<int:article_id>/<int:comment_id>", methods = ["GET", "POST"])
-def edit_article_comment(article_id, comment_id):
-    '''Edit valid article comment.'''
-
-    if not g.user:
-        return redirect("/signup")
-
-    comment = Wordpress_Post_Comment.query.get_or_404(comment_id)
-
-    form = Edit_Article_Comment_Form(obj = comment)
-
-    try:
-        resp = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}")
-        article = resp.json()
-        
-    except:
-        flash("Article does not exist.")
-        return redirect("/wordpress/articles/all")
-
-    if form.validate_on_submit():
-        try:
-            comment.user_comment = form.user_comment.data
-
-            db.session.add(comment)
-            db.session.commit()
-            
-            flash("Updated comment!")
-            return redirect(f"/wordpress/camphub/article/{article_id}")
-
-        except:
-            flash("Something went wrong- please try again.")
-            return redirect(f"/wordpress/camphub/article/{article_id}")
-
-    return render_template("wp_in_app_routes/editComment.html", form = form, article= article, comment = comment)
-
-
-@app.route("/wordpress/delete/<int:article_id>/<int:comment_id>", methods = ["POST"])
-def delete_wordpress_comment(article_id, comment_id):
-    '''Delete user in-app wordpress comment.'''
-
-    if not g.user:
-        return redirect("/signup")
-
-    comment_to_delete = Wordpress_Post_Comment.query.filter_by(id = comment_id, wordpress_article_id = article_id).first_or_404()
-
-    try:
-        db.session.delete(comment_to_delete)
-        db.session.commit()
-        flash("Deleted comment!")
-
-        return redirect(f"/wordpress/camphub/article/{article_id}")
-
-    except:
-        flash("Something went wrong- please try again.")
-        return redirect(f"/wordpress/camphub/article/{article_id}")
-
 

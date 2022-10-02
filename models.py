@@ -22,13 +22,13 @@ class User(db.Model):
         return f"User ID: {u.id}, Contains {u.username}'s password, school name: {u.school_name}, field of study {u.field_of_study}, and optional profile image {u.profile_image_url}."
 
     @classmethod
-    def register(cls, username, password, school_name, field_of_study, profile_image_url):
+    def register(cls, username, password, school_name, field_of_study):
         '''Register user with hashed password.'''
 
         # bcryt.generate_password_hash() is a native flask Brypt method- this salts (introduces random string before hashing) and hashes (1-way transformation of paw) the userpassword. We add this to the db.
         hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
 
-        user = User(username = username, password = hashed_password, school_name = school_name, field_of_study = field_of_study, profile_image_url = profile_image_url)
+        user = User(username = username, password = hashed_password, school_name = school_name, field_of_study = field_of_study)
 
         db.session.add(user)
 
@@ -52,7 +52,6 @@ class User(db.Model):
     password = db.Column(db.String, nullable = False)
     school_name = db.Column(db.String, nullable = False)
     field_of_study = db.Column(db.String, nullable = False)
-    profile_image_url = db.Column(db.String, nullable = True)
 
     posts = db.relationship("Camphub_User_Post", cascade="all, delete-orphan")
     comments = db.relationship("Camphub_Comment", cascade="all, delete-orphan")

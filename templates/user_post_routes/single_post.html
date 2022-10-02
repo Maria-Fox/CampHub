@@ -4,16 +4,17 @@
 {%block content%} 
 
 <div>
-  <h1 class = "pg-header">Post: {{post.title}}</h1>
+  <h1 class = "pg-header">{{post.title}}</h1>
   <div class = "user-post">
     <p><small>Published by: {{post.users.username}} on {{post.date_time}}</small></p>
 
     {% if g.user.id == post.author_id%}
+    <form action="/camphub/edit/post/{{post.id}}"><button class="edit-button">Edit Post</button></form>
     <form
     action="/camphub/delete/post/{{post.id}}"
     method="post"
   >
-    <button class="delete-button">
+    <button class="delete-button" >
       Delete Post <i class="fa fa-trash" aria-hidden="true"></i>
     </button>
   </form>
@@ -36,24 +37,32 @@
   {%for comment in comments %}
   <div class = "camphub-comments">
 
-    {% if g.user.id == comment.comment_user_id%}
-
-    <form
-    action="/camphub/delete/{{post.id}}/{{comment.id}}"
-    method="post"
-  >
-    <button class="delete-ch-comment">
-      Delete Comment <i class="fa fa-trash" aria-hidden="true"></i>
-    </button>
-  </form>
-
-    {%endif%}
-
-
-
+    
     <p><small>Published By: {{comment.users.username}} on {{comment.date_time}}</small></p>
 
     <blockquote>Comment: {{comment.content}}</blockquote>
+
+    {% if g.user.id == comment.comment_user_id%}
+
+
+    <!-- the class styling got edit needs to be changed. Update to look like the  -->
+    <div class = "ch-comment-option-div">
+    <form action="/camphub/edit/{{post.id}}/{{comment.id}}">
+      <button class = "comment-opt" type = "submit"> Edit Comment</button>
+    </form>
+    
+    <form
+    action="/camphub/delete/{{post.id}}/{{comment.id}}"
+    method="post">
+    <button type = "submit" class= "comment-opt">
+      Delete Comment <i class="fa fa-trash" aria-hidden="true"></i>
+    </button>
+  </div>
+  </form>
+
+
+
+  {%endif%}
     
 
   </div>

@@ -75,24 +75,31 @@
 
 .ch-comments {
   text-align: left;
-  justify-content: left;
-  display: flex;
-  flex-direction: column;
-  border: 2px solid whitesmoke;
+  /* justify-content: left; */
+  border: 1px solid whitesmoke;
   border-radius: 3px;
   padding: 10px;
   background-color: #2e5563;
   margin-bottom: 10%;
 }
 
-.del-art-comm-button {
-  position: relative;
-  left: 75%;
-  background-color: #2e5563;
-  background-color: transparent;
+.ch-comment-option-div {
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  direction: row;
+  border: 2px solid whitesmoke;
+  border-radius: 3px;
+}
+
+.comment-opt {
+  display: flex;
+  direction: row;
+  margin: 10px;
+  background: none;
+  color: inherit;
   border: none;
+  padding: 0;
+  font: inherit;
   cursor: pointer;
-  overflow: hidden;
-  outline: none;
-  color: whitesmoke;
 }

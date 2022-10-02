@@ -48,5 +48,6 @@ ul {
 }
 
 .bd-link:hover {
+  background-color: whitesmoke;
   color: #2e5563;
 }

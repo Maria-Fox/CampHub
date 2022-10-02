@@ -50,7 +50,6 @@
 .delete-button {
   position: relative;
   float: right;
-  left: 1%;
   margin-top: -45px;
   background-color: transparent;
   border: none;
@@ -107,7 +106,7 @@
   font-size: 20px;
   border: 2px solid whitesmoke;
   border-radius: 3px;
-  background-color: #2e5563;
+  /* background-color: #2e5563; */
 }
 
 /* /user_post_routes/single_post.html */
@@ -126,7 +125,7 @@
   margin-bottom: 10%;
 }
 
-.delete-ch-comment {
+/* .delete-ch-comment {
   float: right;
   right: 1%;
   background-color: transparent;
@@ -134,9 +133,8 @@
   cursor: pointer;
   overflow: hidden;
   outline: none;
-  font-weight: bold;
   color: whitesmoke;
-}
+} */
 
 /* differences.html */
 
@@ -161,4 +159,16 @@
   border: 2px solid whitesmoke;
   border-radius: 5px;
   padding: 20px;
+}
+
+.edit-button {
+  position: relative;
+  float: right;
+  margin-top: -30px;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+  outline: none;
+  color: whitesmoke;
 }

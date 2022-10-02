@@ -18,6 +18,9 @@
   <h2><a href="/view/camphub/{{post.id}}">Post: {{post.title}}</a></h2>
 
   {% if g.user.id == post.author_id%}
+  <form action="/camphub/edit/post/{{post.id}}", method = "get">
+    <button class = "edit-button"> Edit Post</button>
+  </form>
 
 
   <form
@@ -28,6 +31,8 @@
           Delete Post <i class="fa fa-trash" aria-hidden="true"></i>
         </button>
       </form>
+
+  
   {%endif%}
 
 

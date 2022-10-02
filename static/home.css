@@ -39,7 +39,7 @@
 
 #option {
   /* rgba(182, 231, 233, 0.767); */
-  background-color: #2e5563;
+  background-color: transparent;
   border: 2px solid whitesmoke;
   margin-bottom: 50%;
   border-radius: 3px;
@@ -53,7 +53,7 @@
 
 #option:hover {
   background-color: whitesmoke;
-  color: rgba(29, 98, 102, 0.589);
+  color: #2e5563;
 }
 
 #dir-title {

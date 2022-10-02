@@ -1,0 +1,42 @@
+{%extends "base.html"%} {%block title %} <title>Edit Comment</title> {%endblock%}
+<!-- page content here -->
+
+{%block content%} 
+
+<h1 class = "pg-header">Edit Comment on: "{{article.title}}"</h1>
+
+<div id = "chosen-article">
+  <p><small> Published by: {{article.author.nice_name}} on {{article.date}}</small>
+<br>
+  <a href="{{article.URL}}">Link to Webpress Article</a></p>
+  <br>
+  
+  <blockquote>
+    {{article.content|safe}}
+  </blockquote>
+  
+  </div>
+
+<div>
+
+<form action = "/wordpress/edit/{{article.ID}}/{{comment.id}}" method="post" id = "comment-form" >
+
+  {{form.hidden_tag()}} 
+  {%for field in form if field.widget.input_type != 'hidden'%}
+  {{field.label(class = "comment-field")}} 
+  {{field}} 
+  
+  {%for error in field.errors%}
+  {{error}}{%endfor%} {%endfor%}
+  <button type="submit" class ="comment-button">Post</button>
+</form>
+
+</div>
+
+<a href="/wordpress/articles/all">Return to Worpress Articles</a>
+
+</div>
+
+  <!-- do not touch below -->
+  {%endblock%}
+</div>

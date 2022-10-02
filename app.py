@@ -2,8 +2,9 @@ from flask import Flask, render_template, redirect, flash, redirect, session, g,
 from flask_debugtoolbar import DebugToolbarExtension
 import requests
 from models import db, connect_db, User, Camphub_User_Post, Camphub_Comment, Wordpress_Post_Comment, Suggest_Topic, User_Like
-from forms import Signup_Form, Login_Form, Edit_Profile_form, Camphub_Comment_Form, Camphub_User_Post_Form, Wordpress_CH_Article_Comment_Form, Suggest_Topic_Form
+from forms import Signup_Form, Login_Form, Edit_Profile_form, Camphub_Comment_Form, Camphub_User_Post_Form, Wordpress_CH_Article_Comment_Form, Suggest_Topic_Form, Edit_CH_Comment_Form, Edit_Post_Form, Edit_Article_Comment_Form
 from sqlalchemy.exc import IntegrityError
+import json
 import os
 
 
@@ -24,6 +25,7 @@ CURR_USER_KEY = "curr_user"
 base_url = "https://public-api.wordpress.com/rest/v1.1/sites"
 camphub_site = "camphub2022.wordpress.com"
 site_id = 210640995
+default_profile_image = "https://images.unsplash.com/photo-1504470695779-75300268aa0e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80"
 
 connect_db(app)
 db.create_all()
@@ -87,9 +89,10 @@ def signup():
             password = form.password.data
             school_name = form.school_name.data
             field_of_study = form.field_of_study.data
+            profile_image_url = form.profile_image_url.data or default_profile_image
         
             # hashes given password to securly store in db. Return new user instance w/ hashed data. Add to db.session.
-            user = User.register(username, password, school_name, field_of_study)
+            user = User.register(username, password, school_name, field_of_study, default_profile_image)
 
             db.session.commit()
             complete_login(user)
@@ -161,6 +164,7 @@ def edit_profile(user_id):
                 user.username = form.username.data 
                 user.school_name = form.school_name.data
                 user.field_of_study = form.field_of_study.data
+                profile_image_url = form.profile_image_url.data or default_profile_image
 
                 db.session.add(user)
                 db.session.commit()
@@ -302,6 +306,38 @@ def create_user_post(user_id):
     return render_template("user_post_routes/create_post.html", form = form)
 
 
+@app.route("/camphub/edit/post/<int:post_id>", methods = ["GET", "POST"])
+def edit_user_post(post_id):
+    '''Edit valid user post.'''
+
+    if not g.user:
+        return redirect("/signup")
+
+    post = Camphub_User_Post.query.get_or_404(post_id)
+
+    if post.author_id != g.user.id:
+        flash("Unauthorized Access")
+        return redirect("/camphub/users/posts")
+    
+    form = Edit_Post_Form(obj = post)
+
+    if form.validate_on_submit():
+        try:
+            post.title = form.title.data
+            content = form.content.data
+
+            db.session.add(post)
+            db.session.commit()
+
+            flash("Updated post!")
+            return redirect(f"/view/camphub/{post.id}")
+        except:
+            flash("Something went wrong- please try again.")
+            return redirect(f"/camphub/edit/post/{post_id}")
+
+    return render_template("user_post_routes/editPost.html", form = form, post = post)
+
+
 @app.route("/camphub/delete/post/<int:post_id>", methods = ["POST"])
 def delete_post(post_id):
     '''Delete the given user post and post comments.'''
@@ -374,6 +410,39 @@ def make_post_comment(post_id, user_id):
             return redirect(f"/view/camphub/{post_id}")
 
     return render_template("/user_post_routes/new_comment.html", form = form, post = post)
+
+@app.route("/camphub/edit/<int:post_id>/<int:comment_id>", methods = ["GET", "POST"])
+def edit_camphub_comment(post_id, comment_id):
+    '''Edit authorized user CampHub comment.'''
+
+    if not g.user:
+        return redirect("/signup")
+
+    post = Camphub_User_Post.query.get_or_404(post_id)
+    comment = Camphub_Comment.query.get_or_404(comment_id)
+
+    if g.user.id != comment.comment_user_id:
+        flash("Unauthorized Access")
+        return redirect(f"/view/camphub/{post_id}")
+
+    form = Edit_CH_Comment_Form(obj = comment)
+
+    if form.validate_on_submit():
+        try:
+        
+            comment.Camphub_Comment = form.content.data
+
+            db.session.add(comment)
+            db.session.commit()
+
+            flash("Comment updated!")
+            return redirect(f"/view/camphub/{post_id}")
+        except:
+            flash("Something went wrong- please try again.")
+            return redirect(f"/camphub/edit/{post_id}/{comment_id}")
+
+
+    return render_template("user_post_routes/editComment.html", form = form, post = post , comment = comment)
 
 
 @app.route("/camphub/delete/<int:post_id>/<int:comment_id>", methods = ["POST"])
@@ -448,19 +517,10 @@ def camphub_posts():
     resp = resp.json()
     
     articles = resp["posts"]
-    content = {}
-    
-    #  This needs work - the tags are removed w/ loop but unable to render on pg- something to do w/ the endfor?
-
-    for i in range(len(resp["posts"])):
-        final_content = (resp["posts"][i]["content"][4:-5])
-        print(final_content)
-        
-    print("CONTENT IS: ********")
 
     articles = sorted(articles, key=lambda d: d['date'])
 
-    return render_template("article_routes/articles.html", articles = articles, final_content = final_content)
+    return render_template("article_routes/articles.html", articles = articles)
 
 # NEED EDITS TO ACCOUNT FOR ARTICLE_ID NOT EXISTING- ADD TRY/CATCH 
 @app.route("/wordpress/camphub/article/<int:article_id>")
@@ -528,6 +588,42 @@ def create_WP_camphub_comment(article_id):
 
     return render_template("wp_in_app_routes/new_comment.html", form = form, article = article, article_id = article_id)
 
+@app.route("/wordpress/edit/<int:article_id>/<int:comment_id>", methods = ["GET", "POST"])
+def edit_article_comment(article_id, comment_id):
+    '''Edit valid article comment.'''
+
+    if not g.user:
+        return redirect("/signup")
+
+    comment = Wordpress_Post_Comment.query.get_or_404(comment_id)
+
+    form = Edit_Article_Comment_Form(obj = comment)
+
+    try:
+        resp = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}")
+        article = resp.json()
+        
+    except:
+        flash("Article does not exist.")
+        return redirect("/wordpress/articles/all")
+
+    if form.validate_on_submit():
+        try:
+            comment.user_comment = form.user_comment.data
+
+            db.session.add(comment)
+            db.session.commit()
+            
+            flash("Updated comment!")
+            return redirect(f"/wordpress/camphub/article/{article_id}")
+
+        except:
+            flash("Something went wrong- please try again.")
+            return redirect(f"/wordpress/camphub/article/{article_id}")
+
+    return render_template("wp_in_app_routes/editComment.html", form = form, article= article, comment = comment)
+
+
 @app.route("/wordpress/delete/<int:article_id>/<int:comment_id>", methods = ["POST"])
 def delete_wordpress_comment(article_id, comment_id):
     '''Delete user in-app wordpress comment.'''
@@ -535,10 +631,7 @@ def delete_wordpress_comment(article_id, comment_id):
     if not g.user:
         return redirect("/signup")
 
-    comment_to_delete = Wordpress_Post_Comment.query.filter_by(id = comment_id, wordpress_article_id = article_id).first()
-
-    if not comment_to_delete:
-        return redirect("/wordpress/articles/all")
+    comment_to_delete = Wordpress_Post_Comment.query.filter_by(id = comment_id, wordpress_article_id = article_id).first_or_404()
 
     try:
         db.session.delete(comment_to_delete)

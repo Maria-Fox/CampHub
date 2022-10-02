@@ -1,0 +1,38 @@
+{%extends "base.html"%} {%block title %} <title>Edit Comment</title> {%endblock%}
+<!-- page content here -->
+
+{%block content%} 
+
+<h1 class = "pg-header">Edit Comment on {{post.title}}</h1>
+
+<div>
+  <div id = "post-for-comment">
+      <p><small>Published by: {{post.users.username}}</small></p>
+      <small><p>Published on: {{post.date_time}}</p></small>
+      <blockquote>{{post.content}}</blockquote>
+
+  </div>
+
+
+<form action = "/camphub/edit/{{post.id}}/{{comment.id}}" method="post"  id = "new-ch-comment-form" >
+
+  {{form.hidden_tag()}} 
+  {%for field in form if field.widget.input_type != 'hidden'%}
+
+  {{field.label}} 
+  {{field}} 
+  
+  {%for error in field.errors%}
+  {{error}}{%endfor%} {%endfor%}
+  <button type="submit" class = "comment-button">Update</button>
+</form>
+
+</div>
+<a href="">Cancel</a>
+<a href="/camphub/users/posts">Users Posts</a>
+
+
+
+  <!-- do not touch below -->
+  {%endblock%}
+</div>

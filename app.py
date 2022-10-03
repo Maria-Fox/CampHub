@@ -10,9 +10,16 @@ import os
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = (
+uri = app.config['SQLALCHEMY_DATABASE_URI'] = (
     os.environ.get('DATABASE_URL', 'postgresql:///camphub'))
+
+if uri.startswith("postgres://"):
+    uri = uri.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'camhub_key')
+
+
 
 # delete these when you're ready to push to Heroku
 toolbar = DebugToolbarExtension(app)

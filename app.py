@@ -20,14 +20,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = uri
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'camhub_key')
 
 
-
-# delete these when you're ready to push to Heroku
-toolbar = DebugToolbarExtension(app)
-app.config["SQLALCHEMY_ECHO"] = False
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["DEBUG_TB_INTERCEPT_REDIRECTS"] = False
-
-
 CURR_USER_KEY = "curr_user"
 base_url = "https://public-api.wordpress.com/rest/v1.1/sites"
 camphub_site = "camphub2022.wordpress.com"

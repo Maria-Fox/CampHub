@@ -15,7 +15,10 @@
   {{field}} 
   
   {%for error in field.errors%}
-  {{error}}{%endfor%} {%endfor%}
+  {{error}}
+  {%endfor%}
+  
+  {%endfor%}
   <button type="submit" class = "comment-button">Request Topic</button>
 </form>
 
@@ -23,4 +26,3 @@
 
   <!-- do not touch below -->
   {%endblock%}
-</div>

@@ -7,7 +7,9 @@
 <div>
   <h1 class="pg-header">Camphub Comments - All</h1>
 
-  {%if all_comments%} {% for comment in all_comments%}
+  {%if all_comments%} 
+  {% for comment in all_comments%}
+
   <div class="user-comment">
     <p>
       <small
@@ -15,28 +17,35 @@
         {{comment.date_time}}</small
       >
     </p>
+
     {% if g.user.id == comment.comment_user_id%}
+
     <a href="/camphub/delete/{{comment.camphub_post_id}}/{{comment.id}}">
       Delete Comment <i class="fa fa-trash" aria-hidden="true"></i
     ></a>
+
     {%endif%}
+
     <blockquote>{{comment.content}}</blockquote>
 
-    {%endfor%} {%else%}
+    {%endfor%}
+
+    {%else%}
     <div class="user-comment">
       <h2>No comments yet!</h2>
-      <h3><a href="/create/comment">Make a comment here at CampHub</a></h3>
-      <h4>
-        <a href="https://wordpress.com/home/camphub2022"
-          >Create Comment in Wordpress</a
-        >
-      </h4>
+        <h3><a href="/create/comment">Make a comment here at CampHub</a></h3>
+          <h4>
+            <a href="https://wordpress.com/home/camphub2022"
+              >Create Comment in Wordpress</a
+            >
+          </h4>
     </div>
 
     <a href="/wordpres/articles/all">Return to Wordpress Posts</a>
     {%endif%}
   </div>
 
+</div>
   <!-- do not touch below -->
   {%endblock%}
-</div>
+

@@ -6,28 +6,26 @@
 <div>
   <h1 class = "pg-header">{{post.title}}</h1>
   <div class = "user-post">
-    <p><small>Published by: {{post.users.username}} on {{post.date_time}}</small></p>
+      <p><small>Published by: {{post.users.username}} on {{post.date_time}}</small></p>
 
-    {% if g.user.id == post.author_id%}
-    <form action="/camphub/edit/post/{{post.id}}"><button class="edit-button">Edit Post</button></form>
-    <form
-    action="/camphub/delete/post/{{post.id}}"
-    method="post"
-  >
-    <button class="delete-button" >
-      Delete Post <i class="fa fa-trash" aria-hidden="true"></i>
-    </button>
-  </form>
-    {%endif%}
+      {% if g.user.id == post.author_id%}
 
-    <blockquote>{{post.content}}</blockquote>
+      <form action="/camphub/edit/post/{{post.id}}">
+        <button class="edit-button">Edit Post</button>
+      </form>
 
-    <div class = "post-route-options">
-      <a href="/create/comment/{{post.id}}/{{g.user.id}}" class = "post-option">Add Comment</a>
-    <a href="/camphub/users/posts" class = "post-option">Return to User Posts</a>
+      <form action="/camphub/delete/post/{{post.id}}" method="post">
+        <button class="delete-button" >Delete Post <i class="fa fa-trash" aria-hidden="true"></i></button>
+      </form>
 
+      {%endif%}
 
-    </div>
+      <blockquote>{{post.content}}</blockquote>
+
+      <div class = "post-route-options">
+        <a href="/create/comment/{{post.id}}/{{g.user.id}}" class = "post-option">Add Comment</a>
+        <a href="/camphub/users/posts" class = "post-option">Return to User Posts</a>
+      </div>
   </div>
 
 
@@ -47,18 +45,14 @@
 
     <!-- the class styling got edit needs to be changed. Update to look like the  -->
     <div class = "ch-comment-option-div">
-    <form action="/camphub/edit/{{post.id}}/{{comment.id}}">
-      <button class = "comment-opt" type = "submit"> Edit Comment</button>
-    </form>
+      <form action="/camphub/edit/{{post.id}}/{{comment.id}}">
+        <button class = "comment-opt" type = "submit"> Edit Comment</button>
+      </form>
     
-    <form
-    action="/camphub/delete/{{post.id}}/{{comment.id}}"
-    method="post">
-    <button type = "submit" class= "comment-opt">
-      Delete Comment <i class="fa fa-trash" aria-hidden="true"></i>
-    </button>
-  </div>
-  </form>
+      <form action="/camphub/delete/{{post.id}}/{{comment.id}}" method="post">
+        <button type = "submit" class= "comment-opt">Delete Comment <i class="fa fa-trash" aria-hidden="true"></i></button>
+      </form>
+    </div>
 
 
 
@@ -74,15 +68,13 @@
   <div class = "camphub-comments">
     <h3>There are no comments, yet!</h3>
 
-    <div class = "post-route-options">
-      <a href="/create/comment/{{post.id}}/{{g.user.id}}" class = "post-option">Add Comment</a>
-    </div>
+      <div class = "post-route-options">
+        <a href="/create/comment/{{post.id}}/{{g.user.id}}" class = "post-option">Add Comment</a>
+      </div>
   </div>
 
-{% endif %}
-
 </div>
+{% endif %}
 
   <!-- do not touch below -->
   {%endblock%}
-</div>

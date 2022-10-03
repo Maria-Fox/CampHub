@@ -23,7 +23,6 @@ class Edit_Profile_form(FlaskForm):
     username = StringField("Update Username", validators = [InputRequired(), Length(max=20)])
     school_name = StringField("Bootcamp Name", validators = [InputRequired()])
     field_of_study = StringField("Field of Study", validators = [InputRequired()])
-    profile_image_url = StringField("Optional Image Url", validators = [Optional()])
     password = PasswordField("Enter your password to verify changes", validators = [InputRequired()])
     
 

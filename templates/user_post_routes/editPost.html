@@ -5,24 +5,21 @@
 
 
 <h1 class = "pg-header" >Edit {{post.title}}</h1>
+
 <div id = "create-post-div">
-<form action = "/camphub/edit/post/{{post.id}}" method="post" id = "post-form">
+  <form action = "/camphub/edit/post/{{post.id}}" method="post" id = "post-form">
 
-  {{form.hidden_tag()}} 
-  {%for field in form if field.widget.input_type != 'hidden'%}
-  {{field.label (class = "post-field")}} 
-  {{field}} 
-  
-  {%for error in field.errors%}
-  {{error}}{%endfor%} {%endfor%}
-  <button type="submit" id = "new-post-button">Update</button>
-</form>
-
-</div>
+    {{form.hidden_tag()}} 
+    {%for field in form if field.widget.input_type != 'hidden'%}
+    {{field.label (class = "post-field")}} 
+    {{field}} 
+    
+    {%for error in field.errors%}
+    {{error}}{%endfor%} {%endfor%}
+    <button type="submit" id = "new-post-button">Update</button>
+  </form>
 
 </div>
-
 
   <!-- do not touch below -->
   {%endblock%}
-</div>

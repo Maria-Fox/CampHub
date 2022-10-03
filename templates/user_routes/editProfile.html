@@ -16,18 +16,26 @@
   >
     <!--come back and style the form - leaving to work on functionality for now  -->
 
-    {{form.hidden_tag()}} {%for field in form if field.widget.input_type !=
-    'hidden'%} {{field.label (class = "field-label")}} {{field}} {%for error in
-    field.errors%} {{error}} {%endfor%} {%endfor%}
+    {{form.hidden_tag()}} 
+    {%for field in form if field.widget.input_type !='hidden'%} 
+    {{field.label (class = "field-label")}} 
+    {{field}} 
+    
+    {%for error in field.errors%} 
+    {{error}} 
+    {%endfor%}
+    
+    {%endfor%}
     <button type="submit" id="profile-button">Update</button>
   </form>
+
 </div>
 <br />
 
 <div id="delete-acct-div">
   <form action="/delete/user/{{g.user.id}}" , method="post">
     <p id="delete-zone">Danger:</p>
-    <button id="del-acct-button">Delete Account</button>
+      <button id="del-acct-button">Delete Account</button>
   </form>
 </div>
 

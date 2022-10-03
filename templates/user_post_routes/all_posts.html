@@ -5,11 +5,11 @@
 
 <div>
   <h1 class = "pg-header"> Camphub User Posts</h1>
-  <div id = "user-post-routing">
-  <a href="/create/post/{{g.user.id}}" class = "route-option">Create a Post</a>
-  <br>
-  <a href="/wordpress/articles/all" class = "route-option">View Wordpress Posts</a>
-</div>
+    <div id = "user-post-routing">
+      <a href="/create/post/{{g.user.id}}" class = "route-option">Create a Post</a>
+      <br>
+      <a href="/wordpress/articles/all" class = "route-option">View Wordpress Posts</a>
+    </div>
 
 {%if all_posts%}
 {% for post in all_posts%}
@@ -18,56 +18,54 @@
   <h2><a href="/view/camphub/{{post.id}}">Post: {{post.title}}</a></h2>
 
   {% if g.user.id == post.author_id%}
-  <form action="/camphub/edit/post/{{post.id}}", method = "get">
-    <button class = "edit-button"> Edit Post</button>
-  </form>
+
+    <form action="/camphub/edit/post/{{post.id}}", method = "get">
+      <button class = "edit-button"> Edit Post</button>
+    </form>
 
 
-  <form
+    <form
         action="/camphub/delete/post/{{post.id}}"
         method="post"
       >
         <button class="delete-button">
           Delete Post <i class="fa fa-trash" aria-hidden="true"></i>
         </button>
-      </form>
+    </form>
 
   
   {%endif%}
 
 
-  <p><small>Published by: {{post.users.username}} on {{post.date_time}}</small></p>
+    <p><small>Published by: {{post.users.username}} on {{post.date_time}}</small></p>
   
   
-  <blockquote>{{post.content}}</blockquote>
+      <blockquote>{{post.content}}</blockquote>
   
   <!-- ON USER POST, NOT MODERATOR POST -->
-  <div class = "post-route-options">
-  <a href="/create/comment/{{post.id}}/{{g.user.id}}" class = "post-option">Add Comment</a>
-  <a href="/view/camphub/{{post.id}}", class = "post-option">See Comments</a>
-  </div>
-</div>
+    <div class = "post-route-options">
+      <a href="/create/comment/{{post.id}}/{{g.user.id}}" class = "post-option">Add Comment</a>
+      <a href="/view/camphub/{{post.id}}", class = "post-option">See Comments</a>
+    </div>  
+
+
+    </div>
 
 
 {%endfor%}
 
 
-<!-- {{author_name}} -->
+{%else%}
 
-
-
-
-  {%else%}
   <div class = "user-post">
-  <h2>No posts yet!</h2>
+    <h2>No posts yet!</h2>
   </div>
-  {%endif%}
+
+{%endif%}
 
 
 </div>
-  <!-- not auth user -->
-  
+
 
   <!-- do not touch below -->
   {%endblock%}
-</div>

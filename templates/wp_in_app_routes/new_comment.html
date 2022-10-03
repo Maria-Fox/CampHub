@@ -27,7 +27,10 @@
   {{field}} 
   
   {%for error in field.errors%}
-  {{error}}{%endfor%} {%endfor%}
+  {{error}}
+  {%endfor%}
+  
+  {%endfor%}
   <button type="submit" class ="comment-button">Post</button>
 </form>
 

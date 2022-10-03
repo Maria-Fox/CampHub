@@ -7,6 +7,7 @@
 
 <div id = "chosen-article">
   <p><small> Published by: {{article.author.nice_name}} on {{article.date}}</small>
+
 <br>
   <a href="{{article.URL}}">Link to Webpress Article</a></p>
   <br>
@@ -15,7 +16,7 @@
     {{article.content|safe}}
   </blockquote>
   
-  </div>
+</div>
 
 <div>
 
@@ -27,7 +28,11 @@
   {{field}} 
   
   {%for error in field.errors%}
-  {{error}}{%endfor%} {%endfor%}
+  {{error}}
+  {%endfor%} 
+  
+  {%endfor%}
+
   <button type="submit" class ="comment-button">Post</button>
 </form>
 
@@ -35,8 +40,7 @@
 
 <a href="/wordpress/articles/all">Return to Worpress Articles</a>
 
-</div>
+
 
   <!-- do not touch below -->
   {%endblock%}
-</div>

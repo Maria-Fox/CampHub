@@ -469,7 +469,7 @@ def edit_user_post(post_id):
     if form.validate_on_submit():
         try:
             post.title = form.title.data
-            content = form.content.data
+            post.content = form.content.data
 
             db.session.add(post)
             db.session.commit()
@@ -573,7 +573,7 @@ def edit_camphub_comment(post_id, comment_id):
     if form.validate_on_submit():
         try:
         
-            comment.Camphub_Comment = form.content.data
+            comment.content = form.content.data
 
             db.session.add(comment)
             db.session.commit()

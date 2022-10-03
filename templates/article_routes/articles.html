@@ -1,42 +1,45 @@
 {%extends "base.html"%} {%block title %} <title>Articles</title> {%endblock%}
 <!-- page content here -->
 
-{%block content%} 
-<h1 class = "pg-header">Wordpress Articles</h1>
+{%block content%}
+<h1 class="pg-header">Wordpress Articles</h1>
 
-{% if articles%}
-{% for article in articles%}
-<div class = "wp-article">  
-  <h1 class = "article-title">{{article.title}}</h1>
-  <p><small>Published by: {{article.author.nice_name}} on {{article.modified}}</small></p>
-  
-  
+{% if articles%} {% for article in articles%}
+<div class="wp-article">
+  <h1 class="article-title">{{article.title}}</h1>
+  <p>
+    <small
+      >Published by: {{article.author.nice_name}} on {{article.modified}}</small
+    >
+  </p>
+
   <a href="{{article.short_URL}}">Link to Worpress Article</a>
-  
+
   <blockquote>{{article.content|safe}}</blockquote>
 
-
-  <div class = "article-option-div">
-  <a href="/create/comment/{{article.ID}}" class = "art-option">Add CampHub Comment</a>
-  <a href="https://wordpress.com/home/camphub2022" target = "_blank" class = "art-option">Add WordPress Comment</a>
-  <a href="/wordpress/camphub/article/{{article.ID}}" class = "art-option">See All Comments</a>
-</div>
-</div>
-  {%endfor %}
-
-
-
-  {% else %}
-  <h1>No posts, yet!</h1>
-  <a href="/create/comment/{{article.id}}">Make a Camphub Comment</a>
-
-  {% endif%}
-  
-  <br>
-  <!-- <a href="/wordpress/comments">ALL WordPress Comments</a> -->
+  <div class="article-option-div">
+    <a href="/create/comment/{{article.ID}}" class="art-option"
+      >Add CampHub Comment</a
+    >
+    <a
+      href="https://wordpress.com/home/camphub2022"
+      target="_blank"
+      class="art-option"
+      >Add WordPress Comment</a
+    >
+    <a href="/wordpress/camphub/article/{{article.ID}}" class="art-option"
+      >See All Comments</a
+    >
   </div>
 </div>
+{%endfor %}
 
-  <!-- do not touch below -->
-  {%endblock%}
+{% else %}
+<div class="wp-article">
+  <h1>No posts, yet!</h1>
+    <a href="/create/post/{{g.user.id}}">Make a Camphub Post</a>
 </div>
+{% endif%}
+
+<!-- do not touch below -->
+{%endblock%}

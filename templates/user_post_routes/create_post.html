@@ -1,28 +1,29 @@
 {%extends "base.html"%} {%block title %} <title>Create Post</title> {%endblock%}
 <!-- page content here -->
 
-{%block content%} 
+{%block content%}
 
+<h1 class="pg-header">Create a New Post</h1>
 
-<h1 class = "pg-header" >Create a New Post</h1>
-<div id = "create-post-div">
-<form action = "/create/post/{{g.user.id}}" method="post" id = "post-form">
+  <div id="create-post-div">
+    
+    <form action="/create/post/{{g.user.id}}" method="post" id="post-form">
+      {{form.hidden_tag()}} 
 
-  {{form.hidden_tag()}} 
-  {%for field in form if field.widget.input_type != 'hidden'%}
-  {{field.label (class = "post-field")}} 
-  {{field}} 
-  
-  {%for error in field.errors%}
-  {{error}}{%endfor%} {%endfor%}
-  <button type="submit" id = "new-post-button">Post</button>
-</form>
+      {%for field in form if field.widget.input_type !='hidden'%} 
+      
+      {{field.label (class = "post-field")}} 
+      {{field}} 
 
+      {%for error in field.errors%} 
+      {{error}} 
+      {%endfor%} 
+      
+      {%endfor%}
+
+      <button type="submit" id="new-post-button">Post</button>
+    </form>
 </div>
 
-</div>
-
-
-  <!-- do not touch below -->
-  {%endblock%}
-</div>
+<!-- do not touch below -->
+{%endblock%}

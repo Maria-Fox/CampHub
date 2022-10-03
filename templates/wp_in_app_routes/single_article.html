@@ -17,14 +17,15 @@
   <div class="article-option-div">
     <a href="/create/comment/{{article.ID}}" class="art-option">Add Comment</a>
     <a href="https://wordpress.com/home/camphub2022" class="art-option"
-      >Make a Wordpress Comment</a
-    >
+      >Make a Wordpress Comment</a>
   </div>
 </div>
 
 <div>
   <h1 class="type-of-comment">WordPress Comments</h1>
-  {% if replies %} {% for rep in replies%}
+  {% if replies %} 
+  {% for rep in replies%}
+
   <div class="wordpress-comments">
     <p>
       <small>Published by: {{rep.author.name}} </small>
@@ -33,7 +34,9 @@
     </p>
     <blockquote>{{rep.raw_content|safe}}</blockquote>
   </div>
-  {% endfor %} {%else%}
+  {% endfor %} 
+  
+  {%else%}
 
   <div class="wordpress-comments">
     <h2>No Wordpress comments, yet!</h2>
@@ -45,7 +48,6 @@
   <h2 class="type-of-comment">CampHub Comments</h2>
 
 
-  
     {% if user_comments_on_WP_article%} {% for comment in
     user_comments_on_WP_article %}
     <div class = "ch-comments">
@@ -80,7 +82,9 @@
 
 
   </div>
-  {%endfor%} {% else %}
+  {%endfor%} 
+
+  {% else %}
 
   <div class="ch-comments">
     <h1>No CampHub comments, yet!</h1>
@@ -92,9 +96,9 @@
   </div>
 
   {% endif %}
-  <!-- </div> -->
+</div>
+
+
   <!-- do not touch below -->
-</div>
-</div>
   {%endblock%}
 

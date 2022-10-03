@@ -3,17 +3,23 @@
 
 {%block content%}
 
-<!--  -->
-
 <h1 class="pg-header">Join CampHub</h1>
 
 <div id="register-form-div">
   <form action="/signup" , method="post" id="reg-form">
-    <!--come back and style the form - leaving to work on functionality for now  -->
 
-    {{form.hidden_tag()}} {%for field in form if field.widget.input_type !=
-    'hidden'%} {{field.label(class = "field-label")}} {{field}} {%for error in
-    field.errors%} {{error}} {%endfor%} {%endfor%}
+    {{form.hidden_tag()}}
+
+    {%for field in form if field.widget.input_type !='hidden'%} 
+
+    {{field.label(class = "field-label")}}
+    {{field}} 
+
+    {%for error in field.errors%} 
+    {{error}}
+    {%endfor%}
+    
+    {%endfor%}
 
     <button type="submit" class="user-cred-button">Create Account</button>
   </form>

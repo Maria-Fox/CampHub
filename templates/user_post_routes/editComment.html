@@ -23,11 +23,16 @@
   {{field}} 
   
   {%for error in field.errors%}
-  {{error}}{%endfor%} {%endfor%}
+  {{error}}
+  {%endfor%} 
+  
+  {%endfor%}
+
   <button type="submit" class = "comment-button">Update</button>
 </form>
 
 </div>
+
 <a href="">Cancel</a>
 <a href="/camphub/users/posts">Users Posts</a>
 

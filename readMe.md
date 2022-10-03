@@ -15,12 +15,12 @@ Designed to assist prospectice and current bootcamp students in navigating the b
 
 4 - Should a user want to discuss a topic, but perhaps unsure/ uncomfortable of posting the discussion topic under their account they may "Suggest a Topic." This is logged in the db and the CampHub WordPress moderator can then review and post under the main account for user discussion. 
 
-To read more about the "why" of CampHub please visit [CampHub] (https://visit-camphub.herokuapp.com/camphub/breakdown). As this was a passion project, I am confident additional features will be added. 
+To read more about the "why" of CampHub please visit [CampHub](https://visit-camphub.herokuapp.com/camphub/breakdown). As this was a passion project, I am confident additional features will be added. 
 
 
 Standard User Flow:
 
-Upon visiting [CampHub] (https://visit-camphub.herokuapp.com/camphub) a user is greeted with a few options -  
+Upon visiting [CampHub](https://visit-camphub.herokuapp.com/camphub) a user is greeted with a few options -  
     1 - Learning about CampHub 
     2 - Creating an Account 
     3 - Logging In
@@ -42,7 +42,7 @@ Upon visiting [CampHub] (https://visit-camphub.herokuapp.com/camphub) a user is 
 
 API
 
-CampHub is interacting with [WordPress] (https://developer.wordpress.com/docs/api/), a REST API. I am also the CampHub WordPress creator/moderator which better allows me to quickly approve and render WordPress comments. 
+CampHub is interacting with [WordPress](https://developer.wordpress.com/docs/api/), a REST API. I am also the CampHub WordPress creator/moderator which better allows me to quickly approve and render WordPress comments. 
 
 
 Tech Stack

@@ -1,6 +1,6 @@
 CampHub, the first website to host a live environemnt for technical Bootcamp students to connect. 
 
-[Visit CampHub] (https://visit-camphub.herokuapp.com/camphub)
+[Visit CampHub](https://visit-camphub.herokuapp.com/camphub)
 
 
 Introduction/ Functionality

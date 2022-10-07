@@ -14,7 +14,7 @@
   </div>
 
 
-<form action = "/create/comment/{{post.id}}/{{g.user.id}}" method="post"  id = "new-ch-comment-form" >
+<form action = "/camphub/create/comment/{{post.id}}/{{g.user.id}}" method="post"  id = "new-ch-comment-form" >
 
   {{form.hidden_tag()}} 
   {%for field in form if field.widget.input_type != 'hidden'%}

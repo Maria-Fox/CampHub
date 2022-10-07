@@ -22,7 +22,7 @@
 }
 
 .user-cred-button:hover {
-  background-color: #2e5563;
+  background-color: #004679;
   color: whitesmoke;
 }
 
@@ -57,8 +57,9 @@
 
 /* editProfile.html */
 
+.user-profile-div,
 #profile-button:hover {
-  background-color: #2e5563;
+  background-color: #004679;
   color: whitesmoke;
 }
 
@@ -79,3 +80,4 @@
   background-color: #cc0e0edc;
   color: whitesmoke;
 }
+

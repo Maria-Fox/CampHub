@@ -8,16 +8,20 @@
 <div class="wp-article">
   <p>
     <small>
-      Published by: {{article.author.nice_name}} on {{article.date}}</small
-    >
+      Published by: {{article.author.nice_name}} on {{article.date}}
+    </small>
   </p>
-  <a href="{{article.URL}}">Link to Webpress Article</a>
-  <blockquote>{{article.content}}</blockquote>
+  <p>
+      <a href="{{article.URL}}">Link to Webpress Article</a>
+  </p>
+  
+  <blockquote>{{article.content|safe}}</blockquote>
 
   <div class="article-option-div">
-    <a href="/create/comment/{{article.ID}}" class="art-option">Add Comment</a>
-    <a href="https://wordpress.com/home/camphub2022" class="art-option"
+    <a href="/camphub/create/comment/{{article.ID}}" class="art-option">Add Comment</a>
+    <a href="https://wordpress.com/camphub/home/camphub2022" class="art-option"
       >Make a Wordpress Comment</a>
+      <a href="/wordpress/articles/all" class="art-option">All WordPress Articles</a>
   </div>
 </div>
 
@@ -28,11 +32,11 @@
 
   <div class="wordpress-comments">
     <p>
-      <small>Published by: {{rep.author.name}} </small>
+      <small>Published by: {{rep.author.name}}</small>
       <br />
       <small>Date and Time Published: {{rep.date}}</small>
     </p>
-    <blockquote>{{rep.raw_content|safe}}</blockquote>
+    <blockquote>{{rep.content|safe}}</blockquote>
   </div>
   {% endfor %} 
   
@@ -48,15 +52,39 @@
   <h2 class="type-of-comment">CampHub Comments</h2>
 
 
-    {% if user_comments_on_WP_article%} {% for comment in
-    user_comments_on_WP_article %}
+    {% if user_comments_on_WP_article%} 
+    
+    {% for comment in user_comments_on_WP_article %}
     <div class = "ch-comments">
 
       <p>
-        <small>Published by: {{comment.users.username}}</small>
+        <small>Published by: 
+          <a href="/camphub/{{comment.user_id}}/profile">{{comment.users.username}}</a>
+          </small>
         <br />
         <small>Date and Time Published: {{comment.date_time}}</small>
       </p>
+
+      <!-- If NOT comment creator render like/unlike options -->
+      {% if g.user.id != comment.user_id%}
+
+      {% if comment in g.user.ch_article_comment_likes %}
+      <form action = "/wordpress/{{g.user.id}}/update/{{comment.id}}/like" method = "POST" >
+        <button class = "my-1 bg-transparent border-0" type = "submit" method = "POST"> 
+          <i class="fa-solid fa-heart"></i>
+        </button>
+
+    </form>
+
+      {% else %}
+
+      <form action = "/wordpress/{{g.user.id}}/update/{{comment.id}}/like" method = "POST" >
+        <button class = "my-1 bg-transparent border-0" type = "submit"> 
+          <i class="fa-regular fa-heart"></i>
+        </button>
+    </form>
+    {% endif %}
+    {%endif%}      
 
     <blockquote>{{comment.user_comment}}</blockquote>
 
@@ -89,7 +117,7 @@
   <div class="ch-comments">
     <h1>No CampHub comments, yet!</h1>
     <div class="article-option-div">
-      <a href="/create/comment/{{article.ID}}" class="art-option"
+      <a href="/camphub/create/comment/{{article.ID}}" class="art-option"
         >Add Comment</a
       >
     </div>

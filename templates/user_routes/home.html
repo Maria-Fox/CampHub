@@ -1,35 +1,33 @@
 {%extends "base.html"%} {%block title %} 
 <link rel="stylesheet" href="/static/home.css" />
-
-
-<title>Home</title> {%endblock%}
-<!-- page content here -->
+  <title>Home</title> 
+{%endblock%}
 
 {%block content%}
 <!--  -->
 
 <h1 class="pg-header">What would you like to do?</h1>
 <div id="user-options">
-  <div class="option-div">
+  <div class="option-div my-4">
     <a href="/wordpress/articles/all"><button id="option">View WordPress Articles</button></a>
   </div>
-  <div class="option-div">
+  <div class="option-div  my-4">
     <a href="/camphub/users/posts"><button id="option">View CampHub User Posts</button></a>
   </div>
-  <div class="option-div">
+  <div class="option-div my-4">
     <a href="/create/post/{{g.user.id}}"><button id="option">Create Post</button></a>
   </div>
-  <div class="option-div">
+  <div class="option-div  my-4">
     <a href="/suggest/topic/{{g.user.id}}"><button id="option">Suggest a Topic</button></a>
   </div>
-  <div class="option-div">
+  <div class="option-div  my-4">
       <a href="/edit/profile/{{g.user.id}}"><button id="option">Update Profile</button></a>
   </div>
-    <div class="option-div">
+    <div class="option-div  my-4">
       <a href="/camphub/direction"><button id="option">Need Directions?</button></a>
     </div>
   </div>
 
   <!-- do not touch below -->
   {%endblock%}
-</div>
+

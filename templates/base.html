@@ -43,7 +43,7 @@
   <body>
     <!-- for all pages -->
 
-    <nav class="navbar navbar-expand py-0" id="nav-area">
+    <nav class="navbar navbar-expand py-0 shadow" id="nav-area">
       <div class="container-fluid">
         <div class="navbar-header">
           <a href="/" id="logo" class="navbar-brand nav-text nav-link"
@@ -68,10 +68,13 @@
 
           <ul class="navbar-nav">
             <li>
-              <a class="nav-text nav-link" href="/home/{{g.user.id}}">Home</a>
+              <a class="nav-text nav-link" href="/camphub/home/{{g.user.id}}">Home</a>
             </li>
             <li>
-              <a class="nav-text nav-link" href="/edit/profile/{{g.user.id}}"
+              <a class="nav-text nav-link" href="/camphub/{{g.user.id}}/view/users">All Users</a>
+            </li>
+            <li>
+              <a class="nav-text nav-link" href="/camphub/{{g.user.id}}/profile"
                 >Profile
               </a>
             </li>

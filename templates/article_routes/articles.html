@@ -5,7 +5,7 @@
 <h1 class="pg-header">Wordpress Articles</h1>
 
 {% if articles%} {% for article in articles%}
-<div class="wp-article">
+<div class="wp-article shadow">
   <h1 class="article-title">{{article.title}}</h1>
   <p>
     <small
@@ -14,15 +14,17 @@
   </p>
 
   <a href="{{article.short_URL}}">Link to Worpress Article</a>
+  <br>
+  <br>
 
   <blockquote>{{article.content|safe}}</blockquote>
 
   <div class="article-option-div">
-    <a href="/create/comment/{{article.ID}}" class="art-option"
+    <a href="/camphub/create/comment/{{article.ID}}" class="art-option"
       >Add CampHub Comment</a
     >
     <a
-      href="https://wordpress.com/home/camphub2022"
+      href="https://wordpress.com/camphub/home/camphub2022"
       target="_blank"
       class="art-option"
       >Add WordPress Comment</a

@@ -19,7 +19,7 @@ app.config['ETF_CSRF_ENABLED'] = False
 app.config["TESTING"] = True
 
 class CamphubUserCommentRoutes(TestCase):
-    '''Test camphub comment model. '''
+    '''Test user post comment views. '''
 
     def setUp(self):
         """Create test client, add sample data."""
@@ -27,28 +27,34 @@ class CamphubUserCommentRoutes(TestCase):
         db.drop_all()
         db.create_all()
 
+        db.drop_all()
+        db.create_all()
+
         user1 = User.register(
-            username = "user1",
+            username= "user1",
             password = "password1",
             school_name = "Springboard",
-            field_of_study = "Software Engineering"
+            field_of_study = "Software Engineering",
+            bio = "This is a test bio for user1",
+            profile_image_url = "https://images.unsplash.com/photo-1509515837298-2c67a3933321?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8bmlnaHQlMjBza3V8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60"
         )
 
         user1.id = 888
 
-        user2 = User.register(username = "user2",
+        user2 = User.register(username= "user2",
             password = "password2",
             school_name = "Springboard",
-            field_of_study = "UX Design"
+            field_of_study = "UX Design",
+            bio = "Bio for user2",
+            profile_image_url = "https://images.unsplash.com/photo-1509515837298-2c67a3933321?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8bmlnaHQlMjBza3V8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60"
         )
 
         user2.id = 999
 
-        db.session.add_all([user1, user2])
         db.session.commit()
 
-        self.user1 = user1
-        self.user2 = user2
+        self.user1= user1
+        self.user2= user2
 
         self.client = app.test_client()
 
@@ -73,7 +79,7 @@ class CamphubUserCommentRoutes(TestCase):
             db.session.add(first_post)
             db.session.commit()
 
-            resp = c.get(f"/create/comment/{first_post.id}/{self.user1.id}")
+            resp = c.get(f"/camphub/create/comment/{first_post.id}/{self.user1.id}")
 
             html = resp.get_data(as_text = True)
 
@@ -98,7 +104,7 @@ class CamphubUserCommentRoutes(TestCase):
             db.session.add(first_post)
             db.session.commit()
 
-            resp = c.post(f"/create/comment/{first_post.id}/{self.user1.id}", data = {"comment_user_id": self.user1.id, "camphub_post_id": first_post.id, "content" : "The first comment to be tested."}, follow_redirects = True)
+            resp = c.post(f"/camphub/create/comment/{first_post.id}/{self.user1.id}", data = {"comment_user_id": self.user1.id, "camphub_post_id": first_post.id, "content" : "The first comment to be tested."}, follow_redirects = True)
 
             html = resp.get_data(as_text = True)
 
@@ -121,7 +127,7 @@ class CamphubUserCommentRoutes(TestCase):
                 sess[CURR_USER_KEY] = self.user1.id
 
             # post_id/ user_id - neither exist
-            resp = c.post(f"/create/comment/899/8462", follow_redirects = True)
+            resp = c.post(f"/camphub/create/comment/899/8462", follow_redirects = True)
 
             html = resp.get_data(as_text = True)
 
@@ -139,7 +145,7 @@ class CamphubUserCommentRoutes(TestCase):
             with c.session_transaction() as sess:
                 sess[CURR_USER_KEY] = self.user1.id
 
-            resp = c.post(f"/create/comment/8956/{self.user1.id}", follow_redirects = True)
+            resp = c.post(f"/camphub/create/comment/8956/{self.user1.id}", follow_redirects = True)
 
             html = resp.get_data(as_text = True)
 
@@ -155,7 +161,7 @@ class CamphubUserCommentRoutes(TestCase):
         with self.client as c:
     
             # post with id: 999 does not exist
-            resp = c.post(f"/create/comment/789/{self.user1.id}", follow_redirects = True)
+            resp = c.post(f"/camphub/create/comment/789/{self.user1.id}", follow_redirects = True)
 
             html = resp.get_data(as_text = True)
 

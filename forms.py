@@ -1,3 +1,4 @@
+from logging import PlaceHolder
 from wsgiref.validate import validator
 from flask_wtf import FlaskForm
 from wtforms import Form, StringField, PasswordField, URLField, TextAreaField
@@ -8,21 +9,26 @@ class Signup_Form (FlaskForm):
 
     username = StringField("Username", validators = [InputRequired(), Length(min = 4, max=20)])
     password = PasswordField("Password", validators=[InputRequired(), Length(min=6)])
-    school_name = StringField("Bootcamp Name", validators = [InputRequired()])
-    field_of_study = StringField("Field of Study", validators = [InputRequired()])
+    school_name = StringField("Bootcamp", validators = [InputRequired()])
+    field_of_study = StringField("Field of Study", render_kw = {"placeholder": "Software Engineering"}, validators = [InputRequired()])
+    bio = TextAreaField("Bio", render_kw={"placeholder": "Optional - I am a full-time software engineering student."}, validators=[Optional()])
+    profile_image_url = StringField("Profile Image Url", render_kw = {"placeholder": "Optional"}, validators = [Optional()])
+
 
 class Login_Form (FlaskForm):
     '''Form to authenticate existing user.'''
 
-    username = StringField("Create a username", validators = [InputRequired(), Length(max=20)])
+    username = StringField("Username", validators = [InputRequired(), Length(max=20)])
     password = PasswordField('Password', validators=[InputRequired(), Length(min=5)])
 
 class Edit_Profile_form(FlaskForm):
     '''Allow authroize duser to edit profile details.'''
 
     username = StringField("Update Username", validators = [InputRequired(), Length(max=20)])
-    school_name = StringField("Bootcamp Name", validators = [InputRequired()])
+    school_name = StringField("Bootcamp", validators = [InputRequired()])
     field_of_study = StringField("Field of Study", validators = [InputRequired()])
+    bio = TextAreaField("Bio", validators=[Optional()])
+    profile_image_url = StringField("Profile Image Url", validators=[Optional()])
     password = PasswordField("Enter your password to verify changes", validators = [InputRequired()])
     
 

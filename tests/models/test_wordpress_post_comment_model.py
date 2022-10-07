@@ -30,7 +30,9 @@ class CamphubWordpressPostComment(TestCase):
             username= "user1",
             password = "password1",
             school_name = "Springboard",
-            field_of_study = "Software Engineering"
+            field_of_study = "Software Engineering",
+            bio = "This is a test bio for user1",
+            profile_image_url = "https://images.unsplash.com/photo-1509515837298-2c67a3933321?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8bmlnaHQlMjBza3V8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60"
         )
 
         u1.id = 888
@@ -38,17 +40,18 @@ class CamphubWordpressPostComment(TestCase):
         u2 = User.register(username= "user2",
             password = "password2",
             school_name = "Springboard",
-            field_of_study = "UX Design"
+            field_of_study = "UX Design",
+            bio = "Bio for user2",
+            profile_image_url = "https://images.unsplash.com/photo-1509515837298-2c67a3933321?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8bmlnaHQlMjBza3V8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60"
         )
+
 
         u2.id = 999
 
         db.session.commit()
-        # u1 = User.query.get(u1.id)
-        # u2 = User.query.get(u2.id)
 
-        self.u1 = u1
-        self.u2 = u2
+        self.u1= u1
+        self.u2= u2
         self.article_id = 8
 
         self.client = app.test_client()
@@ -63,7 +66,7 @@ class CamphubWordpressPostComment(TestCase):
     def test_create_wp_post_comment(self):
         '''Test creating a wordpress_post_comment instance with all input.'''
 
-        test_user_comment = Wordpress_Post_Comment(user_id = self.u1.id, wordpress_article_id = self.article_id, user_comment = "This would be a valid comment under the article w/ id: 8." )
+        test_user_comment = Wordpress_Post_Comment(user_id = self.u1.id, wordpress_article_id = self.article_id, user_comment = "This would be a valid comment under the article w/ id: 8.")
 
         test_user_comment.id = 852
 

@@ -20,7 +20,9 @@ class UserModelTestCase(TestCase):
             username = "user1",
             password = "password1",
             school_name = "Springboard",
-            field_of_study = "Software Engineering"
+            field_of_study = "Software Engineering",
+            bio = "This is a test bio for user1",
+            profile_image_url = "https://images.unsplash.com/photo-1509515837298-2c67a3933321?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8bmlnaHQlMjBza3V8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60"
         )
 
         u1.id = 888
@@ -28,7 +30,8 @@ class UserModelTestCase(TestCase):
         u2 = User.register(username = "user2",
             password = "password2",
             school_name = "Springboard",
-            field_of_study = "UX Design"
+            field_of_study = "UX Design",bio = "This is a test bio for user1",
+            profile_image_url = "https://images.unsplash.com/photo-1509515837298-2c67a3933321?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8bmlnaHQlMjBza3V8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60"
         )
 
         u2.id = 999

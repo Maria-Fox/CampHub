@@ -20,14 +20,14 @@
   border: 1px solid whitesmoke;
   border-radius: 3px;
   padding: 10px;
-  background-color: #2e5563;
+  background-color: #004679;
 }
 
 .user-post {
   border: 1px solid whitesmoke;
   border-radius: 3px;
   padding: 10px;
-  background-color: #2e5563;
+  background-color: #004679;
   margin-bottom: 10%;
 }
 
@@ -85,7 +85,7 @@
 }
 
 #new-post-button:hover {
-  background-color: #2e5563;
+  background-color: #004679;
   color: whitesmoke;
 }
 
@@ -96,7 +96,7 @@
   border: 1px solid whitesmoke;
   border-radius: 3px;
   padding: 10px;
-  background-color: #2e5563;
+  background-color: #004679;
 }
 
 #new-ch-comment-form {
@@ -106,7 +106,6 @@
   font-size: 20px;
   border: 2px solid whitesmoke;
   border-radius: 3px;
-  /* background-color: #2e5563; */
 }
 
 /* /user_post_routes/single_post.html */
@@ -121,30 +120,13 @@
   border: 1px solid whitesmoke;
   border-radius: 3px;
   padding: 10px;
-  background-color: #2e5563;
+  background-color: #004679;
   margin-bottom: 10%;
 }
 
-/* .delete-ch-comment {
-  float: right;
-  right: 1%;
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  overflow: hidden;
-  outline: none;
-  color: whitesmoke;
-} */
 
-/* differences.html */
-
-#diff-header {
-  font-size: 30px;
-  margin-top: 60px;
-  text-align: center;
-}
-
-#suggest-ch-article-form {
+.pending-suggestion,
+.suggest-ch-article-form {
   margin: 0;
   bottom: 40%;
   left: 50%;
@@ -171,4 +153,24 @@
   overflow: hidden;
   outline: none;
   color: whitesmoke;
+}
+
+#see-suggestions{
+  background-color: whitesmoke;
+  color:  #004679;
+  display: flex;
+  /* justify-content: center;
+  align-items: center; */
+  margin: auto;
+}
+
+.suggest-article{
+  background-color: whitesmoke;
+  color:  #004679;
+  width: 100%;
+}
+
+.suggest-article:hover{
+  background-color: #004679;
+  color:  whitesmoke
 }

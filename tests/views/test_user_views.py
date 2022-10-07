@@ -26,29 +26,35 @@ class CamphubUserRoutes(TestCase):
         db.drop_all()
         db.create_all()
 
+        db.drop_all()
+        db.create_all()
+
         user1 = User.register(
-            username = "user1",
+            username= "user1",
             password = "password1",
             school_name = "Springboard",
-            field_of_study = "Software Engineering"
+            field_of_study = "Software Engineering",
+            bio = "This is a test bio for user1",
+            profile_image_url = "https://images.unsplash.com/photo-1509515837298-2c67a3933321?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8bmlnaHQlMjBza3V8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60"
         )
 
         user1.id = 888
 
-        user2 = User.register(username = "user2",
+        user2 = User.register(username= "user2",
             password = "password2",
             school_name = "Springboard",
-            field_of_study = "UX Design"
+            field_of_study = "UX Design",
+            bio = "Bio for user2",
+            profile_image_url = "https://images.unsplash.com/photo-1509515837298-2c67a3933321?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8bmlnaHQlMjBza3V8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60"
         )
+
 
         user2.id = 999
 
         db.session.commit()
-        # u1 = User.query.get(u1.id)
-        # u2 = User.query.get(u2.id)
 
-        self.user1 = user1
-        self.user2 = user2
+        self.user1= user1
+        self.user2= user2
 
         self.client = app.test_client()
 
@@ -151,7 +157,7 @@ class CamphubUserRoutes(TestCase):
             with c.session_transaction() as sess:
                 sess[CURR_USER_KEY] = self.user1.id
 
-            resp = c.get(f"/home/{self.user1.id}")
+            resp = c.get(f"/camphub/home/{self.user1.id}")
 
             html = resp.get_data(as_text = True)
 
@@ -167,7 +173,7 @@ class CamphubUserRoutes(TestCase):
 
         with self.client as c:
 
-            resp = c.get(f"/home/{self.user1.id}", follow_redirects = True)
+            resp = c.get(f"/camphub/home/{self.user1.id}", follow_redirects = True)
 
             html = resp.get_data(as_text = True)
 
@@ -185,7 +191,7 @@ class CamphubUserRoutes(TestCase):
             with c.session_transaction() as sess:
                 sess[CURR_USER_KEY] = self.user1.id
 
-            resp = c.get(f"/edit/profile/{self.user1.id}")
+            resp = c.get(f"/camphub/edit/profile/{self.user1.id}")
 
             html = resp.get_data(as_text = True)
 
@@ -202,13 +208,17 @@ class CamphubUserRoutes(TestCase):
             with c.session_transaction() as sess:
                 sess[CURR_USER_KEY] = self.user1.id
 
-            resp = c.post(f"/edit/profile/{self. user1.id}", data = {"username": "updatedUser1", "school_name": "Springboard", "field_of_study": "Software Dev", "password": self.user1.password}, follow_redirects = True)
+            resp = c.post(f"/camphub/edit/profile/{self. user1.id}", 
+                data = {"username": "updatedUser1", 
+                "school_name": "Springboard", 
+                "field_of_study": "Software Dev", 
+                "bio": "Updated bio", 
+                "profile_image_url": "this would be a url", 
+                "password": {self.user1.password}}, follow_redirects = True)
 
             html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
-            # self.assertIn('<h2>Need some direction?</h2>', html)
-
 
     #      #      #      #      #      #      #      #      #      #  
 

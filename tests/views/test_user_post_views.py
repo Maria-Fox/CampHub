@@ -18,7 +18,7 @@ app.config['ETF_CSRF_ENABLED'] = False
 app.config["TESTING"] = True
 
 class CamphubUserPostRoutes(TestCase):
-    '''Test camphub comment model. '''
+    '''Test user post views. '''
 
     def setUp(self):
         """Create test client, add sample data."""
@@ -26,33 +26,34 @@ class CamphubUserPostRoutes(TestCase):
         db.drop_all()
         db.create_all()
 
+        db.drop_all()
+        db.create_all()
+
         user1 = User.register(
-            username = "user1",
+            username= "user1",
             password = "password1",
             school_name = "Springboard",
-            field_of_study = "Software Engineering"
+            field_of_study = "Software Engineering",
+            bio = "This is a test bio for user1",
+            profile_image_url = "https://images.unsplash.com/photo-1509515837298-2c67a3933321?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8bmlnaHQlMjBza3V8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60"
         )
 
         user1.id = 888
 
-        user2 = User.register(username = "user2",
+        user2 = User.register(username= "user2",
             password = "password2",
             school_name = "Springboard",
-            field_of_study = "UX Design"
+            field_of_study = "UX Design",
+            bio = "Bio for user2",
+            profile_image_url = "https://images.unsplash.com/photo-1509515837298-2c67a3933321?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8bmlnaHQlMjBza3V8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60"
         )
 
         user2.id = 999
 
-        # first_post = Camphub_User_Post(author_id = 888, title = "First Post Made", content = "This is where the content would show.")
-
-        # first_post.id = 111
-
-        db.session.add_all([user1, user2])
         db.session.commit()
 
-        self.user1 = user1
-        self.user2 = user2
-        # self.first_post = first_post
+        self.user1= user1
+        self.user2= user2
 
         self.client = app.test_client()
 
@@ -109,7 +110,7 @@ class CamphubUserPostRoutes(TestCase):
             db.session.add(first_post)
             db.session.commit()
 
-            resp = c.get(f"/view/camphub/{first_post.id}", follow_redirects = True)
+            resp = c.get(f"/camphub/view/{first_post.id}", follow_redirects = True)
 
             html = resp.get_data(as_text = True)
 

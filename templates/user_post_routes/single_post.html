@@ -6,7 +6,10 @@
 <div>
   <h1 class = "pg-header">{{post.title}}</h1>
   <div class = "user-post">
-      <p><small>Published by: {{post.users.username}} on {{post.date_time}}</small></p>
+      <p><small>Published by: 
+        <a href="/camphub/{{post.author_id}}/profile">
+        {{post.users.username}}
+        </a> on {{post.date_time}}</small></p>
 
       {% if g.user.id == post.author_id%}
 
@@ -15,35 +18,83 @@
       </form>
 
       <form action="/camphub/delete/post/{{post.id}}" method="post">
-        <button class="delete-button" >Delete Post <i class="fa fa-trash" aria-hidden="true"></i></button>
+        <button class="delete-button my-1" >Delete Post <i class="fa fa-trash" aria-hidden="true"></i></button>
       </form>
 
       {%endif%}
 
+        <!-- If NOT post creator render like/unlike options -->
+        {% if g.user.id != post.author_id%}
+
+        {% if post in g.user.ch_post_likes %}
+        <form action = "/camphub/{{g.user.id}}/update/{{post.id}}/like" method = "POST" >
+          <button class = "my-1 bg-transparent border-0" type = "submit" method = "POST"> 
+            <i class="fa-solid fa-heart"></i>
+          </button>
+
+      </form>
+
+        {% else %}
+
+        <form action = "/camphub/{{g.user.id}}/update/{{post.id}}/like" method = "POST" >
+          <button class = "my-1 bg-transparent border-0" type = "submit"> 
+            <i class="fa-regular fa-heart"></i>
+          </button>
+      </form>
+    {% endif %}
+    {%endif%}
+
+
       <blockquote>{{post.content}}</blockquote>
 
       <div class = "post-route-options">
-        <a href="/create/comment/{{post.id}}/{{g.user.id}}" class = "post-option">Add Comment</a>
+        <a href="/camphub/create/comment/{{post.id}}/{{g.user.id}}" class = "post-option">Add Comment</a>
         <a href="/camphub/users/posts" class = "post-option">Return to User Posts</a>
       </div>
   </div>
 
 
+
+
   <h2 id = "user-comments-header">Comment Section</h2>
   {% if comments%}
-  
+
+
   {%for comment in comments %}
   <div class = "camphub-comments">
-
     
-    <p><small>Published By: {{comment.users.username}} on {{comment.date_time}}</small></p>
+    <p><small>Published By: 
+      <a href="/camphub/{{comment.comment_user_id}}/profile">{{comment.users.username}}</a> 
+      on {{comment.date_time}}</small></p>
+
+
+      <!-- If NOT comment creator render like/unlike options -->
+      {% if g.user.id != comment.comment_user_id%}
+
+      {% if comment in g.user.ch_comment_likes %}
+      <form action = "/camphub/{{g.user.id}}/update/{{post.id}}/{{comment.id}}/like" method = "POST" >
+        <button class = "my-1 bg-transparent border-0" type = "submit" method = "POST"> 
+          <i class="fa-solid fa-heart"></i>
+        </button>
+
+    </form>
+
+      {% else %}
+
+      <form action = "/camphub/{{g.user.id}}/update/{{post.id}}/{{comment.id}}/like" method = "POST" >
+        <button class = "my-1 bg-transparent border-0" type = "submit"> 
+          <i class="fa-regular fa-heart"></i>
+        </button>
+    </form>
+  {% endif %}
+  {%endif%}
+  <!--   -->
 
     <blockquote>Comment: {{comment.content}}</blockquote>
 
     {% if g.user.id == comment.comment_user_id%}
 
 
-    <!-- the class styling got edit needs to be changed. Update to look like the  -->
     <div class = "ch-comment-option-div">
       <form action="/camphub/edit/{{post.id}}/{{comment.id}}">
         <button class = "comment-opt" type = "submit"> Edit Comment</button>
@@ -54,9 +105,7 @@
       </form>
     </div>
 
-
-
-  {%endif%}
+    {%endif%}
     
 
   </div>
@@ -69,7 +118,7 @@
     <h3>There are no comments, yet!</h3>
 
       <div class = "post-route-options">
-        <a href="/create/comment/{{post.id}}/{{g.user.id}}" class = "post-option">Add Comment</a>
+        <a href="/camphub/create/comment/{{post.id}}/{{g.user.id}}" class = "post-option">Add Comment</a>
       </div>
   </div>
 

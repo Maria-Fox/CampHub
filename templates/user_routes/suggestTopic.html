@@ -4,9 +4,11 @@
 {%block content%} 
 
 <h1 class = "pg-header">Suggest an Article Topic for the Moderator</h1>
+<form action="/camphub/{{g.user.id}}/see/suggestions" class = "mt-2 my-3">
+  <button id="see-suggestions" class = "mt-2">See what has already been suggested</button>
+</form>
 
-
-<form action = "/suggest/topic/{{g.user.id}}" method="post"  id = "suggest-ch-article-form" >
+<form action = "/camphub/{{g.user.id}}/suggest/topic" method="post"  class = "suggest-ch-article-form" >
 
   {{form.hidden_tag()}} 
   {%for field in form if field.widget.input_type != 'hidden'%}

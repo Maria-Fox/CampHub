@@ -59,10 +59,9 @@ Testing: Unit and integration testing completing using Flask Unittest.
 
 Goals to Expand CampHub:
 
-  - Design - update to better implement BootStrap. While the CSS implimentation was a great     refresher, I've noticed Heroku will make slight changes to the CSS design/ layout. 
-  - Create a "Rate Bootcamp" feature which a measuring metrics. Metrics to be determined. 
-  - Create a "Review Bootcamp" feature which a measuring metrics. Metrics to be determined. 
+  - Design - update to better implement BootStrap. While the CSS implimentation was a great refresher I would like to fix the design for better UI/UX experience.
+  - Create a "Rate Bootcamp" feature. Metrics to be determined. 
+  - Create a "Review Bootcamp" feature. Metrics to be determined. 
   - Allow Users to request adding a Bootcamp for ratings/ reviews.
   - Refactor form pages to cut down on repitition.
-  - Include user bio and image for more personalization. 
   - Include secondary API (likely YouTube) to incorporate videos for users to navigate and see videos re: "a day in the life of.. ". Aimed for prospective students to further explore career.

@@ -1,7 +1,8 @@
+from collections import UserList
 from flask import Flask, render_template, redirect, flash, redirect, session, g, abort, request, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 import requests
-from models import db, connect_db, User, Camphub_User_Post, Camphub_Comment, Wordpress_Post_Comment, Suggest_Topic, User_Like
+from models import db, connect_db, User, Camphub_User_Post, Camphub_Comment, Wordpress_Post_Comment, Suggest_Topic, CH_Article_Comment_Like, CH_Post_Like, CH_Comment_Like
 from forms import Signup_Form, Login_Form, Edit_Profile_form, Camphub_Comment_Form, Camphub_User_Post_Form, Wordpress_CH_Article_Comment_Form, Suggest_Topic_Form, Edit_CH_Comment_Form, Edit_Post_Form, Edit_Article_Comment_Form
 from sqlalchemy.exc import IntegrityError
 import json
@@ -30,12 +31,15 @@ CURR_USER_KEY = "curr_user"
 base_url = "https://public-api.wordpress.com/rest/v1.1/sites"
 camphub_site = "camphub2022.wordpress.com"
 site_id = 210640995
-default_profile_image = "https://images.unsplash.com/photo-1504470695779-75300268aa0e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80"
+
+default_profile_img = "https://images.unsplash.com/photo-1617150119111-09bbb85178b0?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MjB8fGNsb3Vkc3xlbnwwfHwwfHw%3D&auto=format&fit=crop&w=400&q=60"
 
 connect_db(app)
 db.create_all()
 
-# # # # # # # # # # # # # # # # # # # # # # # # # #  login/auth
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Confirm registered user assign user to flask global
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 @app.before_request
 def add_user_to_g():
@@ -53,14 +57,17 @@ def complete_login(user):
 
     session[CURR_USER_KEY] = user.id
 
-# # # # # # # # # # # # # # # # # # # # #  Sign up/Signin Routes
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# Routes for users: landing pg, signup, login, editAcct, delete Acct, breakdown, whatIs, 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
 
 @app.route("/")
 def app_home():
     '''Home page- routes user to appropriate page.'''
 
     if g.user:
-        return redirect(f"/home/{g.user.id}")
+        return redirect(f"/camphub/home/{g.user.id}")
 
     return redirect("/camphub")
 
@@ -69,7 +76,7 @@ def landing_page():
     '''Show landing page.'''
 
     if g.user:
-        return redirect(f"/home/{g.user.id}")
+        return redirect(f"/camphub/home/{g.user.id}")
 
     return render_template("landing_page.html")
 
@@ -94,14 +101,16 @@ def signup():
             password = form.password.data
             school_name = form.school_name.data
             field_of_study = form.field_of_study.data
+            bio = form.bio.data or None
+            profile_image_url = form.profile_image_url.data or default_profile_img       
             
             # hashes given password to securly store in db. Return new user instance w/ hashed data. Add to db.session.
-            user = User.register(username, password, school_name, field_of_study)
+            user = User.register(username, password, school_name, field_of_study, bio, profile_image_url)
 
             db.session.commit()
             complete_login(user)
 
-            return redirect(f"/home/{user.id}")
+            return redirect(f"/camphub/home/{user.id}")
 
         except IntegrityError:
             flash("Username already exists- please choose a new username.")
@@ -118,7 +127,7 @@ def login():
 
     if g.user:
         user_id = g.user.id
-        return redirect(f"/home/{user_id}")
+        return redirect(f"/camphub/home/{user_id}")
 
     if form.validate_on_submit():
 
@@ -131,7 +140,7 @@ def login():
                 flash(f"Welcome, {user.username}!")
                 complete_login(user)
 
-                return redirect (f"/home/{user.id}")
+                return redirect (f"/camphub/home/{user.id}")
 
         elif not user:
             flash("Incorrect username or password. Please try again.")
@@ -149,7 +158,7 @@ def logout():
     return redirect("/camphub")
 
 
-@app.route("/edit/profile/<int:user_id>", methods = ["GET", "POST"])
+@app.route("/camphub/edit/profile/<int:user_id>", methods = ["GET", "POST"])
 def edit_profile(user_id):
     '''Allow signed in user to edit profile. Redirecct for unauthorized user.'''
 
@@ -168,21 +177,23 @@ def edit_profile(user_id):
                 user.username = form.username.data 
                 user.school_name = form.school_name.data
                 user.field_of_study = form.field_of_study.data
-                
+                user.bio = form.bio.data
+                user.profile_image_url = form.profile_image_url.data or default_profile_img         
+
                 db.session.add(user)
                 db.session.commit()
 
                 flash("Profile was updated!", "success")
-                return redirect(f"/home/{user_id}")
+                return redirect(f"/camphub/{user_id}/profile")
 
         except:
             flash ("Please check your spelling and try again.")
-            return redirect(f"/edit/profile/{user_id}")
+            return redirect(f"camphub/edit/prodile/{user_id}")
 
     return render_template("user_routes/editProfile.html", form = form, user = user)
 
 
-@app.route("/delete/user/<int:user_id>", methods = ["POST"])
+@app.route("/camphub/delete/user/<int:user_id>", methods = ["POST"])
 def delete_user(user_id):
     '''Delete user account.'''
 
@@ -194,19 +205,19 @@ def delete_user(user_id):
     if g.user.id != user.id:
         return redirect("/camphub")
 
-    try:
-        db.session.delete(user)
-        db.session.commit()
+    # try:
+    db.session.delete(user)
+    db.session.commit()
 
-        flash("Account was deleted!")
-        return redirect("/signup")
+    flash("Deleted account!")
+    return redirect("/signup")
 
-    except:
-        flash("Unsuccessful attempt, please try again.")
-        return redirect(f"/edit/profile/{user_id}")
+    # except:
+    #     flash("Unsuccessful attempt, please try again.")
+    #     return redirect(f"/edit/profile/{user_id}")
 
 
-@app.route("/home/<int:user_id>")
+@app.route("/camphub/home/<int:user_id>")
 def render_homepage(user_id):
     '''Render home page for authorized users. Otherwise, redirect to welcome pg.'''
 
@@ -216,7 +227,7 @@ def render_homepage(user_id):
     user = User.query.get(user_id)
 
     if user != g.user:
-        return redirect(f"/home/{g.user.id}")
+        return redirect(f"/camphub/home/{g.user.id}")
 
     return render_template("user_routes/home.html")
 
@@ -233,12 +244,43 @@ def page_not_found(e):
     return render_template("404.html"), 404
 
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# Social User Aspect to see user profile inclusing bio, posts, comments, likes.
+## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
-# 
-# 
-# Wordpress Routes
-# 
-# 
+@app.route("/camphub/<int:user_id>/view/users")
+def view_all_User(user_id):
+    '''Allow autohrized user to see a list of users.'''
+
+    if not g.user:
+        return redirect("/signup")
+
+    try:
+
+        users = User.query.all()
+
+        return render_template("user_routes/allUsers.html", users = users)
+
+    except:
+        flash("Something went wrong- please try again later.")
+        return redirect("/")
+
+@app.route("/camphub/<int:user_id>/profile")
+def view_given_profile(user_id):
+    '''Allow authorized user to see given user account profile'''
+
+    if not g.user:
+        return redirect("/signup")
+
+    user = User.query.get_or_404(user_id)
+
+    return render_template("/user_routes/userProfile.html", user = user )
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# WordPress Article Routes: View WP Posts/ Comments. CH in-app CRUD Functionality 
+## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
 
 @app.route("/wordpress/articles/all")
 def camphub_posts():
@@ -270,11 +312,13 @@ def view_article_CH_comment(article_id):
         resp = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}")
         article = resp.json()
 
-        replies = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}/replies/")
-        replies = replies.json()
+        replies = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}/replies/").json()
+
         replies = replies["comments"]
 
-        user_comments_on_WP_article = Wordpress_Post_Comment.query.filter_by(wordpress_article_id = article_id).all()
+        replies = sorted(replies, key=lambda d: d['date'])
+
+        user_comments_on_WP_article = Wordpress_Post_Comment.query.filter_by(wordpress_article_id = article_id).order_by(Wordpress_Post_Comment.date_time.desc()).all()
 
         return render_template("wp_in_app_routes/single_article.html", article = article, replies = replies, user_comments_on_WP_article = user_comments_on_WP_article)
 
@@ -284,7 +328,7 @@ def view_article_CH_comment(article_id):
 
 
 
-@app.route("/create/comment/<int:article_id>", methods = ["GET", "POST"])
+@app.route("/camphub/create/comment/<int:article_id>", methods = ["GET", "POST"])
 def create_WP_camphub_comment(article_id):
     '''Create new camphub comment - EXCLUSIVELY ON MODERATOR POSTS.'''
 
@@ -294,7 +338,7 @@ def create_WP_camphub_comment(article_id):
     try:
         resp = requests.get(f"{base_url}/{camphub_site}/posts/{article_id}")
         article = resp.json()
-        article_id =article["ID"]
+        article_id = article["ID"]
         
     except:
         flash("Article does not exist.")
@@ -319,7 +363,7 @@ def create_WP_camphub_comment(article_id):
 
         except:
             flash("Something went wrong- please try again.")
-            return redirect(f"/create/comment/{article_id}")
+            return redirect(f"/camphub/create/comment/{article_id}")
 
 
     return render_template("wp_in_app_routes/new_comment.html", form = form, article = article, article_id = article_id)
@@ -384,15 +428,14 @@ def delete_wordpress_comment(article_id, comment_id):
 
 
 
-# 
-# 
-# Camphub IN-APP ROUTES
-# 
-# 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# CampHub User Post Routes: CRUD functionality for Posts & Comments
+## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 
-# # # # # # # # # # # # # # # # # # # # POSTS SECTION FOR IN-APP  
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+                                                                            # Posts 
 
 @app.route("/camphub/users/posts")
 def view_user_posts():
@@ -401,12 +444,15 @@ def view_user_posts():
     if not g.user:
         return redirect("/")
 
-    all_posts = Camphub_User_Post.query.all()
+    all_posts = Camphub_User_Post.query.order_by(Camphub_User_Post.date_time.desc()).all()
+    user = g.user.id
 
-    return render_template("user_post_routes/all_posts.html", all_posts = all_posts)
+    users_liked_posts = g.user.ch_post_likes
+
+    return render_template("user_post_routes/all_posts.html", all_posts = all_posts, user = user, users_liked_posts = users_liked_posts)
 
 
-@app.route("/view/camphub/<int:post_id>")
+@app.route("/camphub/view/<int:post_id>")
 def view_given_post(post_id):
     '''Display given camphub post to authorized user.'''
 
@@ -416,7 +462,7 @@ def view_given_post(post_id):
 
     post = Camphub_User_Post.query.filter_by(id = post_id).first_or_404()
 
-    comments = Camphub_Comment.query.filter_by(camphub_post_id = post_id).all()
+    comments = Camphub_Comment.query.filter_by(camphub_post_id = post_id).order_by(Camphub_Comment.date_time.desc()).all()
 
     return render_template("user_post_routes/single_post.html", post = post, comments = comments)
 
@@ -480,7 +526,7 @@ def edit_user_post(post_id):
             db.session.commit()
 
             flash("Updated post!")
-            return redirect(f"/view/camphub/{post.id}")
+            return redirect(f"/camphub/view/{post.id}")
         except:
             flash("Something went wrong- please try again.")
             return redirect(f"/camphub/edit/post/{post_id}")
@@ -509,9 +555,9 @@ def delete_post(post_id):
         return redirect("/camphub/users/posts")
 
 
-# # # # # # # # # # # # # # # # #  # # # # # # # COMMENTS SECTION FOR IN-APP 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+                                                                            #Comments
 
-# this is for ALL IN APP comments. 
 @app.route("/camphub/<int:user_id>/comments/all")
 def view_camphub_comments(user_id):
     '''View comments made here on camphub- does not include Wordpress Comments.'''
@@ -526,7 +572,7 @@ def view_camphub_comments(user_id):
     return render_template("user_post_routes/camphub_comments.html", all_comments = all_comments)
 
 
-@app.route("/create/comment/<int:post_id>/<int:user_id>", methods = ["GET", "POST"])
+@app.route("/camphub/create/comment/<int:post_id>/<int:user_id>", methods = ["GET", "POST"])
 def make_post_comment(post_id, user_id):
     '''Allow authorized user to create a camphub (in-app) comment to an existing IN-APP post.'''
 
@@ -551,11 +597,11 @@ def make_post_comment(post_id, user_id):
 
             flash("Created Comment!")
 
-            return redirect(f"/view/camphub/{post_id}")
+            return redirect(f"/camphub/view/{post_id}")
 
         except: 
             flash("Something went wrong - please try again.")
-            return redirect(f"/view/camphub/{post_id}")
+            return redirect(f"/camphub/view/{post_id}")
 
     return render_template("/user_post_routes/new_comment.html", form = form, post = post)
 
@@ -571,7 +617,7 @@ def edit_camphub_comment(post_id, comment_id):
 
     if g.user.id != comment.comment_user_id:
         flash("Unauthorized Access")
-        return redirect(f"/view/camphub/{post_id}")
+        return redirect(f"/camphub/view/{post_id}")
 
     form = Edit_CH_Comment_Form(obj = comment)
 
@@ -584,7 +630,7 @@ def edit_camphub_comment(post_id, comment_id):
             db.session.commit()
 
             flash("Comment updated!")
-            return redirect(f"/view/camphub/{post_id}")
+            return redirect(f"/camphub/view/{post_id}")
         except:
             flash("Something went wrong- please try again.")
             return redirect(f"/camphub/edit/{post_id}/{comment_id}")
@@ -607,16 +653,18 @@ def delete_post_comment(post_id, comment_id):
         db.session.commit()
         flash("Comment deleted!")
 
-        return redirect(f"/view/camphub/{post_id}")
+        return redirect(f"/camphub/view/{post_id}")
 
     except:
         flash("Something went wrong- please try agaib.")
-        return (f"/view/camphub/{post_id}")
+        return (f"/camphub/view/{post_id}")
 
 
-# # # # # # # # # # # # # # # # # # # # # # # # Suggest a Topic 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# Allow a user to suggest an article topic. See existing topics 
+## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
-@app.route("/suggest/topic/<int:user_id>", methods = ["GET", "POST"])
+@app.route("/camphub/<int:user_id>/suggest/topic", methods = ["GET", "POST"])
 def suggest_topic(user_id):
     '''Allow user to suggest a moderator article for discussion. '''
 
@@ -641,10 +689,160 @@ def suggest_topic(user_id):
             db.session.commit()
 
             flash("Suggestion submitted!")
-            return redirect(f"/home/{user_id}")
+            return redirect(f"/camphub/home/{user_id}")
         except:
             flash("Something went wrong- please try again.")
 
     return render_template("user_routes/suggestTopic.html", form = form)
 
 
+@app.route("/camphub/<int:user_id>/see/suggestions")
+def view_all_suggestions(user_id):
+    '''Allow users to see suggested topics.'''
+
+    if not g.user:
+        return redirect("/signup")
+
+    try:
+
+        user = User.query.get_or_404(user_id)
+
+        suggestions = Suggest_Topic.query.all()
+
+        return render_template("/user_routes/allSuggestions.html", suggestions = suggestions)
+
+    except:
+
+        flash("Something went wrong- please try again.")
+        return redirect(f"/camphub/home/{user_id}")
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# User likes : User_Posts, User_Comments
+## # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+@app.route("/camphub/<int:user_id>/update/<int:post_id>/like", methods = ["POST"])
+def update_post_like(user_id, post_id):
+    '''Update user_likes if post is not in current likes. Else, remove from likes.'''
+
+    if not g.user:
+        return redirect("/signup")
+
+    user = User.query.get_or_404(user_id)
+    post_clicked = Camphub_User_Post.query.get_or_404(post_id)
+
+    try: 
+
+        # this is an orm list
+        user_likes = g.user.ch_post_likes
+
+        if post_clicked in user_likes:
+            g.user.ch_post_likes = [like for like in user_likes if like != post_clicked]
+            db.session.commit()
+
+            count = g.user.ch_post_likes.count(user_likes)
+            print("THIS IS THE COUNT++++++")
+            print(count)
+
+            flash("Removed from likes!")
+            return redirect("/camphub/users/posts")
+        else:
+            g.user.ch_post_likes.append(post_clicked)
+            db.session.commit()
+
+            count = g.user.ch_post_likes.count(user_likes)
+            print("THIS IS THE COUNT++++++")
+            print(count)
+
+
+            flash("Added to likes!")
+            return redirect(f"/camphub/view/{post_id}")
+        
+    except:
+
+            flash("Something went wrong- please try again later.")
+            return redirect("/camphub")
+
+
+# like a post_comment
+
+@app.route("/camphub/<int:user_id>/update/<int:post_id>/<int:comment_id>/like", methods = ["POST"])
+def update__comment_like(user_id, post_id, comment_id):
+    '''Update user_likes if post is not in current likes. Else, remove from likes.'''
+
+    if not g.user:
+        return redirect("/signup")
+
+    user = User.query.get_or_404(user_id)
+    post = Camphub_User_Post.query.get_or_404(post_id)
+    comment_clicked = Camphub_Comment.query.get_or_404(comment_id)
+
+    try: 
+
+        # orm list 
+        comment_likes = g.user.ch_comment_likes
+
+        if comment_clicked in comment_likes:
+            g.user.ch_comment_likes = [like for like in comment_likes if like != comment_clicked]
+            db.session.commit()
+
+            print("**********************")
+            print(f"Removing {comment_clicked}")
+            print(comment_likes)
+
+            flash("Removed like!")
+            return redirect(f"/camphub/view/{post_id}")
+        else:
+            g.user.ch_comment_likes.append(comment_clicked)
+            db.session.commit()
+            print("**********************")
+            print(f"Adding {comment_clicked}")
+            print(comment_likes)
+
+            flash("Added like!")
+            return redirect(f"/camphub/view/{post_id}")
+        
+    except:
+
+            flash("Something went wrong- please try again later.")
+            return redirect("/camphub")
+
+@app.route("/wordpress/<int:user_id>/update/<int:comment_id>/like", methods = ["POST"])
+def update_wordpress_comment_like(user_id, comment_id):
+    '''Update user_likes if post is not in current likes. Else, remove from likes.'''
+
+    if not g.user:
+        return redirect("/signup")
+
+    user = User.query.get_or_404(user_id)
+    comment_clicked = Wordpress_Post_Comment.query.get_or_404(comment_id)
+
+    try: 
+
+        # orm list 
+        article_comment_likes = g.user.ch_article_comment_likes
+
+        if comment_clicked in article_comment_likes:
+            g.user.ch_article_comment_likes = [like for like in article_comment_likes if like != comment_clicked]
+            db.session.commit()
+
+            print("**********************")
+            print(f"Removing {comment_clicked}")
+            print(article_comment_likes)
+
+            flash("Removed like!")
+            return redirect("/wordpress/articles/all")
+        else:
+            g.user.ch_article_comment_likes.append(comment_clicked)
+            db.session.commit()
+            print("**********************")
+            print(f"Adding {comment_clicked}")
+            print(article_comment_likes)
+
+            flash("Added like!")
+            return redirect(f"/wordpress/articles/all")
+        
+    except:
+
+            flash("Something went wrong- please try again later.")
+            return redirect("/camphub")

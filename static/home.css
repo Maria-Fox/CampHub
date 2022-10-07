@@ -1,11 +1,5 @@
 /* INCLUDES DIRECTION CSS AS WELL- MARKED BELOW  */
 
-#home-title {
-  text-align: center;
-  margin-top: 40px;
-  color: whitesmoke;
-}
-
 #user-options {
   display: flex;
   flex-direction: column;
@@ -28,8 +22,7 @@
 }
 
 #option {
-  /* rgba(182, 231, 233, 0.767); */
-  background-color: transparent;
+  background-color: #65ACE4;
   border: 2px solid whitesmoke;
   margin-bottom: 50%;
   border-radius: 3px;
@@ -39,22 +32,18 @@
   height: 100px;
   text-align: center;
   margin: 20px;
+  color: #004679;;
+  font-weight: bold;
 }
 
 #option:hover {
   background-color: whitesmoke;
-  color: #2e5563;
+  color: #004679;
 }
 
 #dir-title {
   text-align: center;
   text-decoration: underline;
-}
-
-#direction {
-  margin: auto;
-  text-align: center;
-  margin-top: 70px;
 }
 
 h4,

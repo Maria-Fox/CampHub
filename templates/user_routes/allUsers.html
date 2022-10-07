@@ -1,0 +1,18 @@
+{%extends "base.html"%} {%block title %} <title>All Users</title> {%endblock%}
+<!-- page content here -->
+
+{%block content%} 
+
+<h1 class = "display-3 text-center shadow">CampHub Users</h1>
+<p class="text-center"> To visit a user profile click on a username.</p>
+
+{%for user in users%}
+
+<div class = "border text-center bg-white text-body py-2 my-3 shadow">
+  <a href="/camphub/{{user.id}}/profile" class = "text-body">{{user.username}}</a>
+</div>
+
+{%endfor%}
+
+  <!-- do not touch below -->
+  {%endblock%}

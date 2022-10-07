@@ -1,0 +1,36 @@
+{%extends "base.html"%} {%block title %} <title>All Suggestions</title> {%endblock%}
+<!-- page content here -->
+
+{%block content%} 
+
+<h1 class = "pg-header">Article Suggestions</h1>
+
+<div class = "mb-3">
+    <form action = "/camphub/{{g.user.id}}/suggest/topic" method="get"  class = "border shadow" > 
+      <button class = "suggest-article">Suggest an article</button>
+      </form>
+</div>
+
+{% if suggestions %}
+{%for suggestion in suggestions%}
+<div class = "border shadow mb-2 mt-1">
+  <h2>Topic: {{suggestion.topic}}</h2>
+  <p>Details: {{suggestion.details}}</p>
+</div>
+{%endfor%}
+
+
+{%else%}
+
+<div class = "shadow text-center align-middle">
+  <h2>No suggestions, yet!</h2>
+
+</div>
+
+{% endif %}
+
+
+
+
+  <!-- do not touch below -->
+  {%endblock%}

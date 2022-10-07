@@ -21,7 +21,7 @@ app.config['ETF_CSRF_ENABLED'] = False
 app.config["TESTING"] = True
 
 class WordpressCommentRoutes(TestCase):
-    '''Test camphub comment model. '''
+    '''Test article and comments views. '''
 
     def setUp(self):
         """Create test client, add sample data."""
@@ -29,27 +29,36 @@ class WordpressCommentRoutes(TestCase):
         db.drop_all()
         db.create_all()
 
+        db.drop_all()
+        db.create_all()
+
         user1 = User.register(
-            username = "user1",
+            username= "user1",
             password = "password1",
             school_name = "Springboard",
-            field_of_study = "Software Engineering"
+            field_of_study = "Software Engineering",
+            bio = "This is a test bio for user1",
+            profile_image_url = "https://images.unsplash.com/photo-1509515837298-2c67a3933321?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8bmlnaHQlMjBza3V8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60"
         )
 
         user1.id = 888
 
-        db.session.add(user1)
+        user2 = User.register(username= "user2",
+            password = "password2",
+            school_name = "Springboard",
+            field_of_study = "UX Design",
+            bio = "Bio for user2",
+            profile_image_url = "https://images.unsplash.com/photo-1509515837298-2c67a3933321?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8bmlnaHQlMjBza3V8ZW58MHx8MHx8&auto=format&fit=crop&w=500&q=60"
+        )
+
+        user2.id = 999
+
         db.session.commit()
 
-        self.user1 = user1
+        self.user1= user1
+        self.user2= user2
+
         self.client = app.test_client()
-
-        #             user1_wordpress_comment = Wordpress_Post_Comment(wordpress_article_id = 8, user_id = 888, user_comment = "This would be a comment on the Wordpress article w/ ID 8.")
-
-        # user1_wordpress_comment.id = 6543
-
-        # db.sesssion.add(user1_wordpress_comment)
-        # db.session.commit()
 
     def tearDown(self):
         """Clean up transactions."""
@@ -69,7 +78,7 @@ class WordpressCommentRoutes(TestCase):
             html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
-            self.assertIn('<h1 class = "pg-header">Wordpress Articles</h1>', html)
+            self.assertIn('<h1 class="pg-header">Wordpress Articles</h1>', html)
 
 
     #      #      #      #      #      #      #      #      #      # 
@@ -105,7 +114,7 @@ class WordpressCommentRoutes(TestCase):
             html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
-            self.assertIn('<h1 class = "pg-header">Wordpress Articles</h1>', html)
+            self.assertIn('<h1 class="pg-header">Wordpress Articles</h1>', html)
 
 
     #      #      #      #      #      #      #      #      #      # 
@@ -120,7 +129,7 @@ class WordpressCommentRoutes(TestCase):
     #         # hard coding article_id as 8. See tests/models/test_wordpress_post_comments.py for further details.
 
     #         article = c.get(f"{base_url}/{camphub_site}/posts/8")
-    #         resp = c.post("create/comment/8", data = {"user_id": self.user1.id, "wordpress_article_id": 8, "user_comment": "This comment is being made by user 1."}, follow_redirects = True)
+    #         resp = c.post("camphub/create/comment/8", data = {"user_id": self.user1.id, "wordpress_article_id": 8, "user_comment": "This comment is being made by user 1."}, follow_redirects = True)
 
     #         html = resp.get_data(as_text = True)
 

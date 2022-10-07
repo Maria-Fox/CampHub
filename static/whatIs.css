@@ -19,7 +19,7 @@ a:active {
 }
 
 a:hover {
-  color: antiquewhite;
+  color: #97C8ED;
 }
 
 ul {
@@ -49,5 +49,5 @@ ul {
 
 .bd-link:hover {
   background-color: whitesmoke;
-  color: #2e5563;
+  color: #004679;
 }

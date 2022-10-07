@@ -1,0 +1,223 @@
+{%extends "base.html"%} {%block title %} <title>{{user.username}}'s' Profile</title> {%endblock%}
+<!-- page content here -->
+
+{%block content%} 
+
+
+<div class = "shadow px-3 py-2 mb-4 mt-4 user-profile-div">
+
+  <img src="{{user.profile_image_url}}" alt="{{user.username}}'s profile picture" class = "img-thumbnail rounded-circle float-start profile-pic" style = "height: 150px">
+
+    <h1>{{user.username}}</h1>
+
+    <!-- allow auth user to edit profile -->
+
+    {% if g.user.id == user.id%}
+    <div class = "float-*-end">
+      <form action="/camphub/edit/profile/{{g.user.id}}" >
+        <button class = "rounded-2 bg-transparent text-white my-4 ms-4 py-3">
+          Edit Profile
+        </button>
+      </form>
+    </div>
+    {% endif %}
+
+
+    <h3>Bio:</h3>
+
+      {% if user.bio %}
+      <div>
+        <p>{{user.bio}}</p>
+      </div>
+
+      {% else%} 
+      <div>
+        <p>User does not have a bio.</p>
+      </div>
+      {%endif%}
+
+      <div class = "d-flex text-center">
+
+        <div class = "border text-center pt-2 mx-2 px-2">
+          <h6 >CampHub Post Likes</h6>
+              <p class = "mt-4 mx-4">{{ g.user.ch_post_likes | length }}</p>
+        </div>
+        
+        <div class = "border text-center pt-2 mx-2 px-2">
+          <h6>CampHub Comment Likes</h6>
+              <p  class = "mt-4 mx-4">{{ g.user.ch_comment_likes | length }}</p>
+        </div>
+
+        <div class = "border text-center pt-2 mx-2 px-2">
+        <h6>WordPress Article Comment Likes</h6>
+            <p class = "mt-4 mx-4">{{ g.user.ch_article_comment_likes | length }}</p>
+        </div>
+
+      </div>
+    
+
+
+</div>
+
+
+<div>
+  <h2>Posts</h2>
+  
+  {% if user.posts%}
+
+  {% for post in user.posts%}
+  <div class = "border shadow px-3 py-2 mb-4 user-profile-div">
+
+      <a href="/camphub/view/{{post.id}}"> <h3>{{post.title}}</h3> </a>
+        <small>{{post.date_time}}</small>
+
+      <!-- If not post creator render like/unlike options -->
+      {% if g.user.id != post.author_id%}
+
+        <!-- NO MATTER WHAT IT FALLS UNDER THE IF NOT CONDITIONAL. DB IS UPDATING CORRECTLY. -->
+
+        {% if post in g.user.ch_post_likes %}
+        <form action = "/camphub/{{g.user.id}}/update/{{post.id}}/like" method = "POST" >
+          <button class = "my-1 bg-transparent border-0" type = "submit" method = "POST"> 
+            <i class="fa-solid fa-heart"></i>
+          </button>
+
+        </form>
+
+        {% else %}
+
+        <form action = "/camphub/{{g.user.id}}/update/{{post.id}}/like" method = "POST" >
+        <!-- if the user DOES like the post show this -->
+          <button class = "my-1 bg-transparent border-0" type = "submit"> 
+            <i class="fa-regular fa-heart"></i>
+          </button>
+        </form>
+        {% endif %}
+
+      {%endif%}       
+
+      <!-- for all users -->
+
+      <p>{{post.content}}</p>
+
+      <div>
+        <form action="/camphub/create/comment/{{post.id}}/{{g.user.id}}" method = "get">
+          <button type = "submit" class = "bg-white text-dark ">Add Comment</button>
+        </form>
+      </div>
+
+  </div>
+  {%endfor%}
+</div>
+
+{%else%}
+
+<div class = "border shadow px-3 py-2 mb-4 user-profile-div">
+  <h3>No posts, yet!</h3>
+</div>
+
+{%endif%}
+
+
+<div >
+  <h2>CampHub Post Comments</h2>
+
+  {% if user.comments%}
+
+  {% for comment in user.comments%}
+  <div class = "border shadow px-3 py-2 mb-4 user-profile-div">
+
+      <small>{{comment.date_time}}</small>
+
+            <p>Comment made on post:
+              <a href="/camphub/view/{{comment.camphub_post_id}}">{{comment.posts.title}}</a>
+            </p>
+
+          <!-- If NOT comment creator render like/unlike options -->
+          {% if g.user.id != comment.comment_user_id%}
+
+          {% if comment in g.user.ch_comment_likes %}
+
+          <form action = "/camphub/{{g.user.id}}/update/{{comment.camphub_post_id}}/{{comment.id}}/like" method = "POST" >
+            <button class = "my-1 bg-transparent border-0" type = "submit" method = "POST"> 
+              <i class="fa-solid fa-heart"></i>
+            </button>
+          </form>
+
+          {% else %}
+
+          <form action = "/camphub/{{g.user.id}}/update/{{comment.camphub_post_id}}/{{comment.id}}/like" method = "POST" >
+            <button class = "my-1 bg-transparent border-0" type = "submit"> 
+              <i class="fa-regular fa-heart"></i>
+            </button>
+          </form>
+          {% endif %}
+          {%endif%}
+
+
+
+        <!-- if not comment creator  -->
+
+        <p>{{comment.content}}</p>
+  </div>
+  {%endfor%}
+</div>
+
+{%else%}
+
+<div class = "border shadow px-3 py-2 mb-4 user-profile-div">
+  <h3>No comments, yet!</h3>
+</div>
+
+{%endif%}
+
+
+
+<div >
+  <h2>WordPress Comments</h2>
+
+  {% if user.wordpress_comments%}
+
+  {% for comment in user.wordpress_comments%}
+  <div class = "border shadow px-3 py-2 mb-4 user-profile-div">
+      <small>{{comment.date_time}}</small>
+
+            <p>Comment made on Article ID: {{comment.wordpress_article_id}}</p>
+
+              <!-- If NOT comment creator render like/unlike options -->
+              {% if g.user.id != comment.user_id%}
+
+              {% if comment in g.user.ch_article_comment_likes %}
+              <form action = "/wordpress/{{g.user.id}}/update/{{comment.id}}/like" method = "POST" >
+                <button class = "my-1 bg-transparent border-0" type = "submit" method = "POST"> 
+                  <i class="fa-solid fa-heart"></i>
+                </button>
+
+              </form>
+
+              {% else %}
+
+              <form action = "/wordpress/{{g.user.id}}/update/{{comment.id}}/like" method = "POST" >
+                <button class = "my-1 bg-transparent border-0" type = "submit"> 
+                  <i class="fa-regular fa-heart"></i>
+                </button>
+              </form>
+              {% endif %}
+              {%endif%} 
+
+        <p>{{comment.user_comment}}</p>
+  </div>
+  {%endfor%}
+</div>
+
+{%else%}
+
+<div class = "border shadow px-3 py-2 mb-4 user-profile-div">
+  <h3>No comments, yet!</h3>
+</div>
+
+{%endif%}
+
+
+  <!-- do not touch below -->
+{%endblock%}

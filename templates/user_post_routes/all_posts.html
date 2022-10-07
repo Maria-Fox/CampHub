@@ -12,40 +12,69 @@
     </div>
 
 {%if all_posts%}
-{% for post in all_posts%}
-<div class = "user-post">
+  {% for post in all_posts%}
+  <div class = "user-post shadow">
+    
+    <h2><a href="/camphub/view/{{post.id}}">Post: {{post.title}}</a></h2>
+
+    <!-- If post creator render edit and delete options -->
+
+
+    {% if g.user.id == post.author_id%}
+
+      <form action="/camphub/edit/post/{{post.id}}", method = "get">
+        <button class = "edit-button"> Edit Post</button>
+      </form>
+
+      <form
+          action="/camphub/delete/post/{{post.id}}"
+          method="post"
+        >
+          <button class="delete-button my-1">
+            Delete Post <i class="fa fa-trash" aria-hidden="true"></i>
+          </button>
+      </form>
+
+    {%endif%}
+
   
-  <h2><a href="/view/camphub/{{post.id}}">Post: {{post.title}}</a></h2>
+    <!-- If not post creator render like/unlike options -->
+    {% if g.user.id != post.author_id%}
 
-  {% if g.user.id == post.author_id%}
+        <!-- NO MATTER WHAT IT FALLS UNDER THE IF NOT CONDITIONAL. DB IS UPDATING CORRECTLY. -->
 
-    <form action="/camphub/edit/post/{{post.id}}", method = "get">
-      <button class = "edit-button"> Edit Post</button>
-    </form>
+        {% if post in g.user.ch_post_likes %}
+        <form action = "/camphub/{{g.user.id}}/update/{{post.id}}/like" method = "POST" >
+          <button class = "my-1 bg-transparent border-0" type = "submit" method = "POST"> 
+            <i class="fa-solid fa-heart"></i>
+          </button>
+
+      </form>
+
+        {% else %}
+
+        <form action = "/camphub/{{g.user.id}}/update/{{post.id}}/like" method = "POST" >
+        <!-- if the user DOES like the post show this -->
+          <button class = "my-1 bg-transparent border-0" type = "submit"> 
+            <i class="fa-regular fa-heart"></i>
+          </button>
+      </form>
+      {% endif %}
+
+    {%endif%}
 
 
-    <form
-        action="/camphub/delete/post/{{post.id}}"
-        method="post"
-      >
-        <button class="delete-button">
-          Delete Post <i class="fa fa-trash" aria-hidden="true"></i>
-        </button>
-    </form>
-
+    <p><small>Published by: 
+      <a href="/camphub/{{post.author_id}}/profile">{{post.users.username}} </a>
+      on {{post.date_time}}</small></p>
   
-  {%endif%}
-
-
-    <p><small>Published by: {{post.users.username}} on {{post.date_time}}</small></p>
-  
-  
-      <blockquote>{{post.content}}</blockquote>
+      <p>Content:</p>
+        <blockquote>{{post.content}}</blockquote>
   
   <!-- ON USER POST, NOT MODERATOR POST -->
     <div class = "post-route-options">
-      <a href="/create/comment/{{post.id}}/{{g.user.id}}" class = "post-option">Add Comment</a>
-      <a href="/view/camphub/{{post.id}}", class = "post-option">See Comments</a>
+      <a href="/camphub/create/comment/{{post.id}}/{{g.user.id}}" class = "post-option">Add Comment</a>
+      <a href="/camphub/view/{{post.id}}", class = "post-option">See Comments</a>
     </div>  
 
 

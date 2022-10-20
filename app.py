@@ -558,18 +558,18 @@ def delete_post(post_id):
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
                                                                             #Comments
 
-@app.route("/camphub/<int:user_id>/comments/all")
-def view_camphub_comments(user_id):
-    '''View comments made here on camphub- does not include Wordpress Comments.'''
+# @app.route("/camphub/<int:user_id>/comments/all")
+# def view_camphub_comments(user_id):
+#     '''View comments made here on camphub- does not include Wordpress Comments.'''
 
-    if not g.user:
-        return redirect("/")
+#     if not g.user:
+#         return redirect("/")
 
-    user = User.query.get_or_404(user_id)
+#     user = User.query.get_or_404(user_id)
 
-    all_comments = Camphub_Comment.query.all()
+#     all_comments = Camphub_Comment.query.all()
 
-    return render_template("user_post_routes/camphub_comments.html", all_comments = all_comments)
+#     return render_template("user_post_routes/camphub_comments.html", all_comments = all_comments)
 
 
 @app.route("/camphub/create/comment/<int:post_id>/<int:user_id>", methods = ["GET", "POST"])

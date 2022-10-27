@@ -166,6 +166,11 @@ def edit_profile(user_id):
         redirect("/signup")
 
     user = User.query.get_or_404(user_id)
+
+    if(g.user.id != user.id):
+        flash("Unauthorized access.")
+        return redirect(f"/camphub/home/{g.user.id}")
+
     form = Edit_Profile_form(obj = user)
 
     if form.validate_on_submit():

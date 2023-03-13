@@ -2,7 +2,7 @@ from collections import UserList
 from flask import Flask, render_template, redirect, flash, redirect, session, g, abort, request, jsonify
 from flask_debugtoolbar import DebugToolbarExtension
 import requests
-from models import db, connect_db, User, Camphub_User_Post, Camphub_Comment, Wordpress_Post_Comment, Suggest_Topic, CH_Article_Comment_Like, CH_Post_Like, CH_Comment_Like
+from models import db, connect_db, User, Camphub_User_Post, Camphub_Comment, Wordpress_Post_Comment, Suggest_Topic
 from forms import Signup_Form, Login_Form, Edit_Profile_form, Camphub_Comment_Form, Camphub_User_Post_Form, Wordpress_CH_Article_Comment_Form, Suggest_Topic_Form, Edit_CH_Comment_Form, Edit_Post_Form, Edit_Article_Comment_Form
 from sqlalchemy.exc import IntegrityError
 import json
@@ -11,8 +11,7 @@ import os
 
 app = Flask(__name__)
 
-uri = app.config['SQLALCHEMY_DATABASE_URI'] = (
-    os.environ.get('DATABASE_URL', 'postgresql:///camphub'))
+uri = os.environ.get('DATABASE_URL', 'postgresql:///camphub')
 
 if uri.startswith("postgres://"):
     uri = uri.replace("postgres://", "postgresql://", 1)

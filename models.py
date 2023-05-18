@@ -161,7 +161,6 @@ class Suggest_Topic(db.Model):
     users = db.relationship("User")
 
 
-# POSSIBLE FUTURE ADDITION
 
 class CH_Post_Like(db.Model):
     """Holds CampHub post likes."""
